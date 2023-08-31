@@ -4,7 +4,9 @@ import {connect} from "react-redux";
 import {
     getSetting
 } from "./redux/actions";
-import Backup from "./components/base/Backup";
+
+import Backup from "./components/Settings/Backup";
+import Whatsapp from "./components/Settings/Whatsapp";
 
 const DASHBOARD = '/';
 
@@ -22,6 +24,7 @@ const AppRouter = (props) => {
                         <Route path={DASHBOARD}>
                             <Route index path="/" element={<Backup />} />
                             <Route path="/backup" element={<Backup />} />
+                            <Route path="/whatsapp" element={<Whatsapp />} />
                         </Route>
                     </Routes>
                 </main>
