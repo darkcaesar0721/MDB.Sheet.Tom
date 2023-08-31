@@ -8,12 +8,12 @@ require('./database/client');
 const express = require('express');
 const app = express();
 
+const router = require('./routes');
+
+app.use('/api', router)
+
 // process port
 const port = process.env.PORT;
-
-app.post('/get_data', function(req, res) {
-
-})
 
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
