@@ -11,6 +11,10 @@ const app = express();
 // process port
 const port = process.env.PORT;
 
+app.post('/get_data', function(req, res) {
+
+})
+
 app.listen(port, () => {
     console.log(`App listening on port ${port}`);
 });

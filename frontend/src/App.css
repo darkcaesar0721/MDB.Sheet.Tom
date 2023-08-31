@@ -1,0 +1,239 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+label, span, div, input {
+  font-family: Arial !important;
+}
+
+.upload-preview label, .upload-preview span{
+  font-size: 0.8rem !important;
+}
+
+.upload-status-list .ant-table-tbody{
+  padding-left: 0.3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 0.8rem;
+  border-bottom: solid 2px #d1d1d1 !important;
+  border-right: solid 1px #d1d1d1 !important;
+}
+.upload-status-list .ant-table-tbody > tr > td{
+  padding-left: 0.3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 0.8rem;
+  border-bottom: solid 1px #d1d1d1 !important;
+  border-right: solid 1px #d1d1d1 !important;
+}
+
+.upload-status-list .ant-table-tbody > tr > td > button span{
+  font-size: 0.8rem;
+}
+
+.upload-status-list .ant-table-thead > tr > th{
+  padding-left: 0.3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 0.85rem;
+  border-bottom: solid 1px #d1d1d1 !important;
+  border-right: solid 1px #d1d1d1 !important;
+}
+
+.antd-custom-table .ant-table-tbody{
+  padding-left: 0.3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 0.7rem;
+  border-bottom: solid 2px #d1d1d1 !important;
+  border-right: solid 1px #d1d1d1 !important;
+}
+.antd-custom-table .ant-table-tbody > tr > td{
+  padding-left: 0.3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 0.7rem;
+  border-bottom: solid 1px #d1d1d1 !important;
+  border-right: solid 1px #d1d1d1 !important;
+  font-weight: bolder;
+}
+.antd-custom-table .ant-table-tbody > tr > td > input{
+  font-size: 0.7rem;
+}
+
+.antd-custom-table .ant-table-tbody > tr > td > span[role=img]{
+  padding-top: 0.3rem;
+  font-size: 1.5rem;
+}
+
+.antd-custom-table .ant-table-tbody > tr > td > button span{
+  font-size: 0.7rem;
+}
+
+.antd-custom-table .ant-table-tbody > tr > td > button span{
+  font-size: 0.7rem;
+}
+
+.antd-custom-table .ant-table-thead > tr > th{
+  padding-left: 0.3rem !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 0.75rem;
+  border-bottom: solid 1px #d1d1d1 !important;
+  border-right: solid 1px #d1d1d1 !important;
+}
+
+.antd-custom-table .ant-table-tbody > tr > td button{
+  padding: 0.3rem !important;
+}
+
+.antd-custom-table .ant-checkbox-wrapper {
+  width: 20px !important;
+  height: 20px !important;
+  font-size: 10px !important;
+}
+
+.antd-custom-table .ant-radio-button-wrapper {
+  height: 20px;
+  line-height: 20px;
+}
+
+.ant-modal-content .ant-form-item {
+  margin-bottom: 0 !important;
+  border-bottom: 0 !important;
+}
+
+.ant-breadcrumb-link .selected {
+  color: #1677ff;
+}
+
+.group-setting-form .ant-form-item {
+  margin-bottom: 0.5rem;
+}
+
+.ant-form-item-control-input-content span{
+  font-family: bold;
+  font-size: 1rem;
+}
+
+.campaign_yellow {
+  background-color: yellow !important;
+}
+.ant-table-row-selected.campaign_yellow {
+  background-color: yellow !important;
+}
+
+.ant-table-tbody >tr.campaign_yellow >td.ant-table-cell-row-hover {
+  background-color: yellow !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_yellow >td {
+  background-color: yellow !important;
+}
+
+.campaign_green {
+  background-color: lightgreen !important;
+}
+
+.ant-table-row-selected.campaign_green {
+  background-color: lightgreen !important;
+}
+
+.ant-table-tbody >tr.campaign_green >td.ant-table-cell-row-hover {
+  background-color: lightgreen !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_green >td {
+  background-color: lightgreen !important;
+}
+
+.campaign_pink {
+  background-color: pink !important;
+}
+
+.ant-table-row-selected.campaign_pink {
+  background-color: pink !important;
+}
+
+.ant-table-tbody >tr.campaign_pink >td.ant-table-cell-row-hover {
+  background-color: pink !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_pink >td {
+  background-color: pink !important;
+}
+
+.campaign_red {
+  background-color: indianred !important;
+}
+
+.ant-table-row-selected.campaign_red {
+  background-color: indianred !important;
+}
+
+.ant-table-tbody >tr.campaign_red >td.ant-table-cell-row-hover {
+  background-color: indianred !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_red >td {
+  background-color: indianred !important;
+}
+
+.antd-custom-table .ant-radio-button-wrapper {
+  border-radius: 50%;
+  padding-inline: 5px;
+  font-size: 10px;
+}
+
+.antd-custom-table .ant-radio-button-wrapper::before {
+  width: 0;
+}
+
+.antd-custom-table .ant-radio-button-wrapper-checked {
+  border-color: white;
+  color: white;
+  background: #1677ff;
+}
+
+.antd-checked-custom-table .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner {
+  background-color: #1677ff;
+}
+
+.antd-checked-custom-table .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner:after {
+  background-color: white;
+}
