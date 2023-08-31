@@ -1,10 +1,4 @@
 import { combineReducers } from "redux";
-import mdb from "./mdb";
-import schedule from "./schedule";
-import campaigns from "./campaigns";
-import groups from "./groups";
-import backup from "./backup";
-import upload from "./upload";
-import whatsapp from "./whatsapp";
+import setting from "./setting";
 
-export default combineReducers({ mdb, schedule, campaigns, groups, backup, upload, whatsapp});
+export default combineReducers({ setting });
