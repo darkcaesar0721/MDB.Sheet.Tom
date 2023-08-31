@@ -4,6 +4,7 @@ import {connect} from "react-redux";
 import {
     getSetting
 } from "./redux/actions";
+import Backup from "./components/base/Backup";
 
 const DASHBOARD = '/';
 
@@ -19,6 +20,8 @@ const AppRouter = (props) => {
                 <main>
                     <Routes>
                         <Route path={DASHBOARD}>
+                            <Route index path="/" element={<Backup />} />
+                            <Route path="/backup" element={<Backup />} />
                         </Route>
                     </Routes>
                 </main>

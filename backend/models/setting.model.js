@@ -1,0 +1,17 @@
+const mongoose = require("mongoose");
+
+const settingSchema = new mongoose.Schema({
+    backup_path: String,
+    mdb_path: String,
+    schedule_path: String,
+    whatsapp: {
+        global_send_status: Boolean,
+        default_message_template: String,
+        ultramsg_instance_id: String,
+        ultramsg_token: String
+    }
+});
+
+const Settings = mongoose.model("Setting", settingSchema);
+
+module.exports = Settings;
