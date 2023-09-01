@@ -3,7 +3,7 @@ import {Routes, Route, HashRouter} from 'react-router-dom';
 import {connect} from "react-redux";
 import {
     getSetting
-} from "./redux/actions";
+} from "./redux/actions/setting";
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";

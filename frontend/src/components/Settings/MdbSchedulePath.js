@@ -1,7 +1,7 @@
 import { Input, Col, Row } from 'antd';
 import {useEffect, useState} from "react";
 import {connect} from "react-redux";
-import {updateSetting} from "../../redux/actions";
+import {updateSetting} from "../../redux/actions/setting";
 
 function MdbSchedulePath(props) {
     const [mdbPath, setMdbPath] = useState('');

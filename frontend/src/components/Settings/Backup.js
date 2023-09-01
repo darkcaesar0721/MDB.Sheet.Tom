@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import MenuList from "../MenuList";
 import {
     updateSetting, backupDB
-} from "../../redux/actions";
+} from "../../redux/actions/setting";
 
 const Backup = (props) => {
     const [loading, setLoading] = useState(false);

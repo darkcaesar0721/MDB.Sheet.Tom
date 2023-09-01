@@ -5,7 +5,7 @@ import {CheckOutlined, CloseOutlined} from "@ant-design/icons";
 
 import MdbSchedulePath from "./MdbSchedulePath";
 import MenuList from "../MenuList";
-import {updateSetting} from "../../redux/actions";
+import {updateSetting} from "../../redux/actions/setting";
 
 const formItemLayout = {
     labelCol: {
