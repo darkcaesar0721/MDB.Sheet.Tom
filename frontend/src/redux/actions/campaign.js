@@ -1,7 +1,7 @@
 import axios from "axios";
 import {
     INIT_CAMPAIGN_DATA,
-    INSERT_CAMPAIGN_DATA,
+    CREATE_CAMPAIGN_DATA,
     UPDATE_CAMPAIGN_DATA,
     DELETE_CAMPAIGN_DATA
 } from "../actionTypes";
@@ -16,10 +16,10 @@ export const getCampaigns = (callback = function() {}) => async (dispatch) => {
     callback();
 }
 
-export const insertCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
+export const createCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
     const result = await axios.post(API + '/campaign', campaign);
     dispatch({
-        type: INSERT_CAMPAIGN_DATA,
+        type: CREATE_CAMPAIGN_DATA,
         data: result.data
     });
     callback();
@@ -41,4 +41,9 @@ export const deleteCampaign = (campaign = {}, callback = function() {}) => async
         data: result.data
     });
     callback();
+}
+
+export const getQueryColumns = (query = '', callback = function() {}) => async (dispatch) => {
+    const result = await axios.post(API + '/campaign/get_query_column', {query: query});
+    callback(result.data);
 }

@@ -1,6 +1,6 @@
 import {
     INIT_CAMPAIGN_DATA,
-    INSERT_CAMPAIGN_DATA,
+    CREATE_CAMPAIGN_DATA,
     UPDATE_CAMPAIGN_DATA,
     DELETE_CAMPAIGN_DATA,
 } from "../actionTypes";
@@ -15,9 +15,9 @@ function campaign(state = initialState, action) {
         {
             return Object.assign({...state}, {data: action.data})
         }
-        case INSERT_CAMPAIGN_DATA:
+        case CREATE_CAMPAIGN_DATA:
         {
-            return Object.assign({...state}, {data: [...state, ...action.data]})
+            return Object.assign({...state}, {data: [...state.data, {...action.data}]})
         }
         case UPDATE_CAMPAIGN_DATA:
         {

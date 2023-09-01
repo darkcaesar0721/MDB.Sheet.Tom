@@ -37,9 +37,14 @@ function CampaignList(props) {
                 width: 30,
                 fixed: 'left',
                 render: (_, record) => {
+                    let index = -1;
+                    props.campaigns.data.forEach((c, i) => {
+                        if (c._id === record._id) index = i;
+                    });
+
                     return (
                         <>
-                            <span>{(record.index + 1)}</span>
+                            <span>{(index + 1)}</span>
                         </>
                     )
                 }

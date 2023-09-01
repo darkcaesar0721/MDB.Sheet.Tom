@@ -5,7 +5,7 @@ const campaignSchema = new mongoose.Schema({
     schedule: String,
     sheet_urls: [],
     columns: [{
-        db_name: String,
+        mdb_name: String,
         sheet_name: String,
         is_display: {
             type: Boolean,
