@@ -7,19 +7,18 @@ import {
     Input,
     message,
     Modal,
-    Row,
-    Spin, Switch, Table,
+    Row, Spin, Table,
 } from "antd";
-import { MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
-import { useNavigate } from 'react-router-dom';
-import dragula from "dragula";
+import {useNavigate, useParams} from 'react-router-dom';
 import "dragula/dist/dragula.css";
+import {MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
+import dragula from "dragula";
 
+import {updateCampaign} from "../../redux/actions/campaign";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
-import {createCampaign, getQueryColumns} from "../../redux/actions/campaign";
 
 const layout = {
     labelCol: {
@@ -50,19 +49,18 @@ const formItemLayoutWithOutLabel = {
 
 const getIndexInParent = (el) => Array.from(el.parentNode.children).indexOf(el);
 
-function CampaignAdd(props) {
+function CampaignEdit(props) {
     const [form] = Form.useForm();
     const [messageApi, contextHolder] = message.useMessage();
-    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [columns, setColumns] = useState([]);
-    const [buttonState, setButtonState] = useState('column');
     const [tblColumns, setTblColumns] = useState([]);
 
+    const {id} = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (buttonState === 'campaign') {
+        if (open === true) {
             let start;
             let end;
             const container = document.querySelector(".ant-table-tbody");
@@ -78,14 +76,7 @@ function CampaignAdd(props) {
                 handleReorder(start, end);
             });
         }
-    }, [buttonState]);
-
-    useEffect(function() {
-        let data = {
-            sheet_urls: [''],
-        };
-        form.setFieldsValue(data);
-    }, []);
+    }, [open]);
 
     useEffect(function() {
         setTblColumns([
@@ -96,8 +87,10 @@ function CampaignAdd(props) {
                 render: (_, r) => {
                     let index = -1;
                     columns.forEach((c, i) => {
-                        if (c.mdb_name === r.mdb_name) index = i;
-                    });
+                        if (c._id === r._id) {
+                            index = i; return false;
+                        }
+                    })
                     return (
                         <>
                             <span>{(index + 1)}</span>
@@ -123,46 +116,32 @@ function CampaignAdd(props) {
                 dataIndex: 'sheet_name',
                 key: 'sheet_name',
                 render: (_, c) => {
-                    return c.mdb_name === 'Phone' ? c.mdb_name : <Input readOnly={!c.is_display} onChange={(e) => {handleColumnSheetNameChange(e, c)}} value={c.sheet_name}/>
+                    return c.mdb_name === 'Phone' ? c.mdb_name : <Input readOnly={!c.is_display} onChange={(e) => {handleColumnSheetNameChange(e, c)}} value={c.sheet_name}/>;
                 }
             },
         ])
     }, [columns]);
 
-    const getQueryColumns = function(query) {
-        setLoading(true);
+    useEffect(function() {
+        if (props.campaigns.data.length > 0) {
+            let selectedCampaign = props.campaigns.data.filter(c => c._id === id)[0];
+            setColumns(selectedCampaign.columns.map(c => {
+                const column = c;
+                column.key = c._id;
+                return column;
+            }));
 
-        props.getQueryColumns(query, function(result) {
-             setLoading(false);
-
-             if (result.status === 'error') {
-                 messageApi.error(result.description);
-                 return false;
-             } else {
-                 let columns = [];
-                 for (const c of result) {
-                     if (c.name.toLowerCase() === 'systemcreatedate' || c.name.toLowerCase() === 'stop') break;
-
-                     columns.push({key: c.name, mdb_name: c.name, sheet_name: c.name, is_display: true});
-                 }
-                 setColumns(columns);
-                 setOpen(true);
-                 setButtonState('campaign');
-             }
-        });
-    }
+            form.setFieldsValue(selectedCampaign);
+        }
+    }, [props.campaigns.data]);
 
     const handleSubmit = function(form) {
-        if (buttonState === 'column') {
-            getQueryColumns(form.query);
-            return;
-        }
-
         if (validation()) {
-            form.columns = columns;
+            const currentCampaign = props.campaigns.data.filter(c => c._id === id)[0];
 
-            props.createCampaign(form, function() {
-                messageApi.success('create success');
+            const campaign = Object.assign({...currentCampaign}, {columns: columns, sheet_urls: form.sheet_urls, schedule: form.schedule})
+            props.updateCampaign(campaign, function() {
+                messageApi.success('update success');
                 setTimeout(function() {
                     navigate('/campaigns');
                 }, 1000);
@@ -170,12 +149,11 @@ function CampaignAdd(props) {
         }
     }
 
-    const validation = function() {
+    const validation = () => {
         if (columns.length === 0) {
             messageApi.warning('Please custom column! Currently nothing columns.');
             return false;
         }
-
         return true;
     }
 
@@ -208,20 +186,20 @@ function CampaignAdd(props) {
             const newState = [...oldState];
             const item = newState.splice(dragIndex, 1)[0];
             newState.splice(draggedIndex, 0, item);
-            return newState.map((s, i) => {return Object.assign(s, {index: i})});
+            return newState;
         });
-    };
+    }
 
     return (
-        <Spin spinning={loading} tip="CHECKING QUERY AND GET COLUMN LIST BASED ON QUERY ..." delay={300}>
+        <>
             {contextHolder}
             <MenuList
                 currentPage="campaign"
             />
             <Path/>
-            <Row style={{marginTop: '1rem'}}>
+            <Row style={{marginTop: '2rem'}}>
                 <Col span={20} offset={2}>
-                    <Divider>CAMPAIGN ADD FORM</Divider>
+                    <Divider>CAMPAIGN EDIT FORM</Divider>
                     <Form
                         {...layout}
                         name="campaign_add_form"
@@ -238,7 +216,7 @@ function CampaignAdd(props) {
                                 },
                             ]}
                         >
-                            <Input />
+                            <Input readOnly />
                         </Form.Item>
                         <Form.List
                             name="sheet_urls"
@@ -326,13 +304,11 @@ function CampaignAdd(props) {
                         <Form.Item
                             wrapperCol={{
                                 ...layout.wrapperCol,
-                                offset: 19,
+                                offset: 18,
                             }}
                         >
                             <Button type="primary" htmlType="submit">
-                                {
-                                    buttonState === 'column' ? 'Get Column List' : 'Add Campaign'
-                                }
+                                Update Campaign
                             </Button>
                             <Button type="dashed" href="#/campaigns" style={{marginLeft: 5}}>
                                 Cancel
@@ -357,15 +333,15 @@ function CampaignAdd(props) {
                     </Modal>
                 </Col>
             </Row>
-        </Spin>
+        </>
     );
 }
 
 const mapStateToProps = state => {
-    return { };
+    return { campaigns: state.campaigns };
 };
 
 export default connect(
     mapStateToProps,
-    { createCampaign, getQueryColumns }
-)(CampaignAdd);
+    { updateCampaign }
+)(CampaignEdit);

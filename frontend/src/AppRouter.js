@@ -12,6 +12,7 @@ import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
 import CampaignList from "./components/Campaign/CampaignList";
 import CampaignAdd from "./components/Campaign/CampaignAdd";
+import CampaignEdit from "./components/Campaign/CampaignEdit";
 
 const DASHBOARD = '/';
 
@@ -33,6 +34,7 @@ const AppRouter = (props) => {
                             <Route path="/whatsapp" element={<Whatsapp />} />
                             <Route path="/campaigns" element={<CampaignList />} />
                             <Route path="/campaigns/add" element={<CampaignAdd />} />
+                            <Route path="/campaigns/:id" element={<CampaignEdit />} />
                         </Route>
                     </Routes>
                 </main>

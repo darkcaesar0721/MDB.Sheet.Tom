@@ -18,8 +18,10 @@ router.post('/', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-    Campaigns.findByIdAndRemove(req.params.id, req.body, (err, updatedCampaign) => {
-        res.json(updatedCampaign);
+    Campaigns.findByIdAndUpdate(req.params.id, req.body, (err, updatedCampaign) => {
+        Campaigns.findOne({_id: req.params.id}, (err, campaign) => {
+            res.json(campaign); //.json() will send proper headers in response so client knows it's json coming back
+        });
     });
 });
 
@@ -50,7 +52,12 @@ router.post('/get_query_column', (req, res) => {
                     res.json({status: 'error', description: "Please can't run the this query."});
                     return;
                 }
-                res.json(result.columns);
+                const columns = result.columns.map(c => {
+                    const column = c;
+                    column.key = c._id;
+                    return column;
+                })
+                res.json(columns);
             });
         });
     });
