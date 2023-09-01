@@ -5,7 +5,10 @@ const settingSchema = new mongoose.Schema({
     mdb_path: String,
     schedule_path: String,
     whatsapp: {
-        global_send_status: Boolean,
+        global_send_status: {
+            type: Boolean,
+            default: true,
+        },
         default_message_template: String,
         ultramsg_instance_id: String,
         ultramsg_token: String
