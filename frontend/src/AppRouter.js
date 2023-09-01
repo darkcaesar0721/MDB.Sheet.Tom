@@ -7,12 +7,16 @@ import {
 import {
     getCampaigns
 } from "./redux/actions/campaign";
+import {
+    getGroups
+} from "./redux/actions/group";
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
 import CampaignList from "./components/Campaign/CampaignList";
 import CampaignAdd from "./components/Campaign/CampaignAdd";
 import CampaignEdit from "./components/Campaign/CampaignEdit";
+import GroupList from "./components/Group/GroupList";
 
 const DASHBOARD = '/';
 
@@ -21,6 +25,7 @@ const AppRouter = (props) => {
     useEffect(function() {
         props.getSettings();
         props.getCampaigns();
+        props.getGroups();
     }, []);
 
     return (
@@ -32,9 +37,12 @@ const AppRouter = (props) => {
                             <Route index path="/" element={<Backup />} />
                             <Route path="/backup" element={<Backup />} />
                             <Route path="/whatsapp" element={<Whatsapp />} />
+
                             <Route path="/campaigns" element={<CampaignList />} />
                             <Route path="/campaigns/add" element={<CampaignAdd />} />
                             <Route path="/campaigns/:id" element={<CampaignEdit />} />
+
+                            <Route path="/groups" element={<GroupList />} />
                         </Route>
                     </Routes>
                 </main>
@@ -49,5 +57,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { getSettings, getCampaigns }
+    { getSettings, getCampaigns, getGroups }
 )(AppRouter);

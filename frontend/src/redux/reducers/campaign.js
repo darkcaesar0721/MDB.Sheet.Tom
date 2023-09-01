@@ -13,11 +13,18 @@ function campaign(state = initialState, action) {
     switch (action.type) {
         case INIT_CAMPAIGN_DATA:
         {
-            return Object.assign({...state}, {data: action.data})
+            return Object.assign({...state}, {data: action.data.map(c => {
+                    let campaign = {...c};
+                    campaign.key = campaign._id;
+                    return campaign;
+                })})
         }
         case CREATE_CAMPAIGN_DATA:
         {
-            return Object.assign({...state}, {data: [...state.data, {...action.data}]})
+            let createdCampaign = {...action.data};
+            createdCampaign.key = createdCampaign._id;
+
+            return Object.assign({...state}, {data: [...state.data, createdCampaign]})
         }
         case UPDATE_CAMPAIGN_DATA:
         {

@@ -5,7 +5,7 @@ const Groups = require('../models/group.model');
 
 router.get('/', (req, res) => {
     Groups.find({}).populate('campaign_id').exec((err, groups) => {
-        res.json(Groups);
+        res.json(groups);
     })
 });
 
