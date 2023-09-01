@@ -12,11 +12,11 @@ const campaignSchema = new mongoose.Schema({
             default: true
         }
     }],
-    qty_avaiable: Number,
+    qty_available: Number,
     qty_uploaded: Number,
-    last_upload_date: Date,
+    last_upload_datetime: Date,
     last_phone: String,
-    system_create_date: Date
+    system_create_datetime: Date
 });
 
 const Campaigns = mongoose.model("Campaign", campaignSchema);

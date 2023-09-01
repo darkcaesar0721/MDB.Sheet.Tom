@@ -2,18 +2,23 @@ import React, {Fragment, useEffect} from 'react';
 import {Routes, Route, HashRouter} from 'react-router-dom';
 import {connect} from "react-redux";
 import {
-    getSetting
+    getSettings
 } from "./redux/actions/setting";
+import {
+    getCampaigns
+} from "./redux/actions/campaign";
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
+import CampaignList from "./components/Campaign/CampaignList";
 
 const DASHBOARD = '/';
 
 const AppRouter = (props) => {
 
     useEffect(function() {
-        props.getSetting();
+        props.getSettings();
+        props.getCampaigns();
     }, []);
 
     return (
@@ -25,6 +30,7 @@ const AppRouter = (props) => {
                             <Route index path="/" element={<Backup />} />
                             <Route path="/backup" element={<Backup />} />
                             <Route path="/whatsapp" element={<Whatsapp />} />
+                            <Route path="/campaigns" element={<CampaignList />} />
                         </Route>
                     </Routes>
                 </main>
@@ -39,5 +45,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { getSetting }
+    { getSettings, getCampaigns }
 )(AppRouter);
