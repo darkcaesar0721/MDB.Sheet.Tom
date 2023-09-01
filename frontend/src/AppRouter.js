@@ -13,10 +13,13 @@ import {
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
+
 import CampaignList from "./components/Campaign/CampaignList";
 import CampaignAdd from "./components/Campaign/CampaignAdd";
 import CampaignEdit from "./components/Campaign/CampaignEdit";
+
 import GroupList from "./components/Group/GroupList";
+import GroupAdd from "./components/Group/GroupAdd";
 
 const DASHBOARD = '/';
 
@@ -43,6 +46,7 @@ const AppRouter = (props) => {
                             <Route path="/campaigns/:id" element={<CampaignEdit />} />
 
                             <Route path="/groups" element={<GroupList />} />
+                            <Route path="/groups/add" element={<GroupAdd />} />
                         </Route>
                     </Routes>
                 </main>
