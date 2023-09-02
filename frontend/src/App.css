@@ -237,3 +237,11 @@ label, span, div, input {
 .antd-checked-custom-table .ant-checkbox-checked.ant-checkbox-disabled .ant-checkbox-inner:after {
   background-color: white;
 }
+
+.align-right {
+  text-align: right;
+}
+
+.m-t-10 {
+  margin-top: 10px;
+}

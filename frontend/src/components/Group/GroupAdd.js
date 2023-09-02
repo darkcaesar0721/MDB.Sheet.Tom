@@ -1,4 +1,4 @@
-import {Button, Col, Divider, Input, message, Row, Table} from "antd";
+import {Button, Col, Divider, Input, message, Modal, Row, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {SettingOutlined} from '@ant-design/icons';
@@ -10,6 +10,7 @@ import "dragula/dist/dragula.css";
 import {createGroup,} from "../../redux/actions/group";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
+import GroupCampaignSetting from "./GroupCampaignSetting";
 
 const getIndexInParent = (el) => Array.from(el.parentNode.children).indexOf(el);
 
@@ -25,6 +26,8 @@ function GroupAdd(props) {
     const [selectedCampaignKeys, setSelectedCampaignKeys] = useState([]);
     const [messageApi, contextHolder] = message.useMessage();
     const [initDragDropStatus, setInitDragDropStatus] = useState(false);
+    const [settingModalOpen, setSettingModalOpen] = useState(false);
+    const [selectedCampaign, setSelectedCampaign] = useState(null);
 
     let lastDragDropCampaigns = [];
 
@@ -43,7 +46,6 @@ function GroupAdd(props) {
             });
 
             drake.on("drop", (el) => {
-                console.log(group);
                 end = getIndexInParent(el);
                 handleReorder(start, end);
             });
@@ -60,12 +62,15 @@ function GroupAdd(props) {
                 campaign_id: c._id,
                 is_checked: true,
                 whatsapp: {
-                    is_send_status: false,
+                    send_status: props.setting.whatsapp.global_send_status,
+                    message: props.setting.whatsapp.default_message_template,
                     groups: [],
                     users: []
                 },
                 filter: {
-                    key: 'ALL'
+                    way: 'ALL',
+                    date_is_time: false,
+                    date_meridian: 'AM'
                 },
             };
             const keys = Object.keys(c);
@@ -219,7 +224,12 @@ function GroupAdd(props) {
     }
 
     const handleEditSettingClick = function(campaign) {
+        setSelectedCampaign(campaign);
+        setSettingModalOpen(true);
+    }
 
+    const updateCampaignSetting = function(campaign) {
+        setGroup(oldState => Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => c._id === campaign._id ? campaign : c)}));
     }
 
     // rowSelection object indicates the need for row selection
@@ -258,9 +268,13 @@ function GroupAdd(props) {
         lastDragDropCampaigns = campaigns;
 
         setGroup(oldState => {
-            return Object.assign({...oldState}, {campaigns: campaigns.map((c, i) => {return Object.assign(c, {index: i})})});
+            return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map((c, i) => {return Object.assign(c, {index: i})})});
         });
     };
+
+    const showSettingModal = (show = false) => {
+        setSettingModalOpen(show);
+    }
 
     return (
         <>
@@ -279,7 +293,7 @@ function GroupAdd(props) {
                 </Col>
             </Row>
             <Row>
-                <Col offset={20} span={4}>
+                <Col offset={21} span={3}>
                     <Button type="primary" onClick={handleSubmit} style={{marginBottom: 5, marginRight: 5}}>
                         Create Group
                     </Button>
@@ -304,7 +318,7 @@ function GroupAdd(props) {
                 style={{marginTop: 5}}
             />
             <Row>
-                <Col offset={20} span={4}>
+                <Col offset={21} span={3}>
                     <Button type="primary" onClick={handleSubmit} style={{marginBottom: 5, marginRight: 5}}>
                         Create Group
                     </Button>
@@ -313,12 +327,28 @@ function GroupAdd(props) {
                     </Button>
                 </Col>
             </Row>
+            <Modal
+                title="Campaign Setting"
+                centered
+                open={settingModalOpen}
+                onOk={() => setSettingModalOpen(false)}
+                onCancel={() => setSettingModalOpen(false)}
+                width={1300}
+                footer={null}
+            >
+                <GroupCampaignSetting
+                    campaign={selectedCampaign}
+                    updateCampaignSetting={updateCampaignSetting}
+                    setting={props.setting}
+                    showSettingModal={showSettingModal}
+                />
+            </Modal>
         </>
     );
 }
 
 const mapStateToProps = state => {
-    return { campaigns: state.campaigns.data, groups: state.groups.data };
+    return { campaigns: state.campaigns.data, groups: state.groups.data, setting: state.setting };
 };
 
 export default connect(

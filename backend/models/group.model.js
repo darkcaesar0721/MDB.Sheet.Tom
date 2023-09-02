@@ -38,7 +38,7 @@ const groupSchema = new mongoose.Schema({
             },
         },
         whatsapp: {
-            is_send_status: {
+            send_status: {
                 type: Boolean,
                 default: false
             },
@@ -51,7 +51,7 @@ const groupSchema = new mongoose.Schema({
             default: "none"
         },
         filter: {
-            key: {
+            way: {
                 type: String,
                 enum: ['ALL', 'STATIC', 'RANDOM', 'RANDOM_FIRST', 'DATE', 'PERIOD'],
                 default: 'ALL'
