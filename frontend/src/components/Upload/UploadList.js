@@ -200,6 +200,18 @@ const UploadList = (props) => {
             dataIndex: 'way',
             key: 'way',
         }];
+        columns = [...columns, {
+            title: 'Filter Amount',
+            key: 'count',
+            width: 90,
+            render: (_, record) => {
+                return (
+                    <>
+                        <span>{customFilterAmount(record)}</span>
+                    </>
+                )
+            }
+        }];
 
         setTblColumns(columns);
 
@@ -230,6 +242,33 @@ const UploadList = (props) => {
             ...sorter,
         });
     };
+
+    const customFilterAmount = function(r) {
+        let count = 'all';
+
+        switch (r.way) {
+            case 'ALL':
+                count = 'all';
+                break;
+            case 'STATIC':
+                count = r.static_count;
+                break;
+            case 'RANDOM':
+                count = r.random_start + ' ~ ' + r.random_end;
+                break;
+            case 'RANDOM_FIRST':
+                count = r.random_start_position + ': (' + r.random_start + ' ~ ' + r.random_end + ')';
+                break;
+            case 'DATE':
+                let old = (r.date_old_day == "0" || r.date_old_day == "") ? 'today' : r.date_old_day + ' day old ';
+                count = old + (r.date_is_time == "true" ? '  ' + r.date_time + r.date_meridian : '');
+                break;
+            case 'PERIOD':
+                count = "(" + r.period_start + ' ~ ' + r.period_end + ")" + " days";
+                break;
+        }
+        return count;
+    }
 
     const handleUploadBtnClick = function() {
 
