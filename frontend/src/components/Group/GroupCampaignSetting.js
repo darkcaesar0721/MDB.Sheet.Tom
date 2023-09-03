@@ -279,7 +279,7 @@ const GroupCampaignSetting = (props) => {
                 if (group !== '' && group !== undefined) groups.push(group);
             });
 
-            let c = Object.assign({...campaign}, {whatsapp: Object.assign({...campaign.whatsapp}, {users: users, groups: groups})});
+            let c = Object.assign({...campaign}, {whatsapp: Object.assign({...campaign.whatsapp}, {users: users, groups: groups}), columns: columns});
             props.updateCampaignSetting(Object.assign(props.campaign, c));
             props.showSettingModal(false);
         }
@@ -650,6 +650,8 @@ const GroupCampaignSetting = (props) => {
                         onOk={() => setOpen(false)}
                         onCancel={() => setOpen(false)}
                         width={700}
+                        okText="Save"
+                        cancelButtonProps={{ style: { display: 'none' } }}
                     >
                         <Table
                             bordered={true}

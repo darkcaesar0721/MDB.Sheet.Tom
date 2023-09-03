@@ -197,11 +197,14 @@ function GroupAdd(props) {
 
     const handleSubmit = function() {
         if (validation()) {
-            props.createGroup(group);
-            messageApi.success('create success');
-            setTimeout(function() {
-                navigate('/groups');
-            }, 1000);
+            const g = Object.assign({...group}, {campaigns: group.campaigns.filter(g => g.is_checked)});
+
+            props.createGroup(g, (resp) => {
+                messageApi.success('create success');
+                setTimeout(function() {
+                    navigate('/groups');
+                }, 1000);
+            });
         }
     }
 
@@ -214,7 +217,6 @@ function GroupAdd(props) {
             messageApi.warning("Please select campaigns.");
             return false;
         }
-
         if (props.groups.filter(g => g.name === group.name).length > 0) {
             messageApi.warning("Already exist group name. Please input other name");
             return false;
