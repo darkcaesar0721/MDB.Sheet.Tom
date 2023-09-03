@@ -247,6 +247,17 @@ const UploadList = (props) => {
                 )
             }
         }];
+        columns = [...columns, {
+            title: 'SystemCreateDate',
+            dataIndex: 'system_create_datetime',
+            key: 'system_create_datetime',
+            width: 130,
+            render: (_, r) => {
+                return (
+                    <span style={{color: r.is_get_last_phone  ? 'red' : 'black'}}>{r.system_create_datetime === "" || r.system_create_datetime === undefined ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
+                )
+            }
+        }];
 
         setTblColumns(columns);
 
