@@ -2,19 +2,19 @@ import {Button, Col, Divider, Input, message, Modal, Row, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {SettingOutlined} from '@ant-design/icons';
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import moment from "moment";
 import dragula from "dragula";
 import "dragula/dist/dragula.css";
 
-import {createGroup} from "../../redux/actions/group";
+import {updateGroup} from "../../redux/actions/group";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 import GroupCampaignSetting from "./GroupCampaignSetting";
 
 const getIndexInParent = (el) => Array.from(el.parentNode.children).indexOf(el);
 
-function GroupAdd(props) {
+function GroupEdit(props) {
     const [tableParams, setTableParams] = useState({
         pagination: {
             current: 1,
@@ -22,7 +22,7 @@ function GroupAdd(props) {
         },
     });
     const [columns, setColumns] = useState([]);
-    const [group, setGroup] = useState({name: '', campaigns: []});
+    const [group, setGroup] = useState({_id: '', name: '', campaigns: []});
     const [selectedCampaignKeys, setSelectedCampaignKeys] = useState([]);
     const [messageApi, contextHolder] = message.useMessage();
     const [initDragDropStatus, setInitDragDropStatus] = useState(false);
@@ -32,6 +32,7 @@ function GroupAdd(props) {
     let lastDragDropCampaigns = [];
 
     const navigate = useNavigate();
+    const {id} = useParams();
 
     useEffect(() => {
         if (!initDragDropStatus && group.campaigns.length > 0) {
@@ -51,47 +52,54 @@ function GroupAdd(props) {
             });
             setInitDragDropStatus(true);
         }
-    }, [group.campaigns, initDragDropStatus]);
+    }, [group.campaigns]);
 
     useEffect(function() {
-        let campaigns = [];
-        let ids = [];
-        props.campaigns.forEach((c, i) => {
-            let campaign = {
-                order: i,
-                key: c._id,
-                campaign: c._id,
-                is_checked: true,
-                whatsapp: {
-                    send_status: props.setting.whatsapp.global_send_status,
-                    message: props.setting.whatsapp.default_message_template,
-                    groups: [],
-                    users: []
-                },
-                filter: {
-                    way: 'ALL',
-                    date_is_time: false,
-                    date_meridian: 'AM'
-                },
-                columns: []
-            };
-            const keys = Object.keys(c);
-            keys.forEach(key => {
-                campaign[key] = c[key];
-            })
-            campaigns.push(campaign);
-            ids.push(c._id);
-        });
+        if (props.groups.length > 0 && props.campaigns.length > 0) {
+            let campaigns = [...props.groups.filter(g => g._id === id)[0].campaigns];
+            let g = {...props.groups.filter(g => g._id === id)[0]};
 
-        setSelectedCampaignKeys(ids);
+            setSelectedCampaignKeys(oldState => {return campaigns.map(c => {return c._id})});
 
-        setGroup((oldState) => {
-            let newState = {...oldState};
-            newState.campaigns = campaigns;
-            return newState;
-        });
+            props.campaigns.forEach(c => {
+                if (campaigns.filter(g_c => g_c._id === c._id).length === 0) {
+                    let campaign = {
+                        key: c._id,
+                        campaign: c,
+                        is_checked: false,
+                        whatsapp: {
+                            send_status: props.setting.whatsapp.global_send_status,
+                            message: props.setting.whatsapp.default_message_template,
+                            groups: [],
+                            users: []
+                        },
+                        filter: {
+                            way: 'ALL',
+                            date_is_time: false,
+                            date_meridian: 'AM'
+                        },
+                        columns: []
+                    };
+                    campaigns.push(campaign);
+                }
+            });
 
-    }, [props.campaigns]);
+            campaigns.forEach((g_c, g_c_i) => {
+                const campaignKeys = Object.keys(g_c.campaign);
+                for (const k of campaignKeys) {
+                    if (campaigns[g_c_i].is_checked !== false && k === 'columns') continue;
+
+                    campaigns[g_c_i][k] = g_c.campaign[k];
+                }
+                campaigns[g_c_i].order = g_c_i;
+                campaigns[g_c_i].key = g_c._id;
+                campaigns[g_c_i].is_checked = campaigns[g_c_i].is_checked !== false;
+            });
+
+            setGroup(oldState => Object.assign(g, {campaigns: campaigns}));
+        }
+
+    }, [props.groups, props.campaigns]);
 
     useEffect(function() {
         setTableParams({
@@ -205,8 +213,8 @@ function GroupAdd(props) {
             });
             const g = Object.assign({...group}, {campaigns: campaigns.filter(g => g.is_checked)});
 
-            props.createGroup(g, (resp) => {
-                messageApi.success('create success');
+            props.updateGroup(g, (resp) => {
+                messageApi.success('update success');
                 setTimeout(function() {
                     navigate('/groups');
                 }, 1000);
@@ -223,7 +231,7 @@ function GroupAdd(props) {
             messageApi.warning("Please select campaigns.");
             return false;
         }
-        if (props.groups.filter(g => g.name === group.name).length > 0) {
+        if (props.groups.filter(g => g._id !== group._id && g.name === group.name).length > 0) {
             messageApi.warning("Already exist group name. Please input other name");
             return false;
         }
@@ -249,7 +257,7 @@ function GroupAdd(props) {
 
             setGroup(oldState => {
                 return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => {
-                     return Object.assign({...c}, {is_checked: selectedRowKeys.filter(sc => sc === c._id).length > 0});
+                        return Object.assign({...c}, {is_checked: selectedRowKeys.filter(sc => sc === c._id).length > 0});
                     })})
             })
         }
@@ -278,12 +286,12 @@ function GroupAdd(props) {
 
         setGroup(oldState => {
             return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map((c, i) => {
-                let index = -1;
-                lastDragDropCampaigns.forEach((dc, dci) => {
-                    if (dc._id === c._id) index = dci;
-                });
+                    let index = -1;
+                    lastDragDropCampaigns.forEach((dc, dci) => {
+                        if (dc._id === c._id) index = dci;
+                    });
 
-                return Object.assign({...c}, {order: index, index: i});
+                    return Object.assign({...c}, {order: index, index: i});
                 })});
         });
     };
@@ -299,7 +307,7 @@ function GroupAdd(props) {
                 currentPage="group"
             />
             <Path/>
-            <Divider>CAMPAIGN ACTION GROUP ADD FORM</Divider>
+            <Divider>CAMPAIGN ACTION GROUP EDIT FORM</Divider>
             <Row style={{marginBottom: 5}}>
                 <Col span={2} offset={7}>
                     <span style={{lineHeight: 2}}>Group Name:</span>
@@ -311,7 +319,7 @@ function GroupAdd(props) {
             <Row>
                 <Col offset={21} span={3}>
                     <Button type="primary" onClick={handleSubmit} style={{marginBottom: 5, marginRight: 5}}>
-                        Create Group
+                        Update Group
                     </Button>
                     <Button type="dashed" href="#/groups">
                         Cancel
@@ -336,7 +344,7 @@ function GroupAdd(props) {
             <Row>
                 <Col offset={21} span={3}>
                     <Button type="primary" onClick={handleSubmit} style={{marginBottom: 5, marginRight: 5}}>
-                        Create Group
+                        Update Group
                     </Button>
                     <Button type="dashed" href="#/groups">
                         Cancel
@@ -369,5 +377,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { createGroup }
-)(GroupAdd);
+    { updateGroup }
+)(GroupEdit);

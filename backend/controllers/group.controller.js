@@ -4,14 +4,14 @@ const router = express.Router();
 const Groups = require('../models/group.model');
 
 router.get('/', (req, res) => {
-    Groups.find({}).populate('campaign_id').exec((err, groups) => {
+    Groups.find({}).populate('campaigns.campaign').exec((err, groups) => {
         res.json(groups);
     })
 });
 
 router.post('/', (req, res) => {
     Groups.create(req.body, (err, newGroup) => {
-        newGroup.populate('campaign_id', (err, populatedGroup) => {
+        newGroup.populate('campaigns.campaign', (err, populatedGroup) => {
             res.json(populatedGroup);
         });
     });
@@ -19,7 +19,7 @@ router.post('/', (req, res) => {
 
 router.put('/:id', (req, res) => {
     Groups.findByIdAndUpdate(req.params.id, req.body, (err, updatedGroup) => {
-        Groups.findOne({_id: req.params.id}).populate('campaign_id').exec((err, group) => {
+        Groups.findOne({_id: req.params.id}).populate('campaigns.campaign').exec((err, group) => {
             res.json(group);
         });
     });

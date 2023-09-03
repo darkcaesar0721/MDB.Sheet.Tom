@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const groupSchema = new mongoose.Schema({
     name: String,
     campaigns: [{
-        campaign_id: {
+        campaign: {
             type: mongoose.Schema.ObjectId,
             ref: 'Campaign'
         },
@@ -79,7 +79,15 @@ const groupSchema = new mongoose.Schema({
         is_manually_upload: {
             type: Boolean,
             default: false
-        }
+        },
+        columns: [{
+            mdb_name: String,
+            sheet_name: String,
+            is_display: {
+                type: Boolean,
+                default: true
+            }
+        }]
     }]
 });
 

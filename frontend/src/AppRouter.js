@@ -20,6 +20,7 @@ import CampaignEdit from "./components/Campaign/CampaignEdit";
 
 import GroupList from "./components/Group/GroupList";
 import GroupAdd from "./components/Group/GroupAdd";
+import GroupEdit from "./components/Group/GroupEdit";
 
 const DASHBOARD = '/';
 
@@ -47,6 +48,7 @@ const AppRouter = (props) => {
 
                             <Route path="/groups" element={<GroupList />} />
                             <Route path="/groups/add" element={<GroupAdd />} />
+                            <Route path="/groups/:id" element={<GroupEdit />} />
                         </Route>
                     </Routes>
                 </main>
