@@ -1,4 +1,4 @@
-import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Switch, Table} from "antd";
+import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Switch, Table, Input} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 
@@ -149,6 +149,16 @@ const UploadList = (props) => {
                         <Radio.Button value="yellow">Y</Radio.Button>
                         <Radio.Button value="pink">P</Radio.Button>
                     </Radio.Group>
+                )
+            }
+        }];
+        columns = [...columns, {
+            title: 'Comment',
+            key: 'comment',
+            width: 160,
+            render: (_, r) => {
+                return (
+                    <Input value={r.comment} onBlur={(e) => {handleFieldChange(r, 'comment', e.target.value)}} onChange={(e) => {handleFieldChange(r, 'comment', e.target.value)}}/>
                 )
             }
         }];
