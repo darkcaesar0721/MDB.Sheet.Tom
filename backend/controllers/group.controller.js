@@ -5,7 +5,14 @@ const Groups = require('../models/group.model');
 
 router.get('/', (req, res) => {
     Groups.find({}).populate('campaigns.campaign').exec((err, groups) => {
-        res.json(groups);
+        res.json(groups.map(g => Object.assign(g, {campaigns: g.campaigns.map(c => {
+                let campaign = {...c};
+                const campaignKeys = Object.keys(g.campaigns);
+                campaignKeys.forEach((key, value) => {
+                    campaign[key] = value;
+                });
+                return campaign;
+            })})));
     })
 });
 
