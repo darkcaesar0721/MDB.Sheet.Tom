@@ -12,7 +12,18 @@ const settingSchema = new mongoose.Schema({
         default_message_template: String,
         ultramsg_instance_id: String,
         ultramsg_token: String
-    }
+    },
+    current_upload: {
+        group: {
+            type: mongoose.Schema.ObjectId,
+            ref: 'Group'
+        },
+        way: {
+            type: String,
+            enum: ['ALL', 'ONE'],
+            default: 'ALL'
+        },
+    },
 });
 
 const Settings = mongoose.model("Setting", settingSchema);

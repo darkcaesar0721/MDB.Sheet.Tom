@@ -22,6 +22,8 @@ import GroupList from "./components/Group/GroupList";
 import GroupAdd from "./components/Group/GroupAdd";
 import GroupEdit from "./components/Group/GroupEdit";
 
+import UploadList from "./components/Upload/UploadList";
+
 const DASHBOARD = '/';
 
 const AppRouter = (props) => {
@@ -38,7 +40,8 @@ const AppRouter = (props) => {
                 <main>
                     <Routes>
                         <Route path={DASHBOARD}>
-                            <Route index path="/" element={<Backup />} />
+                            <Route index path="/" element={<UploadList />} />
+
                             <Route path="/backup" element={<Backup />} />
                             <Route path="/whatsapp" element={<Whatsapp />} />
 
