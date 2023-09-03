@@ -16,6 +16,10 @@ const campaignSchema = new mongoose.Schema({
     qty_uploaded: Number,
     last_upload_datetime: Date,
     last_phone: String,
+    is_manually_uploaded: {
+        type: Boolean,
+        default: false
+    },
     is_get_last_phone: {
         type: Boolean,
         default: false

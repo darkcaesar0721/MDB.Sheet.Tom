@@ -2,8 +2,10 @@ import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Sw
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 
-import {EyeOutlined} from "@ant-design/icons";
+import {UploadOutlined, EyeOutlined} from "@ant-design/icons";
 import {DraggableModal, DraggableModalProvider} from "@cubetiq/antd-modal";
+import {Link} from "react-router-dom";
+import moment from "moment";
 
 import StyledCheckBox from "../../shared/StyledCheckBox";
 import MenuList from "../MenuList";
@@ -15,9 +17,8 @@ import {
     updateGroup,
     updateGroupCampaignField, updateGroupCampaignObject,
 } from "../../redux/actions/group";
-import {Link} from "react-router-dom";
+import {getUploadLastPhone} from "../../redux/actions/upload";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
-import moment from "moment";
 import {updateCampaignField} from "../../redux/actions/campaign";
 
 const UploadList = (props) => {
@@ -81,24 +82,23 @@ const UploadList = (props) => {
         });
 
         let columns = [];
-        if (currentWay === 'ALL')
-            columns = [...columns, {
-                title: 'no',
-                key: 'no',
-                width: 30,
-                fixed: 'left',
-                render: (_, record) => {
-                    let index = -1;
-                    group.campaigns.forEach((c, i) => {
-                        if (c._id === record._id) index = i;
-                    });
-                    return (
-                        <>
-                            <span>{index + 1}</span>
-                        </>
-                    )
-                }
-            }];
+        columns = [...columns, {
+            title: 'no',
+            key: 'no',
+            width: 30,
+            fixed: 'left',
+            render: (_, record) => {
+                let index = -1;
+                group.campaigns.forEach((c, i) => {
+                    if (c._id === record._id) index = i;
+                });
+                return (
+                    <>
+                        <span>{index + 1}</span>
+                    </>
+                )
+            }
+        }];
         columns = [...columns, {
             title: 'Weekday',
             key: 'weekday',
@@ -258,10 +258,82 @@ const UploadList = (props) => {
                 )
             }
         }];
+        if (currentWay === 'ONE')
+            columns = [...columns, {
+                title: 'Upload',
+                key: 'operation',
+                width: 80,
+                render: (_, record) => {
+                    return (
+                        <>
+                            <Popconfirm
+                                title="Manually Upload data"
+                                description="Are you gonna get data to upload the row of this campaign?"
+                                onConfirm={(e) => {upload(record, true)}}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button style={{marginRight: 1}}><span style={{fontSize: '1rem'}}>D</span></Button>
+                            </Popconfirm>
+                            {
+                                (!record.is_manually_uploaded) ?
+                                    <Popconfirm
+                                        title="Upload data"
+                                        description="Are you sure to upload the row of this campaign?"
+                                        onConfirm={(e) => {upload(record, false)}}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button icon={<UploadOutlined /> } style={{marginRight: 1}}/>
+                                    </Popconfirm> : ''
+                            }
+                            {
+                                (record.is_manually_uploaded) ? <Button onClick={(e) => {showPreviewResult(record)}} icon={<EyeOutlined /> } style={{marginRight: 1}}/> : ''
+                            }
+                        </>
+                    )
+                }
+            }];
+        columns = [...columns, {
+            title: 'Last Phone',
+            key: 'get_phone',
+            width: 90,
+            render: (_, r) => {
+                return (
+                    <Popconfirm
+                        title="Get Last Phone"
+                        description="Are you sure to get last phone of this campaign?"
+                        onConfirm={(e) => {getLastPhone(r)}}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button type="primary">Last Phone</Button>
+                    </Popconfirm>
+
+                )
+            }
+        }];
 
         setTblColumns(columns);
 
-    }, [group, currentGroup]);
+    }, [group, currentGroup, currentWay]);
+
+    const upload = function(campaign, isPreview = false) {
+
+    }
+
+    const showPreviewResult = function(campaign) {
+
+    }
+
+    const getLastPhone = function(campaign) {
+        setLoading(true);
+        setTip("Wait for getting last phone....");
+
+        props.getUploadLastPhone(campaign, props.setting.mdb_path, function() {
+            setLoading(false);
+        })
+    }
 
     const handleGroupChange = function(value) {
         const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {group: value})});
@@ -505,5 +577,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { updateSetting, updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField }
+    { updateSetting, updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField, getUploadLastPhone }
 )(UploadList);
