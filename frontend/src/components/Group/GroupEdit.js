@@ -87,7 +87,7 @@ function GroupEdit(props) {
             campaigns.forEach((g_c, g_c_i) => {
                 const campaignKeys = Object.keys(g_c.campaign);
                 for (const k of campaignKeys) {
-                    if (campaigns[g_c_i].is_checked !== false && k === 'columns') continue;
+                    if (campaigns[g_c_i].is_checked !== false && k === 'columns' || k === '_id') continue;
 
                     campaigns[g_c_i][k] = g_c.campaign[k];
                 }

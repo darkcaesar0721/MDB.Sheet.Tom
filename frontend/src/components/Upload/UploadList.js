@@ -1,4 +1,4 @@
-import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Switch, Table, Input} from "antd";
+import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Switch, Table, Input, Modal} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 
@@ -12,8 +12,11 @@ import {
     updateSetting
 } from "../../redux/actions/setting";
 import {
+    updateGroup,
     updateGroupCampaignField, updateGroupCampaignObject,
 } from "../../redux/actions/group";
+import {Link} from "react-router-dom";
+import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -30,6 +33,8 @@ const UploadList = (props) => {
     const [tblColumns, setTblColumns] = useState([]);
     const [group, setGroup] = useState({});
     const [selectedManualUploadCampaignKeys, setSelectedManualUploadCampaignKeys] = useState([]);
+    const [selectedCampaign, setSelectedCampaign] = useState(null);
+    const [settingModalOpen, setSettingModalOpen] = useState(false);
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -39,14 +44,20 @@ const UploadList = (props) => {
         setGroupOptions(oldState => props.groups.map((group, index) => {return {value: group._id, label: group.name}}));
 
         if (currentGroup === '') return;
-        const g = props.groups.filter(g => g._id === currentGroup)[0];
+        const filterGroup = props.groups.filter(g => g._id === currentGroup)[0];
         let manualUploadCampaignKeys = [];
-        setGroup(oldState => Object.assign(g, {campaigns: g.campaigns.map(c => {
-            let campaign = {...c};
-            if (campaign.is_manually_upload === true) manualUploadCampaignKeys.push(campaign._id);
 
-            campaign.key = campaign._id;
-            return campaign;
+        setGroup(oldState => Object.assign(filterGroup, {campaigns: filterGroup.campaigns.map(c => {
+                let campaign = {...c};
+                if (campaign.is_manually_upload === true) manualUploadCampaignKeys.push(campaign._id);
+
+                campaign.key = campaign._id;
+                const keys = Object.keys(campaign.campaign);
+                for(const key of keys) {
+                    if (key === '_id' || key === 'columns') continue;
+                    campaign[key] = campaign.campaign[key];
+                }
+                return campaign;
             })}));
         setSelectedManualUploadCampaignKeys(manualUploadCampaignKeys);
     }, [props.groups, currentGroup]);
@@ -162,6 +173,18 @@ const UploadList = (props) => {
                 )
             }
         }];
+        columns = [...columns, {
+            title: 'Query Name',
+            key: 'query',
+            render: (_, record) => {
+                const link = '#';
+                return (
+                    <>
+                        <Link to={link} onClick={(e) => {setSelectedCampaign(record); setSettingModalOpen(true)}}>{record.query}</Link>
+                    </>
+                )
+            }
+        }];
 
         setTblColumns(columns);
 
@@ -219,6 +242,15 @@ const UploadList = (props) => {
             disabled: false
         })
     };
+
+    const showSettingModal = (show = false) => {
+        setSettingModalOpen(show);
+    }
+
+    const updateCampaignSetting = function(campaign) {
+        setGroup(oldState => Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => c._id === campaign._id ? campaign : c)}));
+        props.updateGroup(group);
+    }
 
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
@@ -335,6 +367,22 @@ const UploadList = (props) => {
 
                 </Col>
             </Row>
+            <Modal
+                title="Campaign Setting"
+                centered
+                open={settingModalOpen}
+                onOk={() => setSettingModalOpen(false)}
+                onCancel={() => setSettingModalOpen(false)}
+                width={1300}
+                footer={null}
+            >
+                <GroupCampaignSetting
+                    campaign={selectedCampaign}
+                    updateCampaignSetting={updateCampaignSetting}
+                    setting={props.setting}
+                    showSettingModal={showSettingModal}
+                />
+            </Modal>
         </Spin>
     )
 }
@@ -345,5 +393,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { updateSetting, updateGroupCampaignObject, updateGroupCampaignField }
+    { updateSetting, updateGroup, updateGroupCampaignObject, updateGroupCampaignField }
 )(UploadList);
