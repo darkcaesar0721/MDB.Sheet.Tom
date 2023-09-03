@@ -137,6 +137,21 @@ const UploadList = (props) => {
                 )
             }
         }];
+        columns = [...columns, {
+            title: 'N G Y P',
+            key: 'color',
+            width: 90,
+            render: (_, r) => {
+                return (
+                    <Radio.Group onChange={(e) => {handleFieldChange(r, 'color', e.target.value)}} defaultValue="none" value={r.color}>
+                        <Radio.Button value="none">N</Radio.Button>
+                        <Radio.Button value="green">G</Radio.Button>
+                        <Radio.Button value="yellow">Y</Radio.Button>
+                        <Radio.Button value="pink">P</Radio.Button>
+                    </Radio.Group>
+                )
+            }
+        }];
 
         setTblColumns(columns);
 
