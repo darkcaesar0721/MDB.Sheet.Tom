@@ -4,7 +4,7 @@ import {
     UPDATE_GROUP_DATA,
     DELETE_GROUP_DATA,
     UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
-    UPDATE_GROUP_CAMPAIGN_OBJECT_DATA,
+    UPDATE_GROUP_CAMPAIGN_OBJECT_DATA, UPDATE_CAMPAIGN_FIELD_DATA,
 } from "../actionTypes";
 
 const initialState = {
@@ -76,6 +76,17 @@ function group(state = initialState, action) {
                                 return g;
                             }
                         }
+                    )
+                });
+        }
+        case UPDATE_CAMPAIGN_FIELD_DATA:
+        {
+            return Object.assign(
+                {...state}, {data: [...state.data].map(
+                        g => Object.assign(g, {campaigns: g.campaigns.map(c => {
+                            if (c.campaign._id === action.data._id) c.campaign = action.data;
+                            return c;
+                            })})
                     )
                 });
         }

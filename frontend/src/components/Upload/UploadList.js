@@ -17,6 +17,8 @@ import {
 } from "../../redux/actions/group";
 import {Link} from "react-router-dom";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
+import moment from "moment";
+import {updateCampaignField} from "../../redux/actions/campaign";
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -212,6 +214,39 @@ const UploadList = (props) => {
                 )
             }
         }];
+        columns = [...columns, {
+            title: 'Qty Available',
+            dataIndex: 'qty_available',
+            key: 'qty_available',
+            width: 25,
+        }];
+        columns = [...columns, {
+            title: 'Qty Uploaded',
+            dataIndex: 'qty_uploaded',
+            key: 'qty_uploaded',
+            width: 25,
+        }];
+        columns = [...columns, {
+            title: 'LastUploadDate',
+            dataIndex: 'last_upload_datetime',
+            key: 'last_upload_datetime',
+            width: 130,
+            render: (_, r) => {
+                return (
+                    <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
+                )
+            }
+        }];
+        columns = [...columns, {
+            title: 'Last Phone',
+            key: 'last_phone',
+            width: 110,
+            render: (_, r) => {
+                return (
+                    <Input style={{color: r.is_get_last_phone  ? 'red' : 'black'}} onBlur={(e) => {handleCampaignFieldChange(r, 'last_phone', e.target.value)}} onChange={(e) => {handleLastPhoneChange(r, e.target.value)}} value={r.last_phone}/>
+                )
+            }
+        }];
 
         setTblColumns(columns);
 
@@ -233,6 +268,18 @@ const UploadList = (props) => {
 
     const handleObjectChange = function(campaign, object_name, key, value) {
         props.updateGroupCampaignObject(group, campaign, object_name, key, value);
+    }
+
+    const handleLastPhoneChange = function(campaign, value) {
+        let c = {...campaign.campaign};
+        c.last_phone = value;
+        props.updateCampaignField(c);
+    }
+
+    const handleCampaignFieldChange = function(campaign, key, value) {
+        let c = {...campaign.campaign};
+        c.last_phone = value;
+        props.updateCampaignField(c, true);
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -447,5 +494,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { updateSetting, updateGroup, updateGroupCampaignObject, updateGroupCampaignField }
+    { updateSetting, updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField }
 )(UploadList);
