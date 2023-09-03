@@ -185,6 +185,11 @@ const UploadList = (props) => {
                 )
             }
         }];
+        columns = [...columns, {
+            title: 'Sheet Name',
+            dataIndex: 'schedule',
+            key: 'schedule',
+        }];
 
         setTblColumns(columns);
 
