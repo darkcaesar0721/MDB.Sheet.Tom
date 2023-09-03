@@ -12,8 +12,7 @@ import {
     updateSetting
 } from "../../redux/actions/setting";
 import {
-    updateGroupCampaignField,
-    updateGroupCampaignWeekday
+    updateGroupCampaignField, updateGroupCampaignObject,
 } from "../../redux/actions/group";
 
 const UploadList = (props) => {
@@ -98,28 +97,43 @@ const UploadList = (props) => {
                     <Checkbox.Group style={{width: '100%'}} value={weekday}>
                         <Row>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Sunday">S</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Sunday">S</StyledCheckBox>
                             </Col>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Monday">M</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Monday">M</StyledCheckBox>
                             </Col>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Tuesday">T</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Tuesday">T</StyledCheckBox>
                             </Col>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Wednesday">W</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Wednesday">W</StyledCheckBox>
                             </Col>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Thursday">Th</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Thursday">Th</StyledCheckBox>
                             </Col>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Friday">F</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Friday">F</StyledCheckBox>
                             </Col>
                             <Col flex={1}>
-                                <StyledCheckBox onChange={(e) => {handleWeekdayChange(r, e.target.value, e.target.checked)}} value="Saturday">S</StyledCheckBox>
+                                <StyledCheckBox onChange={(e) => {handleObjectChange(r, 'weekday', e.target.value, e.target.checked)}} value="Saturday">S</StyledCheckBox>
                             </Col>
                         </Row>
                     </Checkbox.Group>
+                )
+            }
+        }];
+        columns = [...columns, {
+            title: 'WhatsApp',
+            key: 'whatsapp',
+            width: 70,
+            render: (_, r) => {
+                return (
+                    <Switch
+                        size="small"
+                        disabled={!props.setting.whatsapp.global_send_status}
+                        checked={r.whatsapp.send_status}
+                        onChange={(v) => handleObjectChange(r, 'whatsapp', 'send_status', v)}
+                    />
                 )
             }
         }];
@@ -142,8 +156,8 @@ const UploadList = (props) => {
         props.updateGroupCampaignField(group, campaign, key, value);
     }
 
-    const handleWeekdayChange = function(campaign, key, value) {
-        props.updateGroupCampaignWeekday(group, campaign, key, value);
+    const handleObjectChange = function(campaign, object_name, key, value) {
+        props.updateGroupCampaignObject(group, campaign, object_name, key, value);
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -306,5 +320,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { updateSetting, updateGroupCampaignWeekday, updateGroupCampaignField }
+    { updateSetting, updateGroupCampaignObject, updateGroupCampaignField }
 )(UploadList);

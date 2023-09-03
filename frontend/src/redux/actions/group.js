@@ -3,7 +3,8 @@ import {
     INIT_GROUP_DATA,
     CREATE_GROUP_DATA,
     UPDATE_GROUP_DATA,
-    DELETE_GROUP_DATA, UPDATE_GROUP_CAMPAIGN_WEEKDAY_DATA, UPDATE_GROUP_CAMPAIGN_FIELD_DATA
+    DELETE_GROUP_DATA,
+    UPDATE_GROUP_CAMPAIGN_OBJECT_DATA, UPDATE_GROUP_CAMPAIGN_FIELD_DATA
 } from "../actionTypes";
 import {API} from "../../config";
 
@@ -43,6 +44,26 @@ export const deleteGroup = (group = {}, callback = function() {}) => async (disp
     callback();
 }
 
+export const updateGroupCampaignObject = (group = {}, campaign = {}, object_name= "", key = '', value = '', callback = function() {}) => async (dispatch) => {
+    dispatch({
+        type: UPDATE_GROUP_CAMPAIGN_OBJECT_DATA,
+        data: {
+            group: group,
+            campaign: campaign,
+            object_name: object_name,
+            key: key,
+            value: value
+        }
+    });
+
+    const result = await axios.put(API + '/group/' + group._id, Object.assign({...group}, {campaigns : [...group.campaigns].map(c => {
+            let updatedCampaign = c;
+            if (c._id === campaign._id) updatedCampaign[object_name][key] = value;
+            return updatedCampaign;
+        })}));
+    callback();
+}
+
 export const updateGroupCampaignField = (group = {}, campaign = {}, key = '', value = '', callback = function() {}) => async (dispatch) => {
     dispatch({
         type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
@@ -61,23 +82,3 @@ export const updateGroupCampaignField = (group = {}, campaign = {}, key = '', va
         })}));
     callback();
 }
-
-export const updateGroupCampaignWeekday = (group = {}, campaign = {}, key = '', value = '', callback = function() {}) => async (dispatch) => {
-    dispatch({
-        type: UPDATE_GROUP_CAMPAIGN_WEEKDAY_DATA,
-        data: {
-            group: group,
-            campaign: campaign,
-            key: key,
-            value: value
-        }
-    });
-
-    const result = await axios.put(API + '/group/' + group._id, Object.assign({...group}, {campaigns : [...group.campaigns].map(c => {
-            let updatedCampaign = c;
-            if (c._id === campaign._id) updatedCampaign['weekday'][key] = value;
-            return updatedCampaign;
-        })}));
-    callback();
-}
-

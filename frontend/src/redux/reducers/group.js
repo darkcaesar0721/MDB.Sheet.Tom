@@ -3,8 +3,8 @@ import {
     CREATE_GROUP_DATA,
     UPDATE_GROUP_DATA,
     DELETE_GROUP_DATA,
-    UPDATE_GROUP_CAMPAIGN_WEEKDAY_DATA,
     UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
+    UPDATE_GROUP_CAMPAIGN_OBJECT_DATA,
 } from "../actionTypes";
 
 const initialState = {
@@ -39,15 +39,17 @@ function group(state = initialState, action) {
                     )
                 });
         }
-        case UPDATE_GROUP_CAMPAIGN_WEEKDAY_DATA:
+        case UPDATE_GROUP_CAMPAIGN_OBJECT_DATA:
         {
+            const {group, campaign, object_name, key, value} = action.data;
+
             return Object.assign(
                 {...state}, {data: [...state.data].map(
                         g => {
-                            if (g._id === action.data.group._id) {
+                            if (g._id === group._id) {
                                 return Object.assign({...g}, {campaigns: [...g.campaigns].map(c => {
                                         let updatedCampaign = c;
-                                        if (c._id === action.data.campaign._id) updatedCampaign['weekday'][action.data.key] = action.data.value;
+                                        if (c._id === campaign._id) updatedCampaign[object_name][key] = value;
                                         return updatedCampaign;
                                     })})
                             } else {
@@ -59,13 +61,15 @@ function group(state = initialState, action) {
         }
         case UPDATE_GROUP_CAMPAIGN_FIELD_DATA:
         {
+            const {group, campaign, key, value} = action.data;
+
             return Object.assign(
                 {...state}, {data: [...state.data].map(
                         g => {
-                            if (g._id === action.data.group._id) {
+                            if (g._id === group._id) {
                                 return Object.assign({...g}, {campaigns : [...g.campaigns].map(c => {
                                         let updatedCampaign = c;
-                                        if (c._id === action.data.campaign._id) updatedCampaign[action.data.key] = action.data.value;
+                                        if (c._id === campaign._id) updatedCampaign[key] = value;
                                         return updatedCampaign;
                                     })})
                             } else {
