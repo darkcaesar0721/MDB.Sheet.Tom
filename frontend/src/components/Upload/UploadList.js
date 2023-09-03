@@ -52,10 +52,15 @@ const UploadList = (props) => {
                 if (campaign.is_manually_upload === true) manualUploadCampaignKeys.push(campaign._id);
 
                 campaign.key = campaign._id;
-                const keys = Object.keys(campaign.campaign);
-                for(const key of keys) {
+                const campaignKeys = Object.keys(campaign.campaign);
+                for(const key of campaignKeys) {
                     if (key === '_id' || key === 'columns') continue;
                     campaign[key] = campaign.campaign[key];
+                }
+
+                const filterKeys = Object.keys(campaign.filter);
+                for(const key of filterKeys) {
+                    campaign[key] = campaign.filter[key];
                 }
                 return campaign;
             })}));
@@ -189,6 +194,11 @@ const UploadList = (props) => {
             title: 'Sheet Name',
             dataIndex: 'schedule',
             key: 'schedule',
+        }];
+        columns = [...columns, {
+            title: 'Filter Type',
+            dataIndex: 'way',
+            key: 'way',
         }];
 
         setTblColumns(columns);
