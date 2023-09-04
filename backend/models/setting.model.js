@@ -23,6 +23,18 @@ const settingSchema = new mongoose.Schema({
             enum: ['ALL', 'ONE'],
             default: 'ALL'
         },
+        pause_index: {
+            type: Number,
+            default: -1,
+        },
+        resume_index: {
+            type: Number,
+            default: -1
+        },
+        cancel_status: {
+            type: Boolean,
+            default: false
+        }
     },
 });
 

@@ -10,7 +10,7 @@ export const getSettings = (callback = function() {}) => async (dispatch) => {
         type: INIT_SETTING_DATA,
         data: result.data
     });
-    callback();
+    callback(result.data);
 }
 
 export const updateSetting = (setting = {}, callback = function() {}) => async (dispatch) => {

@@ -11,6 +11,7 @@ import StyledCheckBox from "../../shared/StyledCheckBox";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 import {
+    getSettings,
     updateSetting
 } from "../../redux/actions/setting";
 import {
@@ -18,8 +19,9 @@ import {
     updateGroupCampaignField, updateGroupCampaignObject,
 } from "../../redux/actions/group";
 import {getUploadLastPhone} from "../../redux/actions/upload";
-import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 import {updateCampaignField} from "../../redux/actions/campaign";
+import GroupCampaignSetting from "../Group/GroupCampaignSetting";
+import UploadGettingAllLastPhone from "./UploadGettingAllLastPhone";
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -31,13 +33,14 @@ const UploadList = (props) => {
     const [loading, setLoading] = useState(false);
     const [tip, setTip] = useState('');
     const [messageApi, contextHolder] = message.useMessage();
-    const [open, setOpen] = useState(false);
     const [groupOptions, setGroupOptions] = useState([]);
     const [tblColumns, setTblColumns] = useState([]);
     const [group, setGroup] = useState({});
     const [selectedManualUploadCampaignKeys, setSelectedManualUploadCampaignKeys] = useState([]);
     const [selectedCampaign, setSelectedCampaign] = useState(null);
     const [settingModalOpen, setSettingModalOpen] = useState(false);
+    const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
+    const [runningStatusList, setRunningStatusList] = useState([]);
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -233,7 +236,7 @@ const UploadList = (props) => {
             width: 130,
             render: (_, r) => {
                 return (
-                    <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
+                    <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined || r.last_upload_datetime === null ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
                 )
             }
         }];
@@ -254,7 +257,7 @@ const UploadList = (props) => {
             width: 130,
             render: (_, r) => {
                 return (
-                    <span style={{color: r.is_get_last_phone  ? 'red' : 'black'}}>{r.system_create_datetime === "" || r.system_create_datetime === undefined ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
+                    <span style={{color: r.is_get_last_phone  ? 'red' : 'black'}}>{r.system_create_datetime === "" || r.system_create_datetime === undefined || r.system_create_datetime === null ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
                 )
             }
         }];
@@ -330,8 +333,13 @@ const UploadList = (props) => {
         setLoading(true);
         setTip("Wait for getting last phone....");
 
-        props.getUploadLastPhone(campaign, props.setting.mdb_path, function() {
+        props.getUploadLastPhone(campaign, props.setting.mdb_path, function(result) {
             setLoading(false);
+            if (result.status === 'error') {
+                messageApi.warning(result.description);
+            } else {
+                messageApi.success('success');
+            }
         })
     }
 
@@ -409,7 +417,25 @@ const UploadList = (props) => {
     }
 
     const handleGetAllLastPhoneBtnClick = function() {
+        setRunningStatusList(group.campaigns.map((c, i) => {
+            let campaign = {...c};
+            campaign.key = i;
+            campaign.index = i;
+            campaign.status = (i === 0 ? 'loading' : '');
+            return campaign;
+        }));
 
+        setOpenGetAllLastPhoneModal(true);
+    }
+
+    const updateRunningStatusList = function(statusLists = []) {
+        setRunningStatusList(oldState => runningStatusList.map((s, i) => {
+            if (statusLists[i]['status'] === 'success') {
+                return Object.assign({...s}, statusLists[i]['campaign'], {status: statusLists[i]['status']});
+            } else {
+                return Object.assign({...s}, {status: statusLists[i]['status']});
+            }
+        }))
     }
 
     // rowSelection object indicates the need for row selection
@@ -551,6 +577,7 @@ const UploadList = (props) => {
 
                 </Col>
             </Row>
+
             <Modal
                 title="Campaign Setting"
                 centered
@@ -567,6 +594,27 @@ const UploadList = (props) => {
                     showSettingModal={showSettingModal}
                 />
             </Modal>
+
+            <DraggableModalProvider>
+                <DraggableModal
+                    title="GET LAST PHONE STATUS LIST"
+                    open={openGetAllLastPhoneModal}
+                    header={null}
+                    footer={null}
+                    closable={false}
+                >
+                    <UploadGettingAllLastPhone
+                        setOpen={setOpenGetAllLastPhoneModal}
+                        campaigns={runningStatusList}
+                        getUploadLastPhone={props.getUploadLastPhone}
+                        setting={props.setting}
+                        updateSetting={props.updateSetting}
+                        getSettings={props.getSettings}
+                        runningStatusList={runningStatusList}
+                        updateRunningStatusList={updateRunningStatusList}
+                    />
+                </DraggableModal>
+            </DraggableModalProvider>
         </Spin>
     )
 }
@@ -577,5 +625,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { updateSetting, updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField, getUploadLastPhone }
+    { updateSetting, getSettings, updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField, getUploadLastPhone }
 )(UploadList);
