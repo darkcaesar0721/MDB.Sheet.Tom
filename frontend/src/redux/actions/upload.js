@@ -28,3 +28,16 @@ export const upload = (groupId, campaignId, manually = false, callback = functio
         callback(result.data);
     }
 }
+
+export const uploadPreviewData = (groupId, campaignId, callback = function() {}) => async (dispatch) => {
+    const result = await axios.post(API + '/upload/upload_preview', {groupId: groupId, campaignId: campaignId});
+    if (result.data.status === 'error') {
+        callback(result.data);
+    } else {
+        dispatch({
+            type: UPDATE_CAMPAIGN_DATA,
+            data: result.data.campaign
+        });
+        callback(result.data);
+    }
+}

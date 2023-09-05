@@ -18,11 +18,13 @@ import {
     updateGroup,
     updateGroupCampaignField,
 } from "../../redux/actions/group";
-import {getUploadLastPhone, upload} from "../../redux/actions/upload";
+import {getUploadLastPhone, upload, uploadPreviewData} from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 import UploadGettingAllLastPhone from "./UploadGettingAllLastPhone";
 import UploadCampaign from "./UploadCampaign";
+import uploadPreview from "./UploadPreview";
+import UploadPreview from "./UploadPreview";
 
 let current_date = new Date();
 let pstDate = current_date.toLocaleString("en-US", {
@@ -46,6 +48,7 @@ const UploadList = (props) => {
     const [selectedManualUploadCampaignKeys, setSelectedManualUploadCampaignKeys] = useState([]);
     const [selectedCampaign, setSelectedCampaign] = useState(null);
     const [settingModalOpen, setSettingModalOpen] = useState(false);
+    const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
     const [openUploadAutoStatusModal, setOpenUploadAutoStatusModal] = useState(false);
     const [openUploadManualStatusModal, setOpenUploadManualStatusModal] = useState(false);
@@ -282,15 +285,18 @@ const UploadList = (props) => {
                 render: (_, record) => {
                     return (
                         <>
-                            <Popconfirm
-                                title="Manually Upload data"
-                                description="Are you gonna get data to upload the row of this campaign?"
-                                onConfirm={(e) => {upload(record, true)}}
-                                okText="Yes"
-                                cancelText="No"
-                            >
-                                <Button style={{marginRight: 1}}><span style={{fontSize: '1rem'}}>D</span></Button>
-                            </Popconfirm>
+                            {
+                                (!record.is_manually_uploaded) ?
+                                    <Popconfirm
+                                        title="Manually Upload data"
+                                        description="Are you gonna get data to upload the row of this campaign?"
+                                        onConfirm={(e) => {upload(record, true)}}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button style={{marginRight: 1}}><span style={{fontSize: '1rem'}}>D</span></Button>
+                                    </Popconfirm>: ''
+                            }
                             {
                                 (!record.is_manually_uploaded) ?
                                     <Popconfirm
@@ -334,11 +340,40 @@ const UploadList = (props) => {
 
     }, [group, currentGroup, currentWay]);
 
-    const upload = function(campaign, isPreview = false) {
+    const upload = function(campaign, isManually = false) {
         setLoading(true);
-        setTip("Wait for uploading....");
 
-        props.upload(group._id, campaign.detail, false, function(result) {
+        if (isManually)
+            setTip("Wait for getting data....");
+        else
+            setTip("Wait for uploading....");
+
+        props.upload(group._id, campaign.detail, isManually, function(result) {
+            setLoading(false);
+            if (result.status === 'error') {
+                messageApi.warning(result.description);
+            } else {
+                if (!isManually)
+                    messageApi.success('upload success');
+                else {
+                    setSelectedCampaign(campaign);
+                    setUploadPreviewModalOpen(true);
+                }
+            }
+        })
+    }
+
+    const showPreviewResult = function(campaign) {
+        setSelectedCampaign(campaign);
+        setUploadPreviewModalOpen(true);
+    }
+
+    const uploadPreview = function() {
+        setUploadPreviewModalOpen(false);
+
+        setLoading(true);
+        setTip("Wait for uploading data....");
+        props.uploadPreviewData(group._id, selectedCampaign.detail, function(result) {
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
@@ -348,8 +383,13 @@ const UploadList = (props) => {
         })
     }
 
-    const showPreviewResult = function(campaign) {
+    const cancelUpload = function() {
+        setUploadPreviewModalOpen(false);
 
+        let updateFields = {};
+        updateFields.last_temp_upload_info = {};
+        updateFields.is_manually_uploaded = false;
+        props.updateCampaignField(selectedCampaign.detail, updateFields, true);
     }
 
     const getLastPhone = function(campaign) {
@@ -742,6 +782,23 @@ const UploadList = (props) => {
                     />
                 </DraggableModal>
             </DraggableModalProvider>
+
+            <Modal
+                title="Upload Preview"
+                centered
+                open={uploadPreviewModalOpen}
+                onOk={() => setUploadPreviewModalOpen(false)}
+                onCancel={() => setUploadPreviewModalOpen(false)}
+                width={1300}
+                footer={null}
+            >
+                <UploadPreview
+                    campaign={selectedCampaign}
+                    campaigns={props.campaigns}
+                    uploadPreview={uploadPreview}
+                    cancelUpload={cancelUpload}
+                />
+            </Modal>
         </Spin>
     )
 }
@@ -755,6 +812,6 @@ export default connect(
     {
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
-        getUploadLastPhone, upload
+        getUploadLastPhone, upload, uploadPreviewData
     }
 )(UploadList);

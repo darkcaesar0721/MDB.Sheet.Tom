@@ -12,7 +12,12 @@ const Settings = require("../models/setting.model");
 router.post('/', async (req, res) => {
     const {groupId, campaignId, manually} = req.body;
     await uploadLibrary.upload_sheet(groupId, campaignId, manually, function(result){res.json(result);});
-})
+});
+
+router.post('/upload_preview', async (req, res) => {
+    const {groupId, campaignId, manually} = req.body;
+    await uploadLibrary.upload_preview_sheet(groupId, campaignId, function(result){res.json(result);});
+});
 
 router.get('/get_last_phone', (req, res) => {
     const mdb_path = req.query.mdb_path;

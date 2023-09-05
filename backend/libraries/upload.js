@@ -281,13 +281,12 @@ const upload_sheet = async function (groupId = "", campaignId = "", manually = f
                     await send_whatsapp_message(group, groupCampaign, campaign, setting);
                 }
                 await upload_schedule(group, campaign, setting);
-
-                Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
-                    Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
-                        callback({status: 'success', campaign: updatedCampaign});
-                    });
-                });
             }
+            Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
+                Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
+                    callback({status: 'success', campaign: updatedCampaign});
+                });
+            });
         });
     });
 }
@@ -435,8 +434,93 @@ const upload_schedule = async function (group = {}, campaign = {}, setting = {})
     });
 }
 
+const upload_preview_sheet = async function (groupId = "", campaignId = "", callback = function () {
+}) {
+    const group = await Groups.findOne({_id: groupId});
+    const campaign = await Campaigns.findOne({_id: campaignId});
+    const setting = await Settings.findOne({});
+
+    const groupCampaign = group.campaigns.filter(c => c.detail == campaignId)[0];
+
+    const authClientObject = await auth.getClient();//Google sheets instance
+    const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
+
+    const rows = campaign.last_temp_upload_info.upload_rows;
+    if (rows.length > 0) {
+        for (const sheet_url of campaign.sheet_urls) {
+            const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
+            const match = regex.exec(sheet_url);
+            const spreadsheetId = match[1]; // Extract the ID from the matched string
+
+            const spreadsheet = await googleSheetsInstance.spreadsheets.get({
+                spreadsheetId
+            });
+
+            let sheet = {};
+            for (const s of spreadsheet.data.sheets) {
+                const sheetId = s.properties.sheetId;
+                if (sheet_url.indexOf("gid=" + sheetId) !== -1) {
+                    sheet = s;
+                }
+            }
+
+            if (!sheet) return {status: 'error', description: 'Google sheet path error'};
+
+            let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
+            let upload_row = [];
+            for (const column of groupCampaign.columns) {
+                if (column.is_display === false) continue;
+
+                upload_row.push(column.sheet_name);
+            }
+            upload_rows = [...upload_rows, upload_row];
+
+            rows.forEach((row) => {
+                let upload_row = [];
+                const keys = Object.keys(row);
+                keys.forEach(key => {
+                    upload_row.push(row[key]);
+                })
+                upload_rows.push(upload_row);
+            })
+            upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+
+            await googleSheetsInstance.spreadsheets.values.append({
+                auth, //auth object
+                spreadsheetId, //spreadsheet id
+                range: sheet.properties.title, //sheet name and range of cells
+                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
+                resource: {
+                    values: upload_rows,
+                },
+            });
+        }
+        await send_whatsapp_message(group, groupCampaign, campaign, setting);
+    }
+
+    campaign.qty_available = campaign.last_temp_upload_info.qty_available;
+    campaign.qty_uploaded = campaign.last_temp_upload_info.qty_uploaded;
+    campaign.last_phone = campaign.last_temp_upload_info.last_phone;
+    campaign.system_create_datetime = campaign.last_temp_upload_info.system_create_datetime;
+    campaign.last_upload_rows = campaign.last_temp_upload_info.upload_rows;
+
+    campaign.last_temp_upload_info = {};
+    campaign.is_manually_uploaded = false;
+    campaign.is_get_last_phone = false;
+    campaign.last_upload_datetime = moment().format('M/D/Y hh:mm A');
+
+    await upload_schedule(group, campaign, setting);
+
+    Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
+        Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
+            callback({status: 'success', campaign: updatedCampaign});
+        });
+    });
+}
+
 module.exports = {
     upload_sheet: upload_sheet,
+    upload_preview_sheet: upload_preview_sheet,
     upload_schedule: upload_schedule,
     send_whatsapp_message: send_whatsapp_message
 }
