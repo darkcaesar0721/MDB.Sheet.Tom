@@ -184,6 +184,7 @@ const UploadCampaign = (props) => {
     }, [props.runningStatusList, currentRunningIndex, isPaused]);
 
     const validation = function() {
+        console.log(props.runningStatusList);
         if (props.runningStatusList.length === 0) {
             messageApi.warning('Please select campaign list.');
             return;
@@ -192,46 +193,50 @@ const UploadCampaign = (props) => {
             messageApi.warning('Please input schedule sheet url.');
             return;
         }
-        if (props.whatsapp.ultramsg_instance_id === "") {
+        if (props.setting.whatsapp.ultramsg_instance_id === "") {
             messageApi.warning("Please input whatsapp instance id");
             return false;
         }
-        if (props.whatsapp.ultramsg_token === "") {
+        if (props.setting.whatsapp.ultramsg_token === "") {
             messageApi.warning("Please input whatsapp token");
             return false;
         }
+
+        return true;
     }
 
     const upload = function(index, statusLists = []) {
-        setCurrentRunningIndex(index);
-        setStatusResult(statusLists);
+        if (validation()) {
+            setCurrentRunningIndex(index);
+            setStatusResult(statusLists);
 
-        props.upload(props.group._id, props.runningStatusList[index].detail, false, function(result) {
-            props.getSettings(function(settings) {
-                if (settings.current_upload.cancel_status === false) {
-                    statusLists[index]['status'] = result.status;
-                    statusLists[index]['campaign'] = result.campaign;
-                    if (props.runningStatusList.length > (index + 1)) {
-                        statusLists[index + 1]['status'] = 'loading';
-                    }
-                    setStatusResult(statusLists);
-                    props.updateRunningStatusList(statusLists);
-
-                    if (settings.current_upload.pause_index !== index) {
-                        if (props.runningStatusList.length === (index + 1)) {
-                            setIsClose(true);
-                            setCurrentRunningIndex(index + 1);
-                            messageApi.success('upload success');
-                        } else {
-                            upload(index + 1, statusLists);
+            props.upload(props.group._id, props.runningStatusList[index].detail, false, function(result) {
+                props.getSettings(function(settings) {
+                    if (settings.current_upload.cancel_status === false) {
+                        statusLists[index]['status'] = result.status;
+                        statusLists[index]['campaign'] = result.campaign;
+                        if (props.runningStatusList.length > (index + 1)) {
+                            statusLists[index + 1]['status'] = 'loading';
                         }
-                    } else {
-                        const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: index, pause_index: -1})});
-                        props.updateSetting(setting);
+                        setStatusResult(statusLists);
+                        props.updateRunningStatusList(statusLists);
+
+                        if (settings.current_upload.pause_index !== index) {
+                            if (props.runningStatusList.length === (index + 1)) {
+                                setIsClose(true);
+                                setCurrentRunningIndex(index + 1);
+                                messageApi.success('upload success');
+                            } else {
+                                upload(index + 1, statusLists);
+                            }
+                        } else {
+                            const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: index, pause_index: -1})});
+                            props.updateSetting(setting);
+                        }
                     }
-                }
-            });
-        })
+                });
+            })
+        }
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
