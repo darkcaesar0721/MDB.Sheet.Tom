@@ -4,6 +4,7 @@ const ODBC = require('odbc');
 
 const Campaigns = require('../models/campaign.model');
 const Settings = require('../models/setting.model');
+const Groups = require("../models/group.model");
 
 router.get('/', (req, res) => {
     Campaigns.find({}, (err, campaigns) => {
@@ -27,7 +28,13 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
     Campaigns.findByIdAndRemove(req.params.id, (err, removedCampaign) => {
-        res.json(removedCampaign);
+        Groups.updateMany({ "campaigns.detail":  req.params.id}, {
+            $pull: {
+                campaigns: {detail: req.params.id},
+            },
+        }, (err, doc) => {
+            res.json(removedCampaign);
+        });
     });
 });
 

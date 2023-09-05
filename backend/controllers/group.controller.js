@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const Groups = require('../models/group.model');
+const Settings = require("../models/setting.model");
 
 router.get('/', (req, res) => {
     Groups.find({}).exec((err, groups) => {

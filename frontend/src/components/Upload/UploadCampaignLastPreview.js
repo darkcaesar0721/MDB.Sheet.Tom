@@ -1,30 +1,25 @@
-import {Button, Col, message, Row, Spin, Table} from "antd";
+import {Col, Row, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import moment from "moment/moment";
 
-const UploadPreview = (props) => {
+const UploadCampaignLastPreview = (props) => {
     const [tableParams, setTableParams] = useState({
         pagination: {
             current: 1,
             pageSize: 200,
         },
     });
-    const [loading, setLoading] = useState(false);
-    const [tip, setTip] = useState('');
     const [columns, setColumns] = useState([]);
-    const [messageApi, contextHolder] = message.useMessage();
-
-    const currentCampaign = props.campaigns.filter(c => c._id === props.campaign.detail)[0];
 
     useEffect(function() {
-        if (currentCampaign.last_temp_upload_info.upload_rows) {
+        if (props.campaign.last_upload_rows) {
             let tblColumns = [];
             tblColumns = [...tblColumns, {
                 title: 'no',
                 key: 'no',
                 render: (_, record) => {
                     let index = -1;
-                    currentCampaign.last_temp_upload_info.upload_rows.forEach((row, i) => {
+                    props.campaign.last_upload_rows.forEach((row, i) => {
                         if (row.Phone === record.Phone) index = i;
                     })
                     return (
@@ -56,8 +51,7 @@ const UploadPreview = (props) => {
     };
 
     return (
-        <Spin spinning={loading} tip={tip} delay={500}>
-            {contextHolder}
+        <>
             <Row>
                 <Col span={3} className={"align-right"}>
                     Query Name:
@@ -91,13 +85,13 @@ const UploadPreview = (props) => {
                     Qty Available:
                 </Col>
                 <Col span={3} offset={1}>
-                    {currentCampaign.last_temp_upload_info.qty_available}
+                    {props.campaign.qty_available}
                 </Col>
                 <Col span={3} offset={1} className={"align-right"}>
                     Qty Uploaded:
                 </Col>
                 <Col span={3} offset={1}>
-                    {currentCampaign.last_temp_upload_info.qty_uploaded}
+                    {props.campaign.qty_uploaded}
                 </Col>
             </Row>
             <Row>
@@ -105,13 +99,13 @@ const UploadPreview = (props) => {
                     Last Phone:
                 </Col>
                 <Col span={3} offset={1}>
-                    {currentCampaign.last_temp_upload_info.last_phone}
+                    {props.campaign.last_phone}
                 </Col>
                 <Col span={3} offset={1} className={"align-right"}>
                     System Create Datetime:
                 </Col>
                 <Col span={5} offset={1}>
-                    {moment(currentCampaign.last_temp_upload_info.system_create_datetime).format('M/D/Y, hh:mm A')}
+                    {moment(props.campaign.system_create_datetime).format('M/D/Y, hh:mm A')}
                 </Col>
             </Row>
             <Row>
@@ -119,23 +113,15 @@ const UploadPreview = (props) => {
                     <Table
                         size="small"
                         columns={columns}
-                        dataSource={currentCampaign.last_temp_upload_info.upload_rows}
+                        dataSource={props.campaign.last_upload_rows}
                         pagination={tableParams.pagination}
                         onChange={handleTableChange}
                         className="antd-custom-table"
                     />
                 </Col>
             </Row>
-            <Row>
-                <Col span={2} offset={19}>
-                    <Button type="primary" onClick={props.cancelUpload}>Cancel</Button>
-                </Col>
-                <Col span={2} offset={1}>
-                    <Button type="primary" onClick={props.uploadPreview}>Upload</Button>
-                </Col>
-            </Row>
-        </Spin>
+        </>
     )
 }
 
-export default UploadPreview;
+export default UploadCampaignLastPreview;

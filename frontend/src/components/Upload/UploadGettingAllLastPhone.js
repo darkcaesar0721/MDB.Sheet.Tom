@@ -86,7 +86,15 @@ const UploadGettingAllLastPhone = (props) => {
             {
                 title: 'LastUploadDate',
                 dataIndex: 'last_upload_datetime',
-                key: 'last_upload_datetime',
+                render: (_, r) => {
+                    return (
+                        <>
+                            {
+                                <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined || r.last_upload_datetime === null ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
+                            }
+                        </>
+                    )
+                }
             },
             {
                 title: 'Last Phone',

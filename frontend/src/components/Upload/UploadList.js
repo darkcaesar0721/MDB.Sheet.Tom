@@ -23,8 +23,9 @@ import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 import UploadGettingAllLastPhone from "./UploadGettingAllLastPhone";
 import UploadCampaign from "./UploadCampaign";
-import uploadPreview from "./UploadPreview";
 import UploadPreview from "./UploadPreview";
+import UploadCampaignLastInfo from "./UploadCampaignLastInfo";
+import UploadCampaignLastPreview from "./UploadCampaignLastPreview";
 
 let current_date = new Date();
 let pstDate = current_date.toLocaleString("en-US", {
@@ -49,12 +50,12 @@ const UploadList = (props) => {
     const [selectedCampaign, setSelectedCampaign] = useState(null);
     const [settingModalOpen, setSettingModalOpen] = useState(false);
     const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
+    const [uploadCampaignLastPreviewModalOpen, setUploadCampaignLastPreviewModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
     const [openUploadAutoStatusModal, setOpenUploadAutoStatusModal] = useState(false);
     const [openUploadManualStatusModal, setOpenUploadManualStatusModal] = useState(false);
     const [runningStatusList, setRunningStatusList] = useState([]);
     const [uploadDoneStatus, setUploadDoneStatus] = useState(false);
-    const [errorStatusList, setErrorStatusList] = useState([]);
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -64,6 +65,14 @@ const UploadList = (props) => {
         setGroupOptions(oldState => props.groups.map((group, index) => {return {value: group._id, label: group.name}}));
 
         if (currentGroup === '') return;
+
+        if (props.groups.filter(g => g._id === currentGroup).length === 0) {
+            let setting = {...props.setting};
+            setting.current_upload.group = "";
+            props.updateSetting(setting);
+            return;
+        }
+
         const filterGroup = props.groups.filter(g => g._id === currentGroup)[0];
         let manualUploadCampaignKeys = [];
 
@@ -472,8 +481,6 @@ const UploadList = (props) => {
     }
 
     const handleAutoUploadBtnClick = function() {
-        setErrorStatusList([]);
-
         let campaigns = group.campaigns.filter(c => {
             if (!c.is_manually_upload && c.weekday[wday] === true) return true;
 
@@ -492,8 +499,6 @@ const UploadList = (props) => {
     }
 
     const handleManuallyUploadBtnClick = function() {
-        setErrorStatusList([]);
-
         let campaigns = group.campaigns.filter(c => {
             if (c.is_manually_upload) return true;
 
@@ -573,6 +578,11 @@ const UploadList = (props) => {
             columns: campaign.columns
         }
         props.updateGroupCampaignField(group._id, campaign._id, updatedCampaign);
+    }
+
+    const showCampaignUploadLastInfo = function(campaign) {
+        setSelectedCampaign(campaign);
+        setUploadCampaignLastPreviewModalOpen(true);
     }
 
     return (
@@ -797,6 +807,27 @@ const UploadList = (props) => {
                     campaigns={props.campaigns}
                     uploadPreview={uploadPreview}
                     cancelUpload={cancelUpload}
+                />
+            </Modal>
+            <Row>
+                <Col span={24}>
+                    <UploadCampaignLastInfo
+                        campaigns={props.campaigns}
+                        showCampaignUploadLastInfo={showCampaignUploadLastInfo}
+                    />
+                </Col>
+            </Row>
+            <Modal
+                title="Upload Preview"
+                centered
+                open={uploadCampaignLastPreviewModalOpen}
+                onOk={() => setUploadCampaignLastPreviewModalOpen(false)}
+                onCancel={() => setUploadCampaignLastPreviewModalOpen(false)}
+                width={1300}
+            >
+                <UploadCampaignLastPreview
+                    campaign={selectedCampaign}
+                    campaigns={props.campaigns}
                 />
             </Modal>
         </Spin>

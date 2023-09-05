@@ -3,7 +3,11 @@ import {
     INIT_CAMPAIGN_DATA,
     CREATE_CAMPAIGN_DATA,
     UPDATE_CAMPAIGN_DATA,
-    DELETE_CAMPAIGN_DATA, UPDATE_GROUP_CAMPAIGN_FIELD_DATA, UPDATE_CAMPAIGN_FIELD_DATA
+    DELETE_CAMPAIGN_DATA,
+    UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
+    UPDATE_CAMPAIGN_FIELD_DATA,
+    CREATE_GROUP_DATA,
+    INIT_GROUP_DATA
 } from "../actionTypes";
 import {API} from "../../config";
 
@@ -35,10 +39,16 @@ export const updateCampaign = (campaign = {}, callback = function() {}) => async
 }
 
 export const deleteCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.delete(API + '/campaign/' + campaign._id);
+    const deletedCampaign = await axios.delete(API + '/campaign/' + campaign._id);
     dispatch({
         type: DELETE_CAMPAIGN_DATA,
-        data: result.data
+        data: deletedCampaign.data
+    });
+
+    const groups = await axios.get(API + '/group');
+    dispatch({
+        type: INIT_GROUP_DATA,
+        data: groups.data
     });
     callback();
 }
