@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const groupSchema = new mongoose.Schema({
     name: String,
     campaigns: [{
-        campaign: {
+        detail: {
             type: mongoose.Schema.ObjectId,
             ref: 'Campaign'
         },

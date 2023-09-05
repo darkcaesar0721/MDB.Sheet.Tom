@@ -59,13 +59,14 @@ function GroupEdit(props) {
             let campaigns = [...props.groups.filter(g => g._id === id)[0].campaigns];
             let g = {...props.groups.filter(g => g._id === id)[0]};
 
-            setSelectedCampaignKeys(oldState => {return campaigns.map(c => {return c._id})});
+            setSelectedCampaignKeys(oldState => {return campaigns.map(c => {return c.detail})});
 
             props.campaigns.forEach(c => {
-                if (campaigns.filter(g_c => g_c._id === c._id).length === 0) {
+                if (campaigns.filter(g_c => g_c.detail === c._id).length === 0) {
+                    console.log(c);
                     let campaign = {
                         key: c._id,
-                        campaign: c,
+                        detail: c._id,
                         is_checked: false,
                         whatsapp: {
                             send_status: props.setting.whatsapp.global_send_status,
@@ -85,14 +86,14 @@ function GroupEdit(props) {
             });
 
             campaigns.forEach((g_c, g_c_i) => {
-                const campaignKeys = Object.keys(g_c.campaign);
+                let campaign = props.campaigns.filter(c => c._id === g_c.detail)[0];
+                const campaignKeys = Object.keys(campaign);
                 for (const k of campaignKeys) {
                     if (campaigns[g_c_i].is_checked !== false && k === 'columns' || k === '_id') continue;
-
-                    campaigns[g_c_i][k] = g_c.campaign[k];
+                    campaigns[g_c_i][k] = campaign[k];
                 }
                 campaigns[g_c_i].order = g_c_i;
-                campaigns[g_c_i].key = g_c._id;
+                campaigns[g_c_i].key = g_c.detail;
                 campaigns[g_c_i].is_checked = campaigns[g_c_i].is_checked !== false;
             });
 
@@ -150,7 +151,7 @@ function GroupEdit(props) {
                 width: 120,
                 render: (_, r) => {
                     return (
-                        <span>{r.sheet_urls.length}</span>
+                        <span>{r.sheet_urls === undefined ? '' : r.sheet_urls.length}</span>
                     )
                 }
             },
@@ -207,17 +208,22 @@ function GroupEdit(props) {
 
     const handleSubmit = function() {
         if (validation()) {
-            let campaigns = group.campaigns.sort((a, b) => {
+            let campaigns = [...group.campaigns].sort((a, b) => {
                 if (parseInt(a.order) < parseInt(b.order)) return -1;
                 return 0;
             });
-            const g = Object.assign({...group}, {campaigns: campaigns.filter(g => g.is_checked)});
 
+            const g = Object.assign({...group}, {campaigns: campaigns.filter(g => g.is_checked).map(c => {
+                    let campaign = [...props.campaigns].filter(cg => cg._id === c.detail)[0];
+                    for (const key of Object.keys(campaign)) {
+                        if (key === '_id' || key === 'columns' || key === 'key') continue;
+                        delete c[key];
+                    }
+                    return c;
+                })});
             props.updateGroup(g, (resp) => {
                 messageApi.success('update success');
-                setTimeout(function() {
-                    navigate('/groups');
-                }, 1000);
+                navigate('/groups');
             });
         }
     }
@@ -257,7 +263,7 @@ function GroupEdit(props) {
 
             setGroup(oldState => {
                 return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => {
-                        return Object.assign({...c}, {is_checked: selectedRowKeys.filter(sc => sc === c._id).length > 0});
+                        return Object.assign({...c}, {is_checked: selectedRowKeys.filter(sc => sc === c.detail).length > 0});
                     })})
             })
         }
@@ -278,7 +284,6 @@ function GroupEdit(props) {
     }
 
     const handleReorder = (dragIndex, draggedIndex) => {
-
         const campaigns = lastDragDropCampaigns.length > 0 ? lastDragDropCampaigns : [...group.campaigns];
         const item = campaigns.splice(dragIndex, 1)[0];
         campaigns.splice(draggedIndex, 0, item);

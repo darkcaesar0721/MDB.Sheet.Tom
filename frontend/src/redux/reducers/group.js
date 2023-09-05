@@ -61,15 +61,20 @@ function group(state = initialState, action) {
         }
         case UPDATE_GROUP_CAMPAIGN_FIELD_DATA:
         {
-            const {group, campaign, key, value} = action.data;
+            const {groupId, campaignId, updateFields} = action.data;
 
             return Object.assign(
                 {...state}, {data: [...state.data].map(
                         g => {
-                            if (g._id === group._id) {
+                            if (g._id === groupId) {
                                 return Object.assign({...g}, {campaigns : [...g.campaigns].map(c => {
                                         let updatedCampaign = c;
-                                        if (c._id === campaign._id) updatedCampaign[key] = value;
+                                        if (c._id === campaignId) {
+                                            const keys = Object.keys(updateFields);
+                                            keys.forEach(key => {
+                                                updatedCampaign[key] = updateFields[key];
+                                            })
+                                        }
                                         return updatedCampaign;
                                     })})
                             } else {

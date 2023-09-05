@@ -64,21 +64,16 @@ export const updateGroupCampaignObject = (group = {}, campaign = {}, object_name
     callback();
 }
 
-export const updateGroupCampaignField = (group = {}, campaign = {}, key = '', value = '', callback = function() {}) => async (dispatch) => {
+export const updateGroupCampaignField = (groupId = '', campaignId = '', updateFields = {}, callback = function() {}) => async (dispatch) => {
     dispatch({
         type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
         data: {
-            group: group,
-            campaign: campaign,
-            key: key,
-            value: value
+            groupId: groupId,
+            campaignId: campaignId,
+            updateFields: updateFields
         }
     });
 
-    const result = await axios.put(API + '/group/' + group._id, Object.assign({...group}, {campaigns : [...group.campaigns].map(c => {
-            let updatedCampaign = c;
-            if (c._id === campaign._id) updatedCampaign[key] = value;
-            return updatedCampaign;
-        })}));
+    const result = await axios.post(API + '/group/update_campaign_field', {groupId: groupId, campaignId: campaignId, updateFields: updateFields});
     callback();
 }

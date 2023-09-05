@@ -4,16 +4,14 @@ const router = express.Router();
 const Groups = require('../models/group.model');
 
 router.get('/', (req, res) => {
-    Groups.find({}).populate('campaigns.campaign').exec((err, groups) => {
+    Groups.find({}).exec((err, groups) => {
         res.json(groups);
     })
 });
 
 router.post('/', (req, res) => {
     Groups.create(req.body, (err, newGroup) => {
-        newGroup.populate('campaigns.campaign', (err, populatedGroup) => {
-            res.json(populatedGroup);
-        });
+        res.json(newGroup);
     });
 });
 
@@ -29,6 +27,16 @@ router.delete('/:id', (req, res) => {
     Groups.findByIdAndRemove(req.params.id, (err, removedGroup) => {
         res.json(removedGroup);
     });
+});
+
+router.post('/update_campaign_field', (req, res) => {
+    let set = {};
+    const keys = Object.keys(req.body.updateFields);
+    keys.forEach(key => {
+        set["campaigns.$." + key] = req.body.updateFields[key];
+    });
+    Groups.updateOne({_id: req.body.groupId, "campaigns.campaign": req.body.campaignId}, {$set: set}, );
+    res.json('success');
 });
 
 module.exports = router;

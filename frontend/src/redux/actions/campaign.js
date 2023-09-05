@@ -48,7 +48,7 @@ export const getQueryColumns = (query = '', callback = function() {}) => async (
     callback(result.data);
 }
 
-export const updateCampaignField = (campaign = {}, database_access = false, callback = function() {}) => async (dispatch) => {
+export const updateCampaignField = (campaign = {}, updateFields = {}, database_access = false, callback = function() {}) => async (dispatch) => {
     dispatch({
         type: UPDATE_CAMPAIGN_DATA,
         data: campaign
@@ -60,7 +60,7 @@ export const updateCampaignField = (campaign = {}, database_access = false, call
     });
 
     if (database_access) {
-        const result = await axios.put(API + '/campaign/' + campaign._id, campaign);
+        const result = await axios.put(API + '/campaign/' + campaign._id, updateFields);
     }
     callback();
 }

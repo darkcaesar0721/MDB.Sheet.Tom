@@ -139,7 +139,10 @@ function CampaignEdit(props) {
         if (validation()) {
             const currentCampaign = props.campaigns.data.filter(c => c._id === id)[0];
 
-            const campaign = Object.assign({...currentCampaign}, {columns: columns, sheet_urls: form.sheet_urls, schedule: form.schedule})
+            const campaign = Object.assign({...currentCampaign}, {columns: columns, sheet_urls: form.sheet_urls, schedule: form.schedule});
+            delete campaign['last_temp_upload_info'];
+            delete campaign['last_upload_rows'];
+
             props.updateCampaign(campaign, function() {
                 messageApi.success('update success');
                 setTimeout(function() {

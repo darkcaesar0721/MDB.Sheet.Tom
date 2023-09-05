@@ -69,7 +69,7 @@ const UploadList = (props) => {
                 if (campaign.is_manually_upload === true) manualUploadCampaignKeys.push(campaign._id);
 
                 campaign.key = campaign._id;
-                const campaignKeys = Object.keys(campaign.campaign);
+                const campaignKeys = Object.keys(campaign);
                 for(const key of campaignKeys) {
                     if (key === '_id' || key === 'columns') continue;
                     campaign[key] = campaign.campaign[key];
@@ -82,7 +82,7 @@ const UploadList = (props) => {
                 return campaign;
             })}));
         setSelectedManualUploadCampaignKeys(manualUploadCampaignKeys);
-    }, [props.groups, currentGroup]);
+    }, [props.groups, props.campaigns, currentGroup]);
 
     useEffect(function() {
         if (group.campaigns === undefined) return;
@@ -365,7 +365,9 @@ const UploadList = (props) => {
     }
 
     const handleFieldChange = function(campaign, key, value) {
-        props.updateGroupCampaignField(group, campaign, key, value);
+        const updateFields = {};
+        updateFields[key] = value;
+        props.updateGroupCampaignField(group._id, campaign._id, updateFields);
     }
 
     const handleObjectChange = function(campaign, object_name, key, value) {
@@ -375,13 +377,13 @@ const UploadList = (props) => {
     const handleLastPhoneChange = function(campaign, value) {
         let c = {...campaign.campaign};
         c.last_phone = value;
-        props.updateCampaignField(c);
+        props.updateCampaignField(c, {last_phone: value});
     }
 
     const handleCampaignFieldChange = function(campaign, key, value) {
         let c = {...campaign.campaign};
         c.last_phone = value;
-        props.updateCampaignField(c, true);
+        props.updateCampaignField(c, {last_phone: value}, true);
     }
 
     const handleTableChange = (pagination, filters, sorter) => {

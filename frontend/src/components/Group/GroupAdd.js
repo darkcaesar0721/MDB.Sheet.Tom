@@ -60,7 +60,7 @@ function GroupAdd(props) {
             let campaign = {
                 order: i,
                 key: c._id,
-                campaign: c._id,
+                detail: c._id,
                 is_checked: true,
                 whatsapp: {
                     send_status: props.setting.whatsapp.global_send_status,
@@ -75,10 +75,11 @@ function GroupAdd(props) {
                 },
                 columns: []
             };
-            const keys = Object.keys(c);
-            keys.forEach(key => {
+            const campaignKeys = Object.keys(c);
+            for (const key of campaignKeys) {
+                if (key === '_id') continue;
                 campaign[key] = c[key];
-            })
+            }
             campaigns.push(campaign);
             ids.push(c._id);
         });
@@ -94,107 +95,109 @@ function GroupAdd(props) {
     }, [props.campaigns]);
 
     useEffect(function() {
-        setTableParams({
-            ...tableParams,
-            pagination: {
-                ...tableParams.pagination,
-                total: group.campaigns.length,
-            },
-        });
+        if (group.campaigns.length > 0) {
+            setTableParams({
+                ...tableParams,
+                pagination: {
+                    ...tableParams.pagination,
+                    total: group.campaigns.length,
+                },
+            });
 
-        let no_column = {
-            title: 'no',
-            key: 'no',
-            fixed: 'left',
-            width: 30,
-            render: (_, record) => {
-                let index = -1;
-                group.campaigns.forEach((c, i) => {
-                    if (c._id === record._id) {
-                        index = i + 1;
-                        return true;
-                    }
-                })
-                return (
-                    <>
-                        <span>{index}</span>
-                    </>
-                )
-            }
-        }
-
-        setColumns([no_column,
-            {
-                title: 'Query Name',
-                dataIndex: 'query',
-                key: 'query',
-                width: 350,
-            },
-            {
-                title: 'Sheet Name',
-                dataIndex: 'schedule',
-                key: 'schedule',
-                width: 150
-            },
-            {
-                title: 'Sheet URL Count',
-                key: 'sheet_urls',
-                width: 120,
-                render: (_, r) => {
-                    return (
-                        <span>{r.sheet_urls.length}</span>
-                    )
-                }
-            },
-            {
-                title: 'Qty Available',
-                dataIndex: 'qty_available',
-                key: 'qty_available'
-            },
-            {
-                title: 'Qty Uploaded',
-                dataIndex: 'qty_uploaded',
-                key: 'qty_uploaded'
-            },
-            {
-                title: 'LastUploadDate',
-                dataIndex: 'last_upload_datetime',
-                key: 'last_upload_datetime',
-                render: (_, r) => {
-                    return (
-                        <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
-                    )
-                }
-            },
-            {
-                title: 'Last Phone',
-                dataIndex: 'last_phone',
-                key: 'last_phone',
-                width: 130
-            },
-            {
-                title: 'SystemCreateDate',
-                dataIndex: 'system_create_datetime',
-                key: 'system_create_datetime',
-                render: (_, r) => {
-                    return (
-                        <span>{r.system_create_datetime === "" || r.system_create_datetime === undefined ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
-                    )
-                }
-            },
-            {
-                title: 'Setting',
-                key: 'operation',
-                width: 60,
+            let no_column = {
+                title: 'no',
+                key: 'no',
+                fixed: 'left',
+                width: 30,
                 render: (_, record) => {
+                    let index = -1;
+                    group.campaigns.forEach((c, i) => {
+                        if (c.key === record.key) {
+                            index = i + 1;
+                            return true;
+                        }
+                    })
                     return (
                         <>
-                            <Button disabled={!record.is_checked} icon={<SettingOutlined /> } onClick={() => {handleEditSettingClick(record)}} style={{marginRight: 1}}/>
+                            <span>{index}</span>
                         </>
                     )
                 }
-            },
-        ]);
+            }
+
+            setColumns([no_column,
+                {
+                    title: 'Query Name',
+                    dataIndex: 'query',
+                    key: 'query',
+                    width: 350,
+                },
+                {
+                    title: 'Sheet Name',
+                    dataIndex: 'schedule',
+                    key: 'schedule',
+                    width: 150
+                },
+                {
+                    title: 'Sheet URL Count',
+                    key: 'sheet_urls',
+                    width: 120,
+                    render: (_, r) => {
+                        return (
+                            <span>{r.sheet_urls === undefined ? 0 : r.sheet_urls.length}</span>
+                        )
+                    }
+                },
+                {
+                    title: 'Qty Available',
+                    dataIndex: 'qty_available',
+                    key: 'qty_available'
+                },
+                {
+                    title: 'Qty Uploaded',
+                    dataIndex: 'qty_uploaded',
+                    key: 'qty_uploaded'
+                },
+                {
+                    title: 'LastUploadDate',
+                    dataIndex: 'last_upload_datetime',
+                    key: 'last_upload_datetime',
+                    render: (_, r) => {
+                        return (
+                            <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
+                        )
+                    }
+                },
+                {
+                    title: 'Last Phone',
+                    dataIndex: 'last_phone',
+                    key: 'last_phone',
+                    width: 130
+                },
+                {
+                    title: 'SystemCreateDate',
+                    dataIndex: 'system_create_datetime',
+                    key: 'system_create_datetime',
+                    render: (_, r) => {
+                        return (
+                            <span>{r.system_create_datetime === "" || r.system_create_datetime === undefined ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
+                        )
+                    }
+                },
+                {
+                    title: 'Setting',
+                    key: 'operation',
+                    width: 60,
+                    render: (_, record) => {
+                        return (
+                            <>
+                                <Button disabled={!record.is_checked} icon={<SettingOutlined /> } onClick={() => {handleEditSettingClick(record)}} style={{marginRight: 1}}/>
+                            </>
+                        )
+                    }
+                },
+            ]);
+        }
     }, [group.campaigns]);
 
     const handleSubmit = function() {
@@ -203,13 +206,18 @@ function GroupAdd(props) {
                 if (parseInt(a.order) < parseInt(b.order)) return -1;
                 return 0;
             });
-            const g = Object.assign({...group}, {campaigns: campaigns.filter(g => g.is_checked)});
+            const g = Object.assign({...group}, {campaigns: campaigns.filter(g => g.is_checked).map(c => {
+                let campaign = props.campaigns.filter(cg => cg._id === c.detail)[0];
+                for (const key of Object.keys(campaign)) {
+                    if (key === '_id' || key === 'columns' || key === 'key') continue;
+                    delete c[key];
+                }
+                return c;
+                })});
 
             props.createGroup(g, (resp) => {
                 messageApi.success('create success');
-                setTimeout(function() {
-                    navigate('/groups');
-                }, 1000);
+                navigate('/groups');
             });
         }
     }
@@ -237,7 +245,7 @@ function GroupAdd(props) {
     }
 
     const updateCampaignSetting = function(campaign) {
-        setGroup(oldState => Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => c._id === campaign._id ? campaign : c)}));
+        setGroup(oldState => Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => c.key === campaign.key ? campaign : c)}));
     }
 
     // rowSelection object indicates the need for row selection
@@ -249,7 +257,7 @@ function GroupAdd(props) {
 
             setGroup(oldState => {
                 return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => {
-                     return Object.assign({...c}, {is_checked: selectedRowKeys.filter(sc => sc === c._id).length > 0});
+                     return Object.assign({...c}, {is_checked: selectedRowKeys.filter(sc => sc === c.key).length > 0});
                     })})
             })
         }
@@ -270,7 +278,6 @@ function GroupAdd(props) {
     }
 
     const handleReorder = (dragIndex, draggedIndex) => {
-
         const campaigns = lastDragDropCampaigns.length > 0 ? lastDragDropCampaigns : [...group.campaigns];
         const item = campaigns.splice(dragIndex, 1)[0];
         campaigns.splice(draggedIndex, 0, item);
