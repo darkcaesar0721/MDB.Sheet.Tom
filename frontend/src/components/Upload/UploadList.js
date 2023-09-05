@@ -335,7 +335,17 @@ const UploadList = (props) => {
     }, [group, currentGroup, currentWay]);
 
     const upload = function(campaign, isPreview = false) {
+        setLoading(true);
+        setTip("Wait for uploading....");
 
+        props.upload(group._id, campaign.detail, false, function(result) {
+            setLoading(false);
+            if (result.status === 'error') {
+                messageApi.warning(result.description);
+            } else {
+                messageApi.success('upload success');
+            }
+        })
     }
 
     const showPreviewResult = function(campaign) {
