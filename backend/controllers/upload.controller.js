@@ -10,8 +10,8 @@ const uploadLibrary = require('../libraries/upload');
 const Settings = require("../models/setting.model");
 
 router.post('/', async (req, res) => {
-    const {group, campaign, setting, index, manually} = req.body;
-    await uploadLibrary.upload_sheet(group, campaign, setting, manually, function(result){res.json(result);});
+    const {groupId, campaignId, manually} = req.body;
+    await uploadLibrary.upload_sheet(groupId, campaignId, manually, function(result){res.json(result);});
 })
 
 router.get('/get_last_phone', (req, res) => {

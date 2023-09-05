@@ -479,6 +479,9 @@ const UploadList = (props) => {
                 last_phone: statusLists[i]['campaign'].last_phone,
                 system_create_datetime: statusLists[i]['campaign'].system_create_datetime,
                 is_get_last_phone: statusLists[i]['campaign'].is_get_last_phone,
+                qty_available: statusLists[i]['campaign'].qty_available,
+                qty_uploaded: statusLists[i]['campaign'].qty_uploaded,
+                last_upload_datetime: statusLists[i]['campaign'].last_upload_datetime,
             }
 
             if (statusLists[i]['status'] === 'success') {

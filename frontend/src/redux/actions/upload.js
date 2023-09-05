@@ -16,18 +16,13 @@ export const getUploadLastPhone = (campaignId, callback = function() {}) => asyn
     }
 }
 
-export const upload = (group = {}, campaign = {}, setting = {}, index, callback = function() {}) => async (dispatch) => {
-    const result = await axios.post(API + '/upload', {group: group, campaign: campaign, setting: setting, index: index});
+export const upload = (groupId, campaignId, manually = false, callback = function() {}) => async (dispatch) => {
+    const result = await axios.post(API + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually});
     if (result.data.status === 'error') {
         callback(result.data);
     } else {
         dispatch({
             type: UPDATE_CAMPAIGN_DATA,
-            data: result.data.campaign
-        });
-
-        dispatch({
-            type: UPDATE_CAMPAIGN_FIELD_DATA,
             data: result.data.campaign
         });
         callback(result.data);

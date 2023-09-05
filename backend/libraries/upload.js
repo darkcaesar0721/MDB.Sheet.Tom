@@ -8,6 +8,8 @@ const auth = new google.auth.GoogleAuth({
 });
 
 const Campaigns = require('../models/campaign.model');
+const Groups = require('../models/group.model');
+const Settings = require("../models/setting.model");
 const axios = require("axios");
 const qs = require("qs");
 
@@ -28,7 +30,13 @@ function generateRandomIntegers(count, min, max) {
     return randomIntegers.sort();
 }
 
-const upload_sheet = async function (group = {}, campaign = {}, setting = {}, manually = false, callback = function() {}) {
+const upload_sheet = async function (groupId = "", campaignId = "", manually = false, callback = function() {}) {
+    const group = await Groups.findOne({_id: groupId});
+    const campaign = await Campaigns.findOne({_id: campaignId});
+    const setting = await Settings.findOne({});
+
+    const groupCampaign = group.campaigns.filter(c => c.detail == campaignId)[0];
+
     const authClientObject = await auth.getClient();//Google sheets instance
     const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
 
@@ -54,11 +62,11 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                 mdbRows.push(row);
             }
 
-            switch (campaign.filter.way) {
+            switch (groupCampaign.filter.way) {
                 case 'ALL':
                     mdbRows.forEach(mdbRow => {
                         let row = {};
-                        for (const column of campaign.columns) {
+                        for (const column of groupCampaign.columns) {
                             if (column.is_display === false) continue;
                             row[column.mdb_name] = mdbRow[column.mdb_name];
                         }
@@ -67,10 +75,10 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                     break;
                 case 'STATIC':
                     for (const mdbRow of mdbRows) {
-                        if (rows.length === campaign.filter.static_count) break;
+                        if (rows.length === groupCampaign.filter.static_count) break;
 
                         let row = {};
-                        for (const column of campaign.columns) {
+                        for (const column of groupCampaign.columns) {
                             if (column.is_display === false) continue;
                             row[column.mdb_name] = mdbRow[column.mdb_name];
                         }
@@ -78,24 +86,24 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                     }
                     break;
                 case 'RANDOM':
-                    let random_count = getRandomInt(campaign.filter.random_start, campaign.filter.random_end);
+                    let random_count = getRandomInt(groupCampaign.filter.random_start, groupCampaign.filter.random_end);
                     if (random_count >= mdbRows.length) {
                         for (const mdbRow of mdbRows) {
                             let row = {};
-                            for (const column of campaign.columns) {
+                            for (const column of groupCampaign.columns) {
                                 if (column.is_display === false) continue;
                                 row[column.mdb_name] = mdbRow[column.mdb_name];
                             }
                             rows.push(row);
                         }
                     } else {
-                        const randomIntegers = generateRandomIntegers(random_count - 1, campaign.filter.random_start, campaign.filter.random_end);
+                        const randomIntegers = generateRandomIntegers(random_count - 1, groupCampaign.filter.random_start, groupCampaign.filter.random_end);
                         const randoms = [0, ...randomIntegers];
                         mdbRows.forEach((mdbRow, i) => {
                             randoms.forEach((random, j) => {
                                 if (i === j) {
                                     let row = {};
-                                    for (const column of campaign.columns) {
+                                    for (const column of groupCampaign.columns) {
                                         if (column.is_display === false) continue;
                                         row[column.mdb_name] = mdbRow[column.mdb_name];
                                     }
@@ -106,18 +114,18 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                     }
                     break;
                 case 'RANDOM_FIRST':
-                    let random_first_count = getRandomInt(campaign.filter.random_start, campaign.filter.random_end);
+                    let random_first_count = getRandomInt(groupCampaign.filter.random_start, groupCampaign.filter.random_end);
                     if (random_first_count >= mdbRows.length) {
                         for (const mdbRow of mdbRows) {
                             let row = {};
-                            for (const column of campaign.columns) {
+                            for (const column of groupCampaign.columns) {
                                 if (column.is_display === false) continue;
                                 row[column.mdb_name] = mdbRow[column.mdb_name];
                             }
                             rows.push(row);
                         }
                     } else {
-                        let end = campaign.filter.random_start_position;
+                        let end = groupCampaign.filter.random_start_position;
                         if (mdbRows.length < end) end = mdbRows.length;
 
                         const randomIntegers = generateRandomIntegers(random_first_count - 1, 1, end - 1);
@@ -126,7 +134,7 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                             randoms.forEach((random, j) => {
                                 if (i === j) {
                                     let row = {};
-                                    for (const column of campaign.columns) {
+                                    for (const column of groupCampaign.columns) {
                                         if (column.is_display === false) continue;
                                         row[column.mdb_name] = mdbRow[column.mdb_name];
                                     }
@@ -138,8 +146,8 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                     break;
                 case 'PERIOD':
                     const today = moment().format('M/D/Y');
-                    const start_date = moment().subtract(campaign.filter.period_start, 'days').format('M/D/Y');
-                    const end_date = moment().subtract(campaign.filter.period_end, 'days').format('M/D/Y');
+                    const start_date = moment().subtract(groupCampaign.filter.period_start, 'days').format('M/D/Y');
+                    const end_date = moment().subtract(groupCampaign.filter.period_end, 'days').format('M/D/Y');
 
                     mdbRows.forEach((mdbRow, i) => {
                         const dateValue = new Date(mdbRow['SystemCreateDate']);
@@ -147,7 +155,7 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
 
                         if (date >= end_date && date <= start_date) {
                             let row = {};
-                            for (const column of campaign.columns) {
+                            for (const column of groupCampaign.columns) {
                                 if (column.is_display === false) continue;
                                 row[column.mdb_name] = mdbRow[column.mdb_name];
                             }
@@ -156,9 +164,9 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                     })
                     break;
                 case 'DATE':
-                    if (campaign.filter.date_is_time) {
-                        const before_date = moment().subtract(campaign.filter.date_old_day, 'days').format('M/D/Y');
-                        const before_date_value = new Date(before_date + ' ' + campaign.filter.date_time + ':00 ' + campaign.filter.date_meridian);
+                    if (groupCampaign.filter.date_is_time) {
+                        const before_date = moment().subtract(groupCampaign.filter.date_old_day, 'days').format('M/D/Y');
+                        const before_date_value = new Date(before_date + ' ' + groupCampaign.filter.date_time + ':00 ' + groupCampaign.filter.date_meridian);
                         const before_datetime = moment(before_date_value).format('M/D/Y hh:mm A');
 
                         mdbRows.forEach((mdbRow, i) => {
@@ -167,7 +175,7 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
 
                             if (datetime > before_datetime) {
                                 let row = {};
-                                for (const column of campaign.columns) {
+                                for (const column of groupCampaign.columns) {
                                     if (column.is_display === false) continue;
                                     row[column.mdb_name] = mdbRow[column.mdb_name];
                                 }
@@ -175,7 +183,7 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                             }
                         })
                     } else {
-                        const before_date = moment().subtract(campaign.filter.date_old_day, 'days').format('M/D/Y');
+                        const before_date = moment().subtract(groupCampaign.filter.date_old_day, 'days').format('M/D/Y');
 
                         mdbRows.forEach((mdbRow, i) => {
                             const dateValue = new Date(mdbRow['SystemCreateDate']);
@@ -183,7 +191,7 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
 
                             if (date >= before_date) {
                                 let row = {};
-                                for (const column of campaign.columns) {
+                                for (const column of groupCampaign.columns) {
                                     if (column.is_display === false) continue;
                                     row[column.mdb_name] = mdbRow[column.mdb_name];
                                 }
@@ -220,7 +228,6 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                 campaign.last_upload_rows = rows;
             }
 
-
             if (manually === false) {
                 if (rows.length > 0) {
                     for (const sheet_url of campaign.sheet_urls) {
@@ -244,7 +251,7 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
 
                         let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
                         let upload_row = [];
-                        for (const column of campaign.columns) {
+                        for (const column of groupCampaign.columns) {
                             if (column.is_display === false) continue;
 
                             upload_row.push(column.sheet_name);
@@ -271,23 +278,21 @@ const upload_sheet = async function (group = {}, campaign = {}, setting = {}, ma
                             },
                         });
                     }
-                    await send_whatsapp_message(group, campaign, setting);
+                    await send_whatsapp_message(group, groupCampaign, campaign, setting);
                 }
                 await upload_schedule(group, campaign, setting);
 
-                Campaigns.findByIdAndUpdate(campaign.campaign._id, campaign, function(err, c) {
-                    Campaigns.findOne({_id: campaign.campaign._id}, (err, updatedCampaign) => {
+                Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
+                    Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
                         callback({status: 'success', campaign: updatedCampaign});
                     });
                 });
             }
         });
     });
-
-
 }
 
-const send_whatsapp_message = async function (group = {}, campaign = {}, setting = {}) {
+const send_whatsapp_message = async function (group = {}, groupCampaign = {}, campaign = {}, setting = {}) {
     const result = await get_whatsapp_groups(setting);
     const groups = result.data;
 
@@ -300,8 +305,8 @@ const send_whatsapp_message = async function (group = {}, campaign = {}, setting
         data : {}
     };
 
-    if (campaign.whatsapp.send_status && campaign.whatsapp.users.length > 0 && campaign.whatsapp.message) {
-        for (const user of campaign.whatsapp.users) {
+    if (groupCampaign.whatsapp.send_status && groupCampaign.whatsapp.users.length > 0 && groupCampaign.whatsapp.message) {
+        for (const user of groupCampaign.whatsapp.users) {
             config['data'] = qs.stringify({
                 "token": `${setting.whatsapp.ultramsg_token}`,
                 "to": user,
@@ -310,8 +315,8 @@ const send_whatsapp_message = async function (group = {}, campaign = {}, setting
             await axios(config)
         }
     }
-    if (campaign.whatsapp.send_status && campaign.whatsapp.groups.length > 0 && campaign.whatsapp.message) {
-        for (const group of campaign.whatsapp.groups) {
+    if (groupCampaign.whatsapp.send_status && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
+        for (const group of groupCampaign.whatsapp.groups) {
             const g = groups.filter(g => g.name === group)[0];
 
             config['data'] = qs.stringify({
@@ -340,10 +345,6 @@ const get_whatsapp_groups = async (setting, callback = function () {
     };
 
     return await axios(config);
-}
-
-module.exports = {
-    get_whatsapp_groups: get_whatsapp_groups,
 }
 
 const upload_schedule = async function (group = {}, campaign = {}, setting = {}) {

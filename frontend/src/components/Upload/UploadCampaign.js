@@ -206,7 +206,7 @@ const UploadCampaign = (props) => {
         setCurrentRunningIndex(index);
         setStatusResult(statusLists);
 
-        props.upload(props.group, props.runningStatusList[index], props.setting, index, function(result) {
+        props.upload(props.group._id, props.runningStatusList[index].detail, false, function(result) {
             props.getSettings(function(settings) {
                 if (settings.current_upload.cancel_status === false) {
                     statusLists[index]['status'] = result.status;
@@ -221,9 +221,7 @@ const UploadCampaign = (props) => {
                         if (props.runningStatusList.length === (index + 1)) {
                             setIsClose(true);
                             setCurrentRunningIndex(index + 1);
-                            setTimeout(function() {
-                                messageApi.success('uploadone');
-                            }, 1000);
+                            messageApi.success('upload success');
                         } else {
                             upload(index + 1, statusLists);
                         }
