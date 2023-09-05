@@ -75,7 +75,10 @@ const groupSchema = new mongoose.Schema({
             period_start: Number,
             period_end: Number,
         },
-        comment: String,
+        comment: {
+            type: String,
+            default: ""
+        },
         is_manually_upload: {
             type: Boolean,
             default: false

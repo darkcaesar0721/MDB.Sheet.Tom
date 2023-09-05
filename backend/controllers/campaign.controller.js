@@ -63,4 +63,19 @@ router.post('/get_query_column', (req, res) => {
     });
 });
 
+router.post('/update_field', (req, res) => {
+    let set = {};
+    const keys = Object.keys(req.body.updateFields);
+    keys.forEach(key => {
+        set[key] = req.body.updateFields[key];
+    });
+    Campaigns.updateOne({_id: req.body.campaignId}, set, function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            res.json(docs);
+        }});
+});
+
 module.exports = router;

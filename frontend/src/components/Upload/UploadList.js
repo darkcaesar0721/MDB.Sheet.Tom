@@ -16,7 +16,7 @@ import {
 } from "../../redux/actions/setting";
 import {
     updateGroup,
-    updateGroupCampaignField, updateGroupCampaignObject,
+    updateGroupCampaignField,
 } from "../../redux/actions/group";
 import {getUploadLastPhone, upload} from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
@@ -69,10 +69,12 @@ const UploadList = (props) => {
                 if (campaign.is_manually_upload === true) manualUploadCampaignKeys.push(campaign._id);
 
                 campaign.key = campaign._id;
-                const campaignKeys = Object.keys(campaign);
+
+                let globalCampaign = props.campaigns.filter(c => c._id === campaign.detail)[0];
+                const campaignKeys = Object.keys(globalCampaign);
                 for(const key of campaignKeys) {
-                    if (key === '_id' || key === 'columns') continue;
-                    campaign[key] = campaign.campaign[key];
+                    if (key === '_id' || key === 'columns' || key === 'key') continue;
+                    campaign[key] = globalCampaign[key];
                 }
 
                 const filterKeys = Object.keys(campaign.filter);
@@ -190,7 +192,7 @@ const UploadList = (props) => {
             width: 160,
             render: (_, r) => {
                 return (
-                    <Input value={r.comment} onBlur={(e) => {handleFieldChange(r, 'comment', e.target.value)}} onChange={(e) => {handleFieldChange(r, 'comment', e.target.value)}}/>
+                    <Input value={r.comment} onBlur={(e) => {handleFieldChange(r, 'comment', e.target.value, true)}} onChange={(e) => {handleFieldChange(r, 'comment', e.target.value, false)}}/>
                 )
             }
         }];
@@ -257,7 +259,7 @@ const UploadList = (props) => {
             width: 110,
             render: (_, r) => {
                 return (
-                    <Input style={{color: r.is_get_last_phone  ? 'red' : 'black'}} onBlur={(e) => {handleCampaignFieldChange(r, 'last_phone', e.target.value)}} onChange={(e) => {handleLastPhoneChange(r, e.target.value)}} value={r.last_phone}/>
+                    <Input style={{color: r.is_get_last_phone  ? 'red' : 'black'}} onBlur={(e) => {handleCampaignFieldChange(r, 'last_phone', e.target.value, true)}} onChange={(e) => {handleCampaignFieldChange(r, 'last_phone', e.target.value, false)}} value={r.last_phone}/>
                 )
             }
         }];
@@ -364,26 +366,24 @@ const UploadList = (props) => {
         props.updateSetting(setting);
     }
 
-    const handleFieldChange = function(campaign, key, value) {
+    const handleFieldChange = function(campaign, key, value, databaseAccess = true) {
         const updateFields = {};
         updateFields[key] = value;
-        props.updateGroupCampaignField(group._id, campaign._id, updateFields);
+        props.updateGroupCampaignField(group._id, campaign._id, updateFields, databaseAccess);
     }
 
-    const handleObjectChange = function(campaign, object_name, key, value) {
-        props.updateGroupCampaignObject(group, campaign, object_name, key, value);
+    const handleObjectChange = function(campaign, object_name, key, value, databaseAccess = true) {
+        let object = campaign[object_name];
+        object[key] = value;
+        let updatedObject = {};
+        updatedObject[object_name] = object;
+        props.updateGroupCampaignField(group._id, campaign._id, updatedObject, databaseAccess);
     }
 
-    const handleLastPhoneChange = function(campaign, value) {
-        let c = {...campaign.campaign};
-        c.last_phone = value;
-        props.updateCampaignField(c, {last_phone: value});
-    }
-
-    const handleCampaignFieldChange = function(campaign, key, value) {
-        let c = {...campaign.campaign};
-        c.last_phone = value;
-        props.updateCampaignField(c, {last_phone: value}, true);
+    const handleCampaignFieldChange = function(campaign, key, value, databaseAccess = true) {
+        const updateFields = {};
+        updateFields[key] = value;
+        props.updateCampaignField(campaign.detail, updateFields, databaseAccess);
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
@@ -503,8 +503,17 @@ const UploadList = (props) => {
     }
 
     const updateCampaignSetting = function(campaign) {
-        setGroup(oldState => Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map(c => c._id === campaign._id ? campaign : c)}));
-        props.updateGroup(group);
+        let globalCampaign = props.campaigns.filter(c => c._id === campaign.detail)[0];
+        for (const key of Object.keys(globalCampaign)) {
+            if (key === '_id' || key === 'columns') continue;
+            delete campaign[key];
+        }
+        let updatedCampaign = {
+            whatsapp: campaign.whatsapp,
+            filter: campaign.filter,
+            columns: campaign.columns
+        }
+        props.updateGroupCampaignField(group._id, campaign._id, updatedCampaign);
     }
 
     return (
@@ -726,7 +735,7 @@ export default connect(
     mapStateToProps,
     {
         updateSetting, getSettings,
-        updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField,
+        updateCampaignField, updateGroup, updateGroupCampaignField,
         getUploadLastPhone, upload
     }
 )(UploadList);

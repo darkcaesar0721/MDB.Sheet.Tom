@@ -2,7 +2,7 @@ import {
     INIT_CAMPAIGN_DATA,
     CREATE_CAMPAIGN_DATA,
     UPDATE_CAMPAIGN_DATA,
-    DELETE_CAMPAIGN_DATA,
+    DELETE_CAMPAIGN_DATA, UPDATE_CAMPAIGN_FIELD_DATA,
 } from "../actionTypes";
 
 const initialState = {
@@ -40,6 +40,17 @@ function campaign(state = initialState, action) {
         case DELETE_CAMPAIGN_DATA:
         {
             return Object.assign({...state}, {data: [...state.data].filter(c => c._id !== action.data._id)});
+        }
+        case UPDATE_CAMPAIGN_FIELD_DATA:
+        {
+            const {campaignId, updateFields} = action.data;
+            return Object.assign(
+                {...state}, {data: [...state.data].map(
+                        c => {
+                                if (c._id === campaignId) return Object.assign(c, updateFields);
+                                return c;
+                            })}
+                    );
         }
         default: {
             return state;

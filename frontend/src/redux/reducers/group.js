@@ -39,26 +39,6 @@ function group(state = initialState, action) {
                     )
                 });
         }
-        case UPDATE_GROUP_CAMPAIGN_OBJECT_DATA:
-        {
-            const {group, campaign, object_name, key, value} = action.data;
-
-            return Object.assign(
-                {...state}, {data: [...state.data].map(
-                        g => {
-                            if (g._id === group._id) {
-                                return Object.assign({...g}, {campaigns: [...g.campaigns].map(c => {
-                                        let updatedCampaign = c;
-                                        if (c._id === campaign._id) updatedCampaign[object_name][key] = value;
-                                        return updatedCampaign;
-                                    })})
-                            } else {
-                                return g;
-                            }
-                        }
-                    )
-                });
-        }
         case UPDATE_GROUP_CAMPAIGN_FIELD_DATA:
         {
             const {groupId, campaignId, updateFields} = action.data;
@@ -81,17 +61,6 @@ function group(state = initialState, action) {
                                 return g;
                             }
                         }
-                    )
-                });
-        }
-        case UPDATE_CAMPAIGN_FIELD_DATA:
-        {
-            return Object.assign(
-                {...state}, {data: [...state.data].map(
-                        g => Object.assign(g, {campaigns: g.campaigns.map(c => {
-                            if (c.campaign._id === action.data._id) c.campaign = action.data;
-                            return c;
-                            })})
                     )
                 });
         }

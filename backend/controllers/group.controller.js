@@ -35,8 +35,13 @@ router.post('/update_campaign_field', (req, res) => {
     keys.forEach(key => {
         set["campaigns.$." + key] = req.body.updateFields[key];
     });
-    Groups.updateOne({_id: req.body.groupId, "campaigns.campaign": req.body.campaignId}, {$set: set}, );
-    res.json('success');
+    Groups.updateOne({_id: req.body.groupId, "campaigns._id": req.body.campaignId}, set, function (err, docs) {
+        if (err){
+            console.log(err)
+        }
+        else{
+            res.json('success');
+        }});
 });
 
 module.exports = router;
