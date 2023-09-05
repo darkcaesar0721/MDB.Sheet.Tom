@@ -18,10 +18,17 @@ import {
     updateGroup,
     updateGroupCampaignField, updateGroupCampaignObject,
 } from "../../redux/actions/group";
-import {getUploadLastPhone} from "../../redux/actions/upload";
+import {getUploadLastPhone, upload} from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 import UploadGettingAllLastPhone from "./UploadGettingAllLastPhone";
+import UploadCampaign from "./UploadCampaign";
+
+let current_date = new Date();
+let pstDate = current_date.toLocaleString("en-US", {
+    timeZone: "America/Los_Angeles"
+});
+const wday = moment(pstDate).format('dddd');
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -40,7 +47,11 @@ const UploadList = (props) => {
     const [selectedCampaign, setSelectedCampaign] = useState(null);
     const [settingModalOpen, setSettingModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
+    const [openUploadAutoStatusModal, setOpenUploadAutoStatusModal] = useState(false);
+    const [openUploadManualStatusModal, setOpenUploadManualStatusModal] = useState(false);
     const [runningStatusList, setRunningStatusList] = useState([]);
+    const [uploadDoneStatus, setUploadDoneStatus] = useState(false);
+    const [errorStatusList, setErrorStatusList] = useState([]);
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -408,12 +419,44 @@ const UploadList = (props) => {
         return count;
     }
 
-    const handleUploadBtnClick = function() {
+    const handleAutoUploadBtnClick = function() {
+        setErrorStatusList([]);
 
+        let campaigns = group.campaigns.filter(c => {
+            if (!c.is_manually_upload && c.weekday[wday] === true) return true;
+
+            return false;
+        });
+        setRunningStatusList(campaigns.map((c, i) => {
+            let campaign = {...c};
+            campaign.key = i;
+            campaign.index = i;
+            campaign.status = (i === 0 ? 'loading' : '');
+            campaign.filter_amount = customFilterAmount(c);
+            return campaign;
+        }));
+
+        setOpenUploadAutoStatusModal(true);
     }
 
     const handleManuallyUploadBtnClick = function() {
+        setErrorStatusList([]);
 
+        let campaigns = group.campaigns.filter(c => {
+            if (c.is_manually_upload) return true;
+
+            return false;
+        });
+        setRunningStatusList(campaigns.map((c, i) => {
+            let campaign = {...c};
+            campaign.key = i;
+            campaign.index = i;
+            campaign.status = (i === 0 ? 'loading' : '');
+            campaign.filter_amount = customFilterAmount(c);
+            return campaign;
+        }));
+
+        setOpenUploadManualStatusModal(true);
     }
 
     const handleGetAllLastPhoneBtnClick = function() {
@@ -499,7 +542,7 @@ const UploadList = (props) => {
                                 <Popconfirm
                                     title="Upload data"
                                     description="Are you sure to upload the row of this campaign?"
-                                    onConfirm={handleUploadBtnClick}
+                                    onConfirm={handleAutoUploadBtnClick}
                                     okText="Yes"
                                     cancelText="No"
                                 >
@@ -615,6 +658,60 @@ const UploadList = (props) => {
                     />
                 </DraggableModal>
             </DraggableModalProvider>
+
+            <DraggableModalProvider>
+                <DraggableModal
+                    title="UPLOAD AUTO STATUS LIST"
+                    open={openUploadAutoStatusModal}
+                    header={null}
+                    footer={null}
+                    closable={false}
+                    width={1100}
+                >
+                    <UploadCampaign
+                        setOpen={setOpenUploadAutoStatusModal}
+                        campaigns={runningStatusList}
+                        upload={props.upload}
+                        group={group}
+                        setting={props.setting}
+                        updateSetting={props.updateSetting}
+                        getSettings={props.getSettings}
+                        runningStatusList={runningStatusList}
+                        updateRunningStatusList={updateRunningStatusList}
+                        setUploadDoneStatus={setUploadDoneStatus}
+                        uploadDoneStatus={uploadDoneStatus}
+                        setLoading={setLoading}
+                        setTip={setTip}
+                    />
+                </DraggableModal>
+            </DraggableModalProvider>
+
+            <DraggableModalProvider>
+                <DraggableModal
+                    title="UPLOAD MANUAL STATUS LIST"
+                    open={openUploadManualStatusModal}
+                    header={null}
+                    footer={null}
+                    closable={false}
+                    width={1100}
+                >
+                    <UploadCampaign
+                        setOpen={setOpenUploadManualStatusModal}
+                        campaigns={runningStatusList}
+                        upload={props.upload}
+                        group={group}
+                        setting={props.setting}
+                        updateSetting={props.updateSetting}
+                        getSettings={props.getSettings}
+                        runningStatusList={runningStatusList}
+                        updateRunningStatusList={updateRunningStatusList}
+                        setUploadDoneStatus={setUploadDoneStatus}
+                        uploadDoneStatus={uploadDoneStatus}
+                        setLoading={setLoading}
+                        setTip={setTip}
+                    />
+                </DraggableModal>
+            </DraggableModalProvider>
         </Spin>
     )
 }
@@ -625,5 +722,9 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { updateSetting, getSettings, updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField, getUploadLastPhone }
+    {
+        updateSetting, getSettings,
+        updateCampaignField, updateGroup, updateGroupCampaignObject, updateGroupCampaignField,
+        getUploadLastPhone, upload
+    }
 )(UploadList);

@@ -1,9 +1,9 @@
-import {Button, Col, message, Row, Table} from "antd";
+import {Button, Col, message, Row, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone, Loading3QuartersOutlined} from "@ant-design/icons";
 import moment from "moment";
 
-const UploadGettingAllLastPhone = (props) => {
+const UploadCampaign = (props) => {
     const [messageApi, contextHolder] = message.useMessage();
     const [isPaused, setIsPaused] = useState(false);
     const [isResumed, setIsResumed] = useState(true);
@@ -25,7 +25,7 @@ const UploadGettingAllLastPhone = (props) => {
             const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {cancel_status: false})});
             props.updateSetting(setting);
 
-            getLastPhone(currentRunningIndex, props.runningStatusList.map(s => {
+            upload(currentRunningIndex, props.runningStatusList.map(s => {
                 return {status: '', campaign: {}};
             }));
             setIsRunningStart(true);
@@ -84,6 +84,61 @@ const UploadGettingAllLastPhone = (props) => {
                 key: 'query',
             },
             {
+                title: 'WhatsApp',
+                key: 'whatsapp',
+                render: (_, r) => {
+                    return (
+                        <Switch
+                            size="small"
+                            checked={r.whatsapp.send_status}
+                            disabled={true}
+                        />
+                    )
+                }
+            },
+            {
+                title: 'Send Type',
+                dataIndex: 'way',
+                key: 'way',
+                width: 100,
+            },
+            {
+                title: 'Send Amount',
+                dataIndex: 'filter_amount',
+                key: 'filter_amount',
+                width: 100,
+            },
+            {
+                title: 'Qty Available',
+                key: 'qty_available',
+                render: (_, r) => {
+                    return (
+                        <>
+                            {
+                                (isPaused === true && currentRunningIndex <= r.index) || (isPaused !== true && currentRunningIndex <= r.index) ?
+                                    <span></span> : <span>{r.qty_available}</span>
+                            }
+                        </>
+                    )
+                },
+                width: 70,
+            },
+            {
+                title: 'Qty Uploaded',
+                key: 'qty_uploaded',
+                render: (_, r) => {
+                    return (
+                        <>
+                            {
+                                (isPaused === true && currentRunningIndex <= r.index) || (isPaused !== true && currentRunningIndex <= r.index) ?
+                                    <span></span> : <span>{r.qty_uploaded}</span>
+                            }
+                        </>
+                    )
+                },
+                width: 70,
+            },
+            {
                 title: 'LastUploadDate',
                 key: 'last_upload_datetime',
                 render: (_, r) => {
@@ -128,11 +183,30 @@ const UploadGettingAllLastPhone = (props) => {
         ])
     }, [props.runningStatusList, currentRunningIndex, isPaused]);
 
-    const getLastPhone = function(index, statusLists = []) {
+    const validation = function() {
+        if (props.runningStatusList.length === 0) {
+            messageApi.warning('Please select campaign list.');
+            return;
+        }
+        if (props.setting.schedule_path === "") {
+            messageApi.warning('Please input schedule sheet url.');
+            return;
+        }
+        if (props.whatsapp.ultramsg_instance_id === "") {
+            messageApi.warning("Please input whatsapp instance id");
+            return false;
+        }
+        if (props.whatsapp.ultramsg_token === "") {
+            messageApi.warning("Please input whatsapp token");
+            return false;
+        }
+    }
+
+    const upload = function(index, statusLists = []) {
         setCurrentRunningIndex(index);
         setStatusResult(statusLists);
 
-        props.getUploadLastPhone(props.runningStatusList[index], props.setting.mdb_path, function(result) {
+        props.upload(props.group, props.runningStatusList[index], props.setting, index, function(result) {
             props.getSettings(function(settings) {
                 if (settings.current_upload.cancel_status === false) {
                     statusLists[index]['status'] = result.status;
@@ -148,10 +222,10 @@ const UploadGettingAllLastPhone = (props) => {
                             setIsClose(true);
                             setCurrentRunningIndex(index + 1);
                             setTimeout(function() {
-                                messageApi.success('Get all last phone success');
+                                messageApi.success('uploadone');
                             }, 1000);
                         } else {
-                            getLastPhone(index + 1, statusLists);
+                            upload(index + 1, statusLists);
                         }
                     } else {
                         const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: index, pause_index: -1})});
@@ -188,10 +262,10 @@ const UploadGettingAllLastPhone = (props) => {
                     setIsClose(true);
                     setCurrentRunningIndex(currentRunningIndex + 1);
                     setTimeout(function () {
-                        messageApi.success('Get all last phone success');
+                        messageApi.success('upload all success');
                     }, 1000)
                 } else {
-                    getLastPhone(parseInt(settings.current_upload.resume_index) + 1, statusResult);
+                    upload(parseInt(settings.current_upload.resume_index) + 1, statusResult);
                 }
             }
             const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: -1, pause_index: -1, cancel_status: false})});
@@ -238,4 +312,4 @@ const UploadGettingAllLastPhone = (props) => {
     )
 }
 
-export default UploadGettingAllLastPhone;
+export default UploadCampaign;

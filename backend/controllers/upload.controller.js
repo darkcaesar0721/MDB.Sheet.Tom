@@ -5,6 +5,14 @@ const ODBC = require("odbc");
 const Groups = require('../models/group.model');
 const Campaigns = require('../models/campaign.model');
 
+const whatsappLibrary = require('../libraries/whatsapp');
+const uploadLibrary = require('../libraries/upload');
+
+router.post('/', async (req, res) => {
+    const {group, campaign, setting, index, manually} = req.body;
+    await uploadLibrary.upload_sheet(group, campaign, setting, manually, function(result){res.json(result);});
+})
+
 router.get('/get_last_phone', (req, res) => {
     const mdb_path = req.query.mdb_path;
     const id = req.query.campaign_id;

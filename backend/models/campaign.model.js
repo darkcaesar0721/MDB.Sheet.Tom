@@ -24,7 +24,15 @@ const campaignSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    system_create_datetime: Date
+    system_create_datetime: Date,
+    last_temp_upload_info: {
+        qty_available: Number,
+        qty_uploaded: Number,
+        last_phone: String,
+        system_create_datetime: Date,
+        upload_rows: []
+    },
+    last_upload_rows: []
 });
 
 const Campaigns = mongoose.model("Campaign", campaignSchema);
