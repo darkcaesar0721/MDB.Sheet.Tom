@@ -346,7 +346,7 @@ const UploadList = (props) => {
         setLoading(true);
         setTip("Wait for getting last phone....");
 
-        props.getUploadLastPhone(campaign, props.setting.mdb_path, function(result) {
+        props.getUploadLastPhone(campaign.detail, function(result) {
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
@@ -475,8 +475,14 @@ const UploadList = (props) => {
 
     const updateRunningStatusList = function(statusLists = []) {
         setRunningStatusList(oldState => runningStatusList.map((s, i) => {
+            const updatedCampaign = {
+                last_phone: statusLists[i]['campaign'].last_phone,
+                system_create_datetime: statusLists[i]['campaign'].system_create_datetime,
+                is_get_last_phone: statusLists[i]['campaign'].is_get_last_phone,
+            }
+
             if (statusLists[i]['status'] === 'success') {
-                return Object.assign({...s}, statusLists[i]['campaign'], {status: statusLists[i]['status']});
+                return Object.assign({...s}, updatedCampaign, {status: statusLists[i]['status']});
             } else {
                 return Object.assign({...s}, {status: statusLists[i]['status']});
             }

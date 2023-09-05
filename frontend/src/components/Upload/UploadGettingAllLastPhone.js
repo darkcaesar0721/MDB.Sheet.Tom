@@ -85,17 +85,8 @@ const UploadGettingAllLastPhone = (props) => {
             },
             {
                 title: 'LastUploadDate',
+                dataIndex: 'last_upload_datetime',
                 key: 'last_upload_datetime',
-                render: (_, r) => {
-                    return (
-                        <>
-                            {
-                                (isPaused === true && currentRunningIndex <= r.index) || (isPaused !== true && currentRunningIndex <= r.index) ?
-                                    <span></span> : <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined || r.last_upload_datetime === null ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
-                            }
-                        </>
-                    )
-                }
             },
             {
                 title: 'Last Phone',
@@ -132,7 +123,7 @@ const UploadGettingAllLastPhone = (props) => {
         setCurrentRunningIndex(index);
         setStatusResult(statusLists);
 
-        props.getUploadLastPhone(props.runningStatusList[index], props.setting.mdb_path, function(result) {
+        props.getUploadLastPhone(props.runningStatusList[index].detail, function(result) {
             props.getSettings(function(settings) {
                 if (settings.current_upload.cancel_status === false) {
                     statusLists[index]['status'] = result.status;
