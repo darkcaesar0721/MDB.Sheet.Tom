@@ -17,6 +17,7 @@ export const getCampaigns = (callback = function() {}) => async (dispatch) => {
         type: INIT_CAMPAIGN_DATA,
         data: result.data
     });
+
     callback();
 }
 

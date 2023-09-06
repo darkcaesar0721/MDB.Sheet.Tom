@@ -61,7 +61,7 @@ const UploadList = (props) => {
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
 
     useEffect(function() {
-        if (props.groups.length === 0) return;
+        if (props.groups.length === 0 || props.campaigns.length === 0) return;
         setGroupOptions(oldState => props.groups.map((group, index) => {return {value: group._id, label: group.name}}));
 
         if (currentGroup === '') return;
@@ -83,6 +83,7 @@ const UploadList = (props) => {
                 campaign.key = campaign._id;
 
                 let globalCampaign = props.campaigns.filter(c => c._id === campaign.detail)[0];
+                console.log(globalCampaign);
                 const campaignKeys = Object.keys(globalCampaign);
                 for(const key of campaignKeys) {
                     if (key === '_id' || key === 'columns' || key === 'key') continue;
@@ -471,7 +472,7 @@ const UploadList = (props) => {
                 break;
             case 'DATE':
                 let old = (r.date_old_day == "0" || r.date_old_day == "") ? 'today' : r.date_old_day + ' day old ';
-                count = old + (r.date_is_time == "true" ? '  ' + r.date_time + r.date_meridian : '');
+                count = old + (r.date_is_time === true ? '  ' + r.date_time + r.date_meridian : '');
                 break;
             case 'PERIOD':
                 count = "(" + r.period_start + ' ~ ' + r.period_end + ")" + " days";

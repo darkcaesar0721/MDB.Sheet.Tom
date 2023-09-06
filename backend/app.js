@@ -8,11 +8,13 @@ require('./database/client');
 const controllers = require('./controllers');
 
 const express = require('express');
+const bodyParser = require('body-parser')
 const app = express();
 
-app.use(express.urlencoded({ extended: false })); // extended: false - does not allow nested objects in query strings
-app.use(express.json()); //use .json(), not .urlencoded()
 app.use(express.static("public")); // we need to tell express to use the public directory for static files... this way our app will find index.html as the route of the application! We can then attach React to that file!
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
+app.use(express.json()); //use .json(), not .urlencoded()
 
 app.use('/api', controllers);
 

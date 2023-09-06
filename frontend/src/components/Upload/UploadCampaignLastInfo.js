@@ -96,7 +96,7 @@ function UploadCampaignLastInfo(props) {
                 key: 'SystemCreateDate',
                 render: (_, r) => {
                     return (
-                        <span>{r.system_create_datetime === "" || r.system_create_datetime === undefined ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
+                        <span>{r.system_create_datetime === "" || r.system_create_datetime === undefined || r.system_create_datetime === null ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
                     )
                 }
             },

@@ -287,7 +287,7 @@ function GroupAdd(props) {
             return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map((c, i) => {
                 let index = -1;
                 lastDragDropCampaigns.forEach((dc, dci) => {
-                    if (dc._id === c._id) index = dci;
+                    if (dc.key === c.key) index = dci;
                 });
 
                 return Object.assign({...c}, {order: index, index: i});

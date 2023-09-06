@@ -63,7 +63,6 @@ function GroupEdit(props) {
 
             props.campaigns.forEach(c => {
                 if (campaigns.filter(g_c => g_c.detail === c._id).length === 0) {
-                    console.log(c);
                     let campaign = {
                         key: c._id,
                         detail: c._id,
@@ -119,7 +118,7 @@ function GroupEdit(props) {
             render: (_, record) => {
                 let index = -1;
                 group.campaigns.forEach((c, i) => {
-                    if (c._id === record._id) {
+                    if (c.key === record.key) {
                         index = i + 1;
                         return true;
                     }
@@ -293,7 +292,7 @@ function GroupEdit(props) {
             return Object.assign({...oldState}, {campaigns: [...oldState.campaigns].map((c, i) => {
                     let index = -1;
                     lastDragDropCampaigns.forEach((dc, dci) => {
-                        if (dc._id === c._id) index = dci;
+                        if (dc.key === c.key) index = dci;
                     });
 
                     return Object.assign({...c}, {order: index, index: i});

@@ -105,7 +105,10 @@ const UploadCampaignLastPreview = (props) => {
                     System Create Datetime:
                 </Col>
                 <Col span={5} offset={1}>
-                    {moment(props.campaign.system_create_datetime).format('M/D/Y, hh:mm A')}
+                    {
+                        !props.campaign.system_create_datetime ? "" :
+                            moment(props.campaign.system_create_datetime).format('M/D/Y, hh:mm A')
+                    }
                 </Col>
             </Row>
             <Row>
