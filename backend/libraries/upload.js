@@ -309,7 +309,7 @@ const send_whatsapp_message = async function (group = {}, groupCampaign = {}, ca
             config['data'] = qs.stringify({
                 "token": `${setting.whatsapp.ultramsg_token}`,
                 "to": user,
-                "body": setting.whatsapp.message
+                "body": groupCampaign.whatsapp.message
             });
             await axios(config)
         }
@@ -321,15 +321,14 @@ const send_whatsapp_message = async function (group = {}, groupCampaign = {}, ca
             config['data'] = qs.stringify({
                 "token": `${setting.whatsapp.ultramsg_token}`,
                 "to": g.id,
-                "body": setting.whatsapp.message
+                "body": groupCampaign.whatsapp.message
             });
             await axios(config)
         }
     }
 }
 
-const get_whatsapp_groups = async (setting, callback = function () {
-}) => {
+const get_whatsapp_groups = async (setting) => {
     const params = {
         "token": `${setting.whatsapp.ultramsg_token}`
     };
