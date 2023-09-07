@@ -49,10 +49,12 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
         }
 
         connection.query(`SELECT * FROM [${campaign.query}]`, async (error, result) => {
+            await connection.close();
+
             if (error) {
                 callback({status: 'error', description: "Please can't run the this query."});
+                return;
             }
-
             let rows = [];
 
             let mdbRows = [];
@@ -527,8 +529,11 @@ const getLastInputDate = async function (callback) {
 
         const query = "002_DateInput";
         connection.query(`SELECT TOP 1 * FROM [${query}]`, async (error, result) => {
+            await connection.close();
+
             if (error) {
                 callback({status: 'error', description: "Please can't run the this query."});
+                return;
             }
 
             const date = moment(new Date(result[0]['Date'])).format('M/D/YYYY');

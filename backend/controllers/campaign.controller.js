@@ -54,11 +54,14 @@ router.post('/get_query_column', (req, res) => {
                 return;
             }
 
-            connection.query(`SELECT TOP 1 * FROM [${req.body.query}]`, (error, result) => {
+            connection.query(`SELECT TOP 1 * FROM [${req.body.query}]`, async (error, result) => {
+                await connection.close();
+
                 if (error) {
                     res.json({status: 'error', description: "Please can't run the this query."});
                     return;
                 }
+
                 const columns = result.columns.map(c => {
                     const column = c;
                     column.key = c._id;

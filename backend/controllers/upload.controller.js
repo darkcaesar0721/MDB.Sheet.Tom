@@ -33,7 +33,9 @@ router.get('/get_last_phone', (req, res) => {
                     return;
                 }
 
-                connection.query(`SELECT TOP 1 * FROM [${campaign.query}]`, (error, result) => {
+                connection.query(`SELECT TOP 1 * FROM [${campaign.query}]`, async (error, result) => {
+                    await connection.close();
+
                     if (error) {
                         res.json({status: 'error', description: "Please can't run this mdb query.", campaign: {}});
                     } else {
