@@ -39,7 +39,12 @@ router.get('/get_last_phone', (req, res) => {
 
                     if (error) {
                         res.json({status: 'error', description: "Please can't run this mdb query.", campaign: {}});
+                        return;
                     } else {
+                        if (result.length === 0) {
+                            res.json({status: 'error', description: "mdb not data", campaign: {}});
+                            return;
+                        }
                         const obj = {};
                         obj.last_phone = result[0].Phone;
                         obj.system_create_datetime = result[0].SystemCreateDate;
