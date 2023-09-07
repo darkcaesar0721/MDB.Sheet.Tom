@@ -6,9 +6,9 @@ const MenuList = function(props) {
         <Row style={{marginTop: '1rem'}}>
             <Col span={20} offset={1}>
                 <Breadcrumb>
-                    {/*<Breadcrumb.Item>*/}
-                    {/*    <a className={props.currentPage === "backup" ? "selected" : ""} href="#/backup">Backup</a>*/}
-                    {/*</Breadcrumb.Item>*/}
+                    <Breadcrumb.Item>
+                        <a className={props.currentPage === "backup" ? "selected" : ""} href="#/backup">Backup(Restore)</a>
+                    </Breadcrumb.Item>
                     <Breadcrumb.Item>
                         <a className={props.currentPage === "whatsapp" ? "selected" : ""} href="#/whatsapp">WhatsApp</a>
                     </Breadcrumb.Item>

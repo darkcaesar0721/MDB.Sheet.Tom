@@ -1,4 +1,4 @@
-import {Button, Col, Input, message, Row, Spin} from "antd";
+import {Button, Col, Input, message, Row, Spin, Upload} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 
@@ -6,6 +6,7 @@ import MenuList from "../MenuList";
 import {
     updateSetting, backupDB
 } from "../../redux/actions/setting";
+import {API} from "../../config";
 
 const Backup = (props) => {
     const [loading, setLoading] = useState(false);
@@ -36,6 +37,14 @@ const Backup = (props) => {
         });
     }
 
+    const upload_props = {
+        headers: {
+            authorization: 'authorization-text',
+        },
+        action: API + '/setting/restore',
+        name: 'file',
+    };
+
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
@@ -48,8 +57,28 @@ const Backup = (props) => {
                 </Col>
             </Row>
             <Row style={{marginTop: '1rem'}}>
-                <Col span={2} offset={11}>
+                <Col span={1} offset={9}>
                     <Button type="primary" onClick={handleClick}>Backup</Button>
+
+                </Col>
+                <Col span={2} offset={1}>
+                    <Upload {...upload_props}
+                            accept=".json"
+                            onChange={(response) => {
+                                if (response.file.status !== 'uploading') {
+                                    console.log(response.file, response.fileList);
+                                }
+                                if (response.file.status === 'done') {
+                                    message.success(`${response.file.name} 
+                               db restored successfully`);
+                                } else if (response.file.status === 'error') {
+                                    message.error(`${response.file.name} 
+                             db restore failed.`);
+                                }
+                            }}
+                    >
+                        <Button type="primary">Restore Db</Button>
+                    </Upload>
                 </Col>
             </Row>
         </Spin>

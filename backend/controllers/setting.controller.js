@@ -1,7 +1,14 @@
 const express = require('express');
 const router = express.Router();
+const formidable = require('formidable');
 
 const Settings = require('../models/setting.model');
+const fs = require("fs");
+const Campaigns = require("../models/campaign.model");
+const Groups = require("../models/group.model");
+
+const moment = require('moment-timezone');
+moment.tz.setDefault('America/Los_Angeles');
 
 router.get('/', (req, res) => {
     Settings.findOne({}, (err, setting) => {
@@ -23,8 +30,48 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.post('/backup', (req, res) => {
-    res.json('success');
+router.post('/backup', async (req, res) => {
+    const settings = await Settings.find();
+    const campaigns = await Campaigns.find();
+    const groups = await Groups.find();
+
+    const data = {
+        settings: settings,
+        campaigns: campaigns,
+        groups: groups
+    }
+
+    const file_name = moment().format('Y_M_D_hh_mm_ss_A');
+
+    fs.writeFile(settings[0].backup_path + '\\' + file_name + '.json', JSON.stringify(data), function(err) {
+        if (err) throw err;
+        res.json('success');
+    });
 });
+
+router.post('/restore', (req, res) => {
+    const form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        fs.readFile(files.file[0].filepath, 'utf8', async (err, data) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+            const settings = JSON.parse(data).settings;
+            await Settings.find({'__v': 0}).remove().exec();
+            await Settings.insertMany(settings);
+
+            const campaigns = JSON.parse(data).campaigns;
+            await Campaigns.find({'__v': 0}).remove().exec();
+            await Campaigns.insertMany(campaigns);
+
+            const groups = JSON.parse(data).groups;
+            await Groups.find({'__v': 0}).remove().exec();
+            await Groups.insertMany(groups);
+            res.end();
+        });
+
+    });
+})
 
 module.exports = router;
