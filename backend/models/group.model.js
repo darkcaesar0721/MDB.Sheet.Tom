@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const groupSchema = new mongoose.Schema({
     name: String,
+    last_control_date: Date,
+    last_input_date: Date,
     campaigns: [{
         detail: {
             type: mongoose.Schema.ObjectId,

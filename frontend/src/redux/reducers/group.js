@@ -4,7 +4,7 @@ import {
     UPDATE_GROUP_DATA,
     DELETE_GROUP_DATA,
     UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
-    UPDATE_IS_MANUALLY,
+    UPDATE_IS_MANUALLY, UPDATE_GROUP_INPUT_DATE,
 } from "../actionTypes";
 
 const initialState = {
@@ -84,6 +84,20 @@ function group(state = initialState, action) {
                     )
                 });
         }
+        case UPDATE_GROUP_INPUT_DATE:
+            const {groupId, currentDate, inputDate} = action.data;
+
+            return Object.assign(
+                {...state}, {data: [...state.data].map(
+                        g => {
+                            if (g._id === groupId) {
+                                return Object.assign({...g}, {last_control_date: currentDate, last_input_date: inputDate});
+                            } else {
+                                return g;
+                            }
+                        }
+                    )
+                });
         case DELETE_GROUP_DATA:
         {
             return Object.assign({...state}, {data: [...state.data].filter(c => c._id !== action.data._id)});

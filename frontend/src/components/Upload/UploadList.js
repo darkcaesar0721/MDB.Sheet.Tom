@@ -63,7 +63,6 @@ const UploadList = (props) => {
     const [openUploadManualStatusModal, setOpenUploadManualStatusModal] = useState(false);
     const [runningStatusList, setRunningStatusList] = useState([]);
     const [uploadDoneStatus, setUploadDoneStatus] = useState(false);
-    const [lastInputDate, setLastInputDate] = useState('');
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -533,27 +532,40 @@ const UploadList = (props) => {
 
     const startUploadCampaigns = function(campaigns, manual = false) {
         if (validation(campaigns)) {
-            setLoading(true);
-            setTip('Wait for getting input date...');
-            props.getLastInputDate(function(result) {
-                setLoading(false);
-                if (result.status === 'error') {
-                    messageApi.warning(result.description);
-                } else {
-                    setLastInputDate(result.date);
-                    setRunningStatusList(campaigns.map((c, i) => {
-                        let campaign = {...c};
-                        campaign.key = i;
-                        campaign.index = i;
-                        campaign.status = (i === 0 ? 'loading' : '');
-                        campaign.filter_amount = customFilterAmount(c);
-                        return campaign;
-                    }));
+            if (moment(new Date(group.last_control_date)).format('M/D/Y') === currentDate) {
+                setRunningStatusList(campaigns.map((c, i) => {
+                    let campaign = {...c};
+                    campaign.key = i;
+                    campaign.index = i;
+                    campaign.status = (i === 0 ? 'loading' : '');
+                    campaign.filter_amount = customFilterAmount(c);
+                    return campaign;
+                }));
 
-                    if (manual) setOpenUploadManualStatusModal(true);
-                    else setOpenUploadAutoStatusModal(true);
-                }
-            });
+                if (manual) setOpenUploadManualStatusModal(true);
+                else setOpenUploadAutoStatusModal(true);
+            } else {
+                setLoading(true);
+                setTip('Wait for getting input date...');
+                props.getLastInputDate(group._id, currentDate, function(result) {
+                    setLoading(false);
+                    if (result.status === 'error') {
+                        messageApi.warning(result.description);
+                    } else {
+                        setRunningStatusList(campaigns.map((c, i) => {
+                            let campaign = {...c};
+                            campaign.key = i;
+                            campaign.index = i;
+                            campaign.status = (i === 0 ? 'loading' : '');
+                            campaign.filter_amount = customFilterAmount(c);
+                            return campaign;
+                        }));
+
+                        if (manual) setOpenUploadManualStatusModal(true);
+                        else setOpenUploadAutoStatusModal(true);
+                    }
+                });
+            }
         }
     }
 
@@ -792,7 +804,7 @@ const UploadList = (props) => {
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title={<div><span style={{fontSize: '18px'}}>UPLOAD AUTO STATUS LIST</span><span style={lastInputDate === currentDate ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{lastInputDate}</span></div>}
+                    title={<div><span style={{fontSize: '18px'}}>UPLOAD AUTO STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === currentDate ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
                     open={openUploadAutoStatusModal}
                     header={null}
                     footer={null}
@@ -819,7 +831,7 @@ const UploadList = (props) => {
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title="UPLOAD MANUAL STATUS LIST"
+                    title={<div><span style={{fontSize: '18px'}}>UPLOAD MANUAL STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === currentDate ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
                     open={openUploadManualStatusModal}
                     header={null}
                     footer={null}

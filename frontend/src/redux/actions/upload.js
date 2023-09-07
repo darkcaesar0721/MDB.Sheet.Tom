@@ -1,7 +1,10 @@
 import axios from "axios";
-import qs from "qs";
 import {API} from "../../config";
-import {INIT_GROUP_DATA, UPDATE_CAMPAIGN_DATA, UPDATE_CAMPAIGN_FIELD_DATA, UPDATE_IS_MANUALLY} from "../actionTypes";
+import {
+    UPDATE_CAMPAIGN_DATA,
+    UPDATE_GROUP_INPUT_DATE,
+    UPDATE_IS_MANUALLY
+} from "../actionTypes";
 
 export const getUploadLastPhone = (campaignId, callback = function() {}) => async (dispatch) => {
     const result = await axios.get(API + '/upload/get_last_phone?campaignId=' + campaignId);
@@ -42,9 +45,21 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {})
     }
 }
 
-export const getLastInputDate = (callback) => async (dispatch) => {
-    const result = await axios.get(API + '/upload/get_last_input_date');
-    callback(result.data);
+export const getLastInputDate = (groupId, currentDate, callback) => async (dispatch) => {
+    const result = await axios.post(API + '/upload/get_last_input_date', {groupId: groupId, currentDate: currentDate});
+    if (result.data.status === "error")  {
+        callback(result.data);
+    } else {
+        dispatch({
+            type: UPDATE_GROUP_INPUT_DATE,
+            data: {
+                groupId: groupId,
+                currentDate: currentDate,
+                inputDate: result.data.date
+            }
+        });
+        callback(result.data);
+    }
 }
 
 export const updateIsManually = (groupId, campaignIds, value) => async (dispatch) => {

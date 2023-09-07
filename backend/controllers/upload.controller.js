@@ -8,6 +8,7 @@ const Campaigns = require('../models/campaign.model');
 const whatsappLibrary = require('../libraries/whatsapp');
 const uploadLibrary = require('../libraries/upload');
 const Settings = require("../models/setting.model");
+const moment = require("moment");
 
 router.post('/', async (req, res) => {
     const {groupId, campaignId, manually} = req.body;
@@ -56,9 +57,15 @@ router.get('/get_last_phone', (req, res) => {
     })
 });
 
-router.get('/get_last_input_date', async (req, res) => {
+router.post('/get_last_input_date', async (req, res) => {
     await uploadLibrary.getLastInputDate(function(result) {
-        res.json(result);
+        if (result.status === "error") {
+            res.json(result);
+        } else {
+            Groups.updateOne({_id: req.body.groupId}, {last_control_date: req.body.currentDate, last_input_date: result.date}, function(err, doc) {
+                res.json(result);
+            });
+        }
     });
 });
 
