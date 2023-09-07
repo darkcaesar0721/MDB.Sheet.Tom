@@ -30,7 +30,7 @@ function generateRandomIntegers(count, min, max) {
     return randomIntegers.sort();
 }
 
-const upload_sheet = async function (groupId = "", campaignId = "", manually = false, callback = function() {}) {
+const uploadSheet = async function (groupId = "", campaignId = "", manually = false, callback = function() {}) {
     const group = await Groups.findOne({_id: groupId});
     const campaign = await Campaigns.findOne({_id: campaignId});
     const setting = await Settings.findOne({});
@@ -433,8 +433,7 @@ const upload_schedule = async function (group = {}, campaign = {}, setting = {})
     });
 }
 
-const upload_preview_sheet = async function (groupId = "", campaignId = "", callback = function () {
-}) {
+const uploadPreviewSheet = async function (groupId = "", campaignId = "", callback = function () {}) {
     const group = await Groups.findOne({_id: groupId});
     const campaign = await Campaigns.findOne({_id: campaignId});
     const setting = await Settings.findOne({});
@@ -517,9 +516,29 @@ const upload_preview_sheet = async function (groupId = "", campaignId = "", call
     });
 }
 
+const getLastInputDate = async function (callback) {
+    const setting = await Settings.findOne({});
+
+    const connectionString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=${setting.mdb_path}; Uid=;Pwd=;`;
+    ODBC.connect(connectionString, (error, connection) => {
+        if (error) {
+            callback({status: 'error', description: "Please can't connect to this MDB file."});
+        }
+
+        const query = "002_DateInput";
+        connection.query(`SELECT TOP 1 * FROM [${query}]`, async (error, result) => {
+            if (error) {
+                callback({status: 'error', description: "Please can't run the this query."});
+            }
+
+            const date = moment(new Date(result[0]['Date'])).format('M/D/YYYY');
+            callback({status: 'success', date: date});
+        });
+    });
+}
+
 module.exports = {
-    upload_sheet: upload_sheet,
-    upload_preview_sheet: upload_preview_sheet,
-    upload_schedule: upload_schedule,
-    send_whatsapp_message: send_whatsapp_message
+    uploadSheet: uploadSheet,
+    updatePreviewSheet: uploadPreviewSheet,
+    getLastInputDate: getLastInputDate
 }

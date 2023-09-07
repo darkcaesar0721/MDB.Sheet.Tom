@@ -18,7 +18,13 @@ import {
     updateGroup,
     updateGroupCampaignField,
 } from "../../redux/actions/group";
-import {getUploadLastPhone, upload, uploadPreviewData} from "../../redux/actions/upload";
+import {
+    getLastInputDate,
+    getUploadLastPhone,
+    updateIsManually,
+    upload,
+    uploadPreviewData
+} from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 import UploadGettingAllLastPhone from "./UploadGettingAllLastPhone";
@@ -31,6 +37,7 @@ let current_date = new Date();
 let pstDate = current_date.toLocaleString("en-US", {
     timeZone: "America/Los_Angeles"
 });
+let currentDate = moment(pstDate).format('M/D/YYYY');
 const wday = moment(pstDate).format('dddd');
 
 const UploadList = (props) => {
@@ -56,6 +63,7 @@ const UploadList = (props) => {
     const [openUploadManualStatusModal, setOpenUploadManualStatusModal] = useState(false);
     const [runningStatusList, setRunningStatusList] = useState([]);
     const [uploadDoneStatus, setUploadDoneStatus] = useState(false);
+    const [lastInputDate, setLastInputDate] = useState('');
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -83,7 +91,6 @@ const UploadList = (props) => {
                 campaign.key = campaign._id;
 
                 let globalCampaign = props.campaigns.filter(c => c._id === campaign.detail)[0];
-                console.log(globalCampaign);
                 const campaignKeys = Object.keys(globalCampaign);
                 for(const key of campaignKeys) {
                     if (key === '_id' || key === 'columns' || key === 'key') continue;
@@ -487,16 +494,7 @@ const UploadList = (props) => {
 
             return false;
         });
-        setRunningStatusList(campaigns.map((c, i) => {
-            let campaign = {...c};
-            campaign.key = i;
-            campaign.index = i;
-            campaign.status = (i === 0 ? 'loading' : '');
-            campaign.filter_amount = customFilterAmount(c);
-            return campaign;
-        }));
-
-        setOpenUploadAutoStatusModal(true);
+        startUploadCampaigns(campaigns);
     }
 
     const handleManuallyUploadBtnClick = function() {
@@ -505,16 +503,58 @@ const UploadList = (props) => {
 
             return false;
         });
-        setRunningStatusList(campaigns.map((c, i) => {
-            let campaign = {...c};
-            campaign.key = i;
-            campaign.index = i;
-            campaign.status = (i === 0 ? 'loading' : '');
-            campaign.filter_amount = customFilterAmount(c);
-            return campaign;
-        }));
+        startUploadCampaigns(campaigns);
+    }
 
-        setOpenUploadManualStatusModal(true);
+    const validation = function(campaigns) {
+        if (campaigns.length === 0) {
+            messageApi.warning('Please select campaign list.');
+            return;
+        }
+        if (props.setting.mdb_path === "") {
+            messageApi.warning('Please input mdb path.');
+            return;
+        }
+        if (props.setting.schedule_path === "") {
+            messageApi.warning('Please input schedule sheet url.');
+            return;
+        }
+        if (props.setting.whatsapp.ultramsg_instance_id === "") {
+            messageApi.warning("Please input whatsapp instance id");
+            return false;
+        }
+        if (props.setting.whatsapp.ultramsg_token === "") {
+            messageApi.warning("Please input whatsapp token");
+            return false;
+        }
+
+        return true;
+    }
+
+    const startUploadCampaigns = function(campaigns, manual = false) {
+        if (validation(campaigns)) {
+            setLoading(true);
+            setTip('Wait for getting input date...');
+            props.getLastInputDate(function(result) {
+                setLoading(false);
+                if (result.status === 'error') {
+                    messageApi.warning(result.description);
+                } else {
+                    setLastInputDate(result.date);
+                    setRunningStatusList(campaigns.map((c, i) => {
+                        let campaign = {...c};
+                        campaign.key = i;
+                        campaign.index = i;
+                        campaign.status = (i === 0 ? 'loading' : '');
+                        campaign.filter_amount = customFilterAmount(c);
+                        return campaign;
+                    }));
+
+                    if (manual) setOpenUploadManualStatusModal(true);
+                    else setOpenUploadAutoStatusModal(true);
+                }
+            });
+        }
     }
 
     const handleGetAllLastPhoneBtnClick = function() {
@@ -548,19 +588,29 @@ const UploadList = (props) => {
         }))
     }
 
+    const handleIsManuallySelectAll = function(checked) {
+        const campaignIds = group.campaigns.map(campaign => campaign._id);
+        props.updateIsManually(group._id, campaignIds, checked);
+    }
+
     // rowSelection object indicates the need for row selection
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectedManualUploadCampaignKeys((oldState) => {
                 return [...selectedRowKeys];
             });
+
+            // handleIsManuallySelect(selectedRowKeys);
         },
         onSelect: (record, selected) => {
             handleFieldChange(record, 'is_manually_upload', selected);
         },
         getCheckboxProps: r => ({
             disabled: false
-        })
+        }),
+        onSelectAll: (checked) => {
+            handleIsManuallySelectAll(checked);
+        }
     };
 
     const showSettingModal = (show = false) => {
@@ -742,7 +792,7 @@ const UploadList = (props) => {
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title="UPLOAD AUTO STATUS LIST"
+                    title={<div><span style={{fontSize: '18px'}}>UPLOAD AUTO STATUS LIST</span><span style={lastInputDate === currentDate ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{lastInputDate}</span></div>}
                     open={openUploadAutoStatusModal}
                     header={null}
                     footer={null}
@@ -844,6 +894,6 @@ export default connect(
     {
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
-        getUploadLastPhone, upload, uploadPreviewData
+        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually
     }
 )(UploadList);

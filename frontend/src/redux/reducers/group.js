@@ -4,7 +4,7 @@ import {
     UPDATE_GROUP_DATA,
     DELETE_GROUP_DATA,
     UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
-    UPDATE_GROUP_CAMPAIGN_OBJECT_DATA, UPDATE_CAMPAIGN_FIELD_DATA,
+    UPDATE_IS_MANUALLY,
 } from "../actionTypes";
 
 const initialState = {
@@ -55,6 +55,26 @@ function group(state = initialState, action) {
                                                 updatedCampaign[key] = updateFields[key];
                                             })
                                         }
+                                        return updatedCampaign;
+                                    })})
+                            } else {
+                                return g;
+                            }
+                        }
+                    )
+                });
+        }
+        case UPDATE_IS_MANUALLY:
+        {
+            const {groupId, value} = action.data;
+
+            return Object.assign(
+                {...state}, {data: [...state.data].map(
+                        g => {
+                            if (g._id === groupId) {
+                                return Object.assign({...g}, {campaigns : [...g.campaigns].map(c => {
+                                        let updatedCampaign = c;
+                                        updatedCampaign.is_manually_upload = value;
                                         return updatedCampaign;
                                     })})
                             } else {

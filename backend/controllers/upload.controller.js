@@ -11,12 +11,12 @@ const Settings = require("../models/setting.model");
 
 router.post('/', async (req, res) => {
     const {groupId, campaignId, manually} = req.body;
-    await uploadLibrary.upload_sheet(groupId, campaignId, manually, function(result){res.json(result);});
+    await uploadLibrary.uploadSheet(groupId, campaignId, manually, function(result){res.json(result);});
 });
 
 router.post('/upload_preview', async (req, res) => {
     const {groupId, campaignId, manually} = req.body;
-    await uploadLibrary.upload_preview_sheet(groupId, campaignId, function(result){res.json(result);});
+    await uploadLibrary.uploadPreviewSheet(groupId, campaignId, function(result){res.json(result);});
 });
 
 router.get('/get_last_phone', (req, res) => {
@@ -52,6 +52,30 @@ router.get('/get_last_phone', (req, res) => {
             });
         })
     })
+});
+
+router.get('/get_last_input_date', async (req, res) => {
+    await uploadLibrary.getLastInputDate(function(result) {
+        res.json(result);
+    });
+});
+
+router.post('/update_is_manually', async  (req, res) => {
+    const campaignIds = req.body.campaignIds;
+    const update = function(index, callback) {
+        if ((index + 1) === campaignIds.length) {
+            callback();
+            return;
+        }
+
+        const campaignId = campaignIds[index];
+        Groups.updateOne({_id: req.body.groupId, "campaigns._id": campaignId}, {"campaigns.$.is_manually_upload": req.body.value}, (err, doc) => {
+            update(index + 1, callback);
+        });
+    };
+    update(0, function() {
+        res.json("success");
+    });
 });
 
 module.exports = router;
