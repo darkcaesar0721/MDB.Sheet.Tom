@@ -539,6 +539,7 @@ const UploadList = (props) => {
                     campaign.index = i;
                     campaign.status = (i === 0 ? 'loading' : '');
                     campaign.filter_amount = customFilterAmount(c);
+                    campaign.description = "";
                     return campaign;
                 }));
 
@@ -558,6 +559,7 @@ const UploadList = (props) => {
                             campaign.index = i;
                             campaign.status = (i === 0 ? 'loading' : '');
                             campaign.filter_amount = customFilterAmount(c);
+                            campaign.description = "";
                             return campaign;
                         }));
 
@@ -593,9 +595,9 @@ const UploadList = (props) => {
             }
 
             if (statusLists[i]['status'] === 'success') {
-                return Object.assign({...s}, updatedCampaign, {status: statusLists[i]['status']});
+                return Object.assign({...s}, updatedCampaign, {status: statusLists[i]['status'], description: statusLists[i]['description']});
             } else {
-                return Object.assign({...s}, {status: statusLists[i]['status']});
+                return Object.assign({...s}, {status: statusLists[i]['status'], description: statusLists[i]['description']});
             }
         }))
     }
@@ -809,7 +811,7 @@ const UploadList = (props) => {
                     header={null}
                     footer={null}
                     closable={false}
-                    width={1100}
+                    width={1500}
                 >
                     <UploadCampaign
                         setOpen={setOpenUploadAutoStatusModal}
@@ -836,7 +838,7 @@ const UploadList = (props) => {
                     header={null}
                     footer={null}
                     closable={false}
-                    width={1100}
+                    width={1500}
                 >
                     <UploadCampaign
                         setOpen={setOpenUploadManualStatusModal}

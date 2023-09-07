@@ -45,14 +45,15 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
     ODBC.connect(connectionString, (error, connection) => {
         if (error) {
-            callback({status: 'error', description: "Please can't connect to this MDB file."});
+            callback({status: 'error', description: "mdb open error."});
+            return;
         }
 
         connection.query(`SELECT * FROM [${campaign.query}]`, async (error, result) => {
             await connection.close();
 
             if (error) {
-                callback({status: 'error', description: "Please can't run the this query."});
+                callback({status: 'error', description: "mdb query error."});
                 return;
             }
             let rows = [];
@@ -232,6 +233,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
             if (manually === false) {
                 if (rows.length > 0) {
+                    await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
                     for (const sheet_url of campaign.sheet_urls) {
                         const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
                         const match = regex.exec(sheet_url);
@@ -249,7 +251,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                             }
                         }
 
-                        if (!sheet) return {status: 'error', description: 'Google sheet path error'};
+                        if (!sheet) {
+                            callback({status: 'error', description: 'sheet url error'});
+                            return;
+                        }
 
                         let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
                         let upload_row = [];
@@ -280,9 +285,8 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                             },
                         });
                     }
-                    await send_whatsapp_message(group, groupCampaign, campaign, setting);
                 }
-                await upload_schedule(group, campaign, setting);
+                await upload_schedule(group, campaign, setting, callback);
             }
             Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
                 Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
@@ -293,7 +297,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
     });
 }
 
-const send_whatsapp_message = async function (group = {}, groupCampaign = {}, campaign = {}, setting = {}) {
+const send_whatsapp_message = async function (group = {}, groupCampaign = {}, campaign = {}, setting = {}, callback) {
     const result = await get_whatsapp_groups(setting);
     const groups = result.data;
 
@@ -318,6 +322,11 @@ const send_whatsapp_message = async function (group = {}, groupCampaign = {}, ca
     }
     if (groupCampaign.whatsapp.send_status && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
         for (const group of groupCampaign.whatsapp.groups) {
+            if (groups.filter(g => g.name === group).length === 0) {
+                callback({status: 'error', description: 'whatsapp group error'});
+                return;
+            }
+
             const g = groups.filter(g => g.name === group)[0];
 
             config['data'] = qs.stringify({
@@ -347,7 +356,7 @@ const get_whatsapp_groups = async (setting) => {
     return await axios(config);
 }
 
-const upload_schedule = async function (group = {}, campaign = {}, setting = {}) {
+const upload_schedule = async function (group = {}, campaign = {}, setting = {}, callback) {
     const authClientObject = await auth.getClient();//Google sheets instance
     const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
 
@@ -367,7 +376,10 @@ const upload_schedule = async function (group = {}, campaign = {}, setting = {})
         }
     }
 
-    if (!sheet) return {status: 'error', description: 'Schedule google sheet path error'};
+    if (!sheet) {
+        callback({status: 'error', description: 'sheet url path error'});
+        return;
+    }
 
     let currentColInd = -1;
     const readData = await googleSheetsInstance.spreadsheets.values.get({
@@ -447,6 +459,7 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
 
     const rows = campaign.last_temp_upload_info.upload_rows;
     if (rows.length > 0) {
+        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
         for (const sheet_url of campaign.sheet_urls) {
             const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
             const match = regex.exec(sheet_url);
@@ -464,7 +477,10 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
                 }
             }
 
-            if (!sheet) return {status: 'error', description: 'Google sheet path error'};
+            if (!sheet) {
+                callback({status: 'error', description: 'sheet url error'});
+                return;
+            }
 
             let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
             let upload_row = [];
@@ -495,7 +511,6 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
                 },
             });
         }
-        await send_whatsapp_message(group, groupCampaign, campaign, setting);
     }
 
     campaign.qty_available = campaign.last_temp_upload_info.qty_available;
@@ -509,7 +524,7 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     campaign.is_get_last_phone = false;
     campaign.last_upload_datetime = moment().format('M/D/Y hh:mm A');
 
-    await upload_schedule(group, campaign, setting);
+    await upload_schedule(group, campaign, setting, callback);
 
     Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
         Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {

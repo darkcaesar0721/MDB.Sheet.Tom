@@ -26,7 +26,7 @@ const UploadCampaign = (props) => {
             props.updateSetting(setting);
 
             upload(currentRunningIndex, props.runningStatusList.map(s => {
-                return {status: '', campaign: {}};
+                return {status: '', campaign: {}, description: ""};
             }));
             setIsRunningStart(true);
         }
@@ -180,6 +180,11 @@ const UploadCampaign = (props) => {
                     )
                 }
             },
+            {
+                title: 'Error Description',
+                dataIndex: 'description',
+                key: 'description',
+            },
         ])
     }, [props.runningStatusList, currentRunningIndex, isPaused]);
 
@@ -212,7 +217,13 @@ const UploadCampaign = (props) => {
             props.getSettings(function(settings) {
                 if (settings.current_upload.cancel_status === false) {
                     statusLists[index]['status'] = result.status;
-                    statusLists[index]['campaign'] = result.campaign;
+                    if (result.status === 'error') {
+                        statusLists[index]['description'] = result.description;
+                        statusLists[index]['campaign'] = {};
+                    } else {
+                        statusLists[index]['description'] = "";
+                        statusLists[index]['campaign'] = result.campaign;
+                    }
                     if (props.runningStatusList.length > (index + 1)) {
                         statusLists[index + 1]['status'] = 'loading';
                     }
