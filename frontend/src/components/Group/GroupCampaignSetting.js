@@ -280,6 +280,9 @@ const GroupCampaignSetting = (props) => {
             });
 
             let c = Object.assign({...campaign}, {whatsapp: Object.assign({...campaign.whatsapp}, {users: users, groups: groups}), columns: columns});
+            if (c.filter.way === 'DATE') {
+                c.filter.date_old_day = !c.filter.date_old_day ? 0 : c.filter.date_old_day;
+            }
             props.updateCampaignSetting(Object.assign(props.campaign, c));
             props.showSettingModal(false);
         }
