@@ -52,11 +52,13 @@ router.post('/backup', async (req, res) => {
 router.post('/restore', (req, res) => {
     const form = new formidable.IncomingForm();
     form.parse(req, function (err, fields, files) {
-        fs.readFile(files.file[0].filepath, 'utf8', async (err, data) => {
+        fs.readFile(files.file[0].filepath, 'utf8', async (err, db) => {
             if (err) {
                 console.error(err);
                 return;
             }
+
+            let data = db.replaceAll("County.County:", "County:");
             const settings = JSON.parse(data).settings;
             await Settings.find({'__v': 0}).remove().exec();
             await Settings.insertMany(settings);
