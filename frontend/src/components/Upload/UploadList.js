@@ -11,6 +11,7 @@ import StyledCheckBox from "../../shared/StyledCheckBox";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 import {
+    backupDB,
     getSettings,
     updateSetting
 } from "../../redux/actions/setting";
@@ -827,6 +828,7 @@ const UploadList = (props) => {
                         uploadDoneStatus={uploadDoneStatus}
                         setLoading={setLoading}
                         setTip={setTip}
+                        backupDB={props.backupDB}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
@@ -854,6 +856,7 @@ const UploadList = (props) => {
                         uploadDoneStatus={uploadDoneStatus}
                         setLoading={setLoading}
                         setTip={setTip}
+                        backupDB={props.backupDB}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
@@ -908,6 +911,6 @@ export default connect(
     {
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
-        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually
+        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB
     }
 )(UploadList);

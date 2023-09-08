@@ -234,6 +234,7 @@ const UploadCampaign = (props) => {
                         if (props.runningStatusList.length === (index + 1)) {
                             setIsClose(true);
                             setCurrentRunningIndex(index + 1);
+                            props.backupDB();
                             messageApi.success('upload success');
                         } else {
                             upload(index + 1, statusLists);
@@ -272,6 +273,7 @@ const UploadCampaign = (props) => {
                 if (props.runningStatusList.length === (parseInt(settings.current_upload.resume_index) + 1)) {
                     setIsClose(true);
                     setCurrentRunningIndex(currentRunningIndex + 1);
+                    props.backupDB();
                     setTimeout(function () {
                         messageApi.success('upload all success');
                     }, 1000)
