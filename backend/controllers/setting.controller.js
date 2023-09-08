@@ -58,7 +58,7 @@ router.post('/restore', (req, res) => {
                 return;
             }
 
-            let data = db.replaceAll("County.County:", "County:");
+            let data = db.replaceAll('"County.County":', '"County":');
             const settings = JSON.parse(data).settings;
             await Settings.find({'__v': 0}).remove().exec();
             await Settings.insertMany(settings);
