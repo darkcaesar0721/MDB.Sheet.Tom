@@ -180,6 +180,7 @@ const UploadList = (props) => {
             title: 'WhatsApp',
             key: 'whatsapp',
             width: 70,
+            align: 'center',
             render: (_, r) => {
                 return (
                     <Switch
@@ -195,6 +196,7 @@ const UploadList = (props) => {
             title: 'N G Y P',
             key: 'color',
             width: 90,
+            align: 'center',
             render: (_, r) => {
                 return (
                     <Radio.Group onChange={(e) => {handleFieldChange(r, 'color', e.target.value)}} defaultValue="none" value={r.color}>
@@ -216,6 +218,46 @@ const UploadList = (props) => {
                 )
             }
         }];
+        if (currentWay === 'ONE')
+            columns = [...columns, {
+                title: 'Upload',
+                key: 'operation',
+                width: 80,
+                align: 'center',
+                render: (_, record) => {
+                    return (
+                        <>
+                            {
+                                (!record.is_manually_uploaded) ?
+                                    <Popconfirm
+                                        title="Manually Upload data"
+                                        description="Are you gonna get data to upload the row of this campaign?"
+                                        onConfirm={(e) => {upload(record, true)}}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button style={{marginLeft: 4, marginRight: 1}}><span style={{fontSize: '1rem'}}>D</span></Button>
+                                    </Popconfirm>: ''
+                            }
+                            {
+                                (!record.is_manually_uploaded) ?
+                                    <Popconfirm
+                                        title="Upload data"
+                                        description="Are you sure to upload the row of this campaign?"
+                                        onConfirm={(e) => {upload(record, false)}}
+                                        okText="Yes"
+                                        cancelText="No"
+                                    >
+                                        <Button icon={<UploadOutlined /> } style={{marginRight: 1}}/>
+                                    </Popconfirm> : ''
+                            }
+                            {
+                                (record.is_manually_uploaded) ? <Button onClick={(e) => {showPreviewResult(record)}} icon={<EyeOutlined /> } style={{marginRight: 1}}/> : ''
+                            }
+                        </>
+                    )
+                }
+            }];
         columns = [...columns, {
             title: 'Query Name',
             key: 'query',
@@ -294,45 +336,6 @@ const UploadList = (props) => {
                 )
             }
         }];
-        if (currentWay === 'ONE')
-            columns = [...columns, {
-                title: 'Upload',
-                key: 'operation',
-                width: 80,
-                render: (_, record) => {
-                    return (
-                        <>
-                            {
-                                (!record.is_manually_uploaded) ?
-                                    <Popconfirm
-                                        title="Manually Upload data"
-                                        description="Are you gonna get data to upload the row of this campaign?"
-                                        onConfirm={(e) => {upload(record, true)}}
-                                        okText="Yes"
-                                        cancelText="No"
-                                    >
-                                        <Button style={{marginRight: 1}}><span style={{fontSize: '1rem'}}>D</span></Button>
-                                    </Popconfirm>: ''
-                            }
-                            {
-                                (!record.is_manually_uploaded) ?
-                                    <Popconfirm
-                                        title="Upload data"
-                                        description="Are you sure to upload the row of this campaign?"
-                                        onConfirm={(e) => {upload(record, false)}}
-                                        okText="Yes"
-                                        cancelText="No"
-                                    >
-                                        <Button icon={<UploadOutlined /> } style={{marginRight: 1}}/>
-                                    </Popconfirm> : ''
-                            }
-                            {
-                                (record.is_manually_uploaded) ? <Button onClick={(e) => {showPreviewResult(record)}} icon={<EyeOutlined /> } style={{marginRight: 1}}/> : ''
-                            }
-                        </>
-                    )
-                }
-            }];
         columns = [...columns, {
             title: 'Last Phone',
             key: 'get_phone',
@@ -659,49 +662,9 @@ const UploadList = (props) => {
             />
             <Path/>
             <Row style={{marginTop: '1rem'}}>
-                <Col span={2} offset={1} style={{textAlign: 'right', lineHeight: '2rem', marginRight: '0.7rem', marginLeft: '1.8rem'}}>
-                    <span>Select Group :</span>
-                </Col>
-                <Col span={3}>
-                    <Select
-                        size="large"
-                        defaultValue=""
-                        onChange={handleGroupChange}
-                        style={{ width: 200 }}
-                        options={groupOptions}
-                        value={currentGroup}
-                    />
-                </Col>
-                <Col span={2} style={{textAlign: 'right', lineHeight: '2rem', marginRight: '0.7rem', marginLeft: '-3rem'}}>
-                    <span>Send Type :</span>
-                </Col>
-                <Col span={3}>
-                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay}>
-                        <Radio value="ALL">Upload all campaigns</Radio>
-                        <Radio value="ONE">Upload one by one</Radio>
-                    </Radio.Group>
-                </Col>
                 {
                     currentWay === 'ALL' ?
-                        <Col span={2}>
-                            {
-                                <Popconfirm
-                                    title="Upload data"
-                                    description="Are you sure to upload the row of this campaign?"
-                                    onConfirm={handleAutoUploadBtnClick}
-                                    okText="Yes"
-                                    cancelText="No"
-                                >
-                                    <Button type="primary">
-                                        Upload
-                                    </Button>
-                                </Popconfirm>
-                            }
-                        </Col> : ''
-                }
-                {
-                    currentWay === 'ALL' ?
-                        <Col span={2}>
+                        <Col span={1}>
                             {
                                 <Popconfirm
                                     title="Upload Manually data"
@@ -711,12 +674,46 @@ const UploadList = (props) => {
                                     cancelText="No"
                                 >
                                     <Button type="primary">
-                                        Manually
+                                        Manual
                                     </Button>
                                 </Popconfirm>
                             }
-                        </Col> : ''
+                        </Col> : <Col span={1}></Col>
                 }
+                {
+                    currentWay === 'ALL' ?
+                        <Col span={1}>
+                            {
+                                <Popconfirm
+                                    title="Upload data"
+                                    description="Are you sure to upload the row of this campaign?"
+                                    onConfirm={handleAutoUploadBtnClick}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button type="primary" style={{marginLeft: '20px'}}>
+                                        Daily - Manual
+                                    </Button>
+                                </Popconfirm>
+                            }
+                        </Col> : <Col span={1}></Col>
+                }
+                <Col span={3} offset={2}>
+                    <Select
+                        size="large"
+                        defaultValue=""
+                        onChange={handleGroupChange}
+                        style={{ width: 200, marginLeft: '-15px' }}
+                        options={groupOptions}
+                        value={currentGroup}
+                    />
+                </Col>
+                <Col span={3}>
+                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-15px'}}>
+                        <Radio value="ALL">Upload all campaigns</Radio>
+                        <Radio value="ONE">Upload one by one</Radio>
+                    </Radio.Group>
+                </Col>
             </Row>
             <Row>
                 <Col span={2} offset={22}>
