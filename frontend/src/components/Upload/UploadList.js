@@ -576,7 +576,18 @@ const UploadList = (props) => {
     }
 
     const handleGetAllLastPhoneBtnClick = function() {
-        setRunningStatusList(group.campaigns.map((c, i) => {
+        let campaigns = group.campaigns.filter(c => {
+            if (c.is_manually_upload) return true;
+
+            return false;
+        });
+
+        if (campaigns.length === 0) {
+            messageApi.warning('Please select campaign list.');
+            return;
+        }
+
+        setRunningStatusList(campaigns.map((c, i) => {
             let campaign = {...c};
             campaign.key = i;
             campaign.index = i;
@@ -715,21 +726,24 @@ const UploadList = (props) => {
                     </Radio.Group>
                 </Col>
             </Row>
-            <Row>
-                <Col span={2} offset={22}>
-                    <Popconfirm
-                        title="All Last Phone"
-                        description="Are you sure to get last phone of all campaigns?"
-                        onConfirm={handleGetAllLastPhoneBtnClick}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button type="primary">
-                            All Last Phone
-                        </Button>
-                    </Popconfirm>
-                </Col>
-            </Row>
+            {
+                currentWay === 'ALL' ?
+                    <Row>
+                        <Col span={2} offset={22}>
+                            <Popconfirm
+                                title="All Last Phone"
+                                description="Are you sure to get last phone of all campaigns?"
+                                onConfirm={handleGetAllLastPhoneBtnClick}
+                                okText="Yes"
+                                cancelText="No"
+                            >
+                                <Button type="primary">
+                                    All Last Phone
+                                </Button>
+                            </Popconfirm>
+                        </Col>
+                    </Row> : ''
+            }
             <Row>
                 <Col span={24}>
                     {
