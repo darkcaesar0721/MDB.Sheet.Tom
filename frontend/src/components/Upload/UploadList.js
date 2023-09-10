@@ -742,7 +742,12 @@ const UploadList = (props) => {
                                 </Button>
                             </Popconfirm>
                         </Col>
-                    </Row> : ''
+                    </Row> :
+                    <Row style={{height: 30}}>
+                        <Col span={2} offset={22}>
+
+                        </Col>
+                    </Row>
             }
             <Row>
                 <Col span={24}>
