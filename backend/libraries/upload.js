@@ -559,6 +559,6 @@ const getLastInputDate = async function (callback) {
 
 module.exports = {
     uploadSheet: uploadSheet,
-    updatePreviewSheet: uploadPreviewSheet,
+    uploadPreviewSheet: uploadPreviewSheet,
     getLastInputDate: getLastInputDate
 }
