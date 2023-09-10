@@ -169,7 +169,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                 case 'DATE':
                     if (groupCampaign.filter.date_is_time) {
                         const before_date = moment().subtract(groupCampaign.filter.date_old_day, 'days').format('M/D/Y');
-                        const before_date_value = new Date(before_date + ' ' + groupCampaign.filter.date_time + ':00 ' + groupCampaign.filter.date_meridian);
+                        const before_date_value = new Date(before_date + ' ' + (groupCampaign.filter.date_time ? groupCampaign.filter.date_time : '00') + ':00 ' + groupCampaign.filter.date_meridian);
                         const before_datetime = moment(before_date_value).format('M/D/Y hh:mm A');
 
                         mdbRows.forEach((mdbRow, i) => {
