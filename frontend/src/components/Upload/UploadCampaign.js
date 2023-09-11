@@ -259,6 +259,12 @@ const UploadCampaign = (props) => {
                     }
                 }
             });
+        }, (error) => {
+            toastr.error('There is a problem with server.');
+            cancel();
+        }, () => {
+            toastr.warning('There is a problem with MDB file.');
+            cancel();
         })
     }
 

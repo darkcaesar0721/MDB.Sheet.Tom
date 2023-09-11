@@ -6,30 +6,56 @@ import {
     UPDATE_IS_MANUALLY
 } from "../actionTypes";
 
-export const getUploadLastPhone = (campaignId, callback = function() {}) => async (dispatch) => {
-    const result = await axios.get(API + '/upload/get_last_phone?campaignId=' + campaignId);
-    if (result.data.status === 'error') {
-        callback(result.data);
-    } else {
-        dispatch({
-            type: UPDATE_CAMPAIGN_DATA,
-            data: result.data.campaign
+export const getUploadLastPhone = (campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 60000;
+    axios.get(API + '/upload/get_last_phone?campaignId=' + campaignId)
+        .then(result => {
+            if (result.data.status === 'error') {
+                callback(result.data);
+            } else {
+                dispatch({
+                    type: UPDATE_CAMPAIGN_DATA,
+                    data: result.data.campaign
+                });
+                callback(result.data);
+            }
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+        .finally(() => {
+            clearTimeout(timer);
         });
-        callback(result.data);
-    }
+
+    const timer = setTimeout(() => {
+        timeoutCallback();
+    }, timeout);
 }
 
-export const upload = (groupId, campaignId, manually = false, callback = function() {}) => async (dispatch) => {
-    const result = await axios.post(API + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually});
-    if (result.data.status === 'error') {
-        callback(result.data);
-    } else {
-        dispatch({
-            type: UPDATE_CAMPAIGN_DATA,
-            data: result.data.campaign
+export const upload = (groupId, campaignId, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 60000;
+    axios.post(API + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually})
+        .then(result => {
+            if (result.data.status === 'error') {
+                callback(result.data);
+            } else {
+                dispatch({
+                    type: UPDATE_CAMPAIGN_DATA,
+                    data: result.data.campaign
+                });
+                callback(result.data);
+            }
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+        .finally(() => {
+            clearTimeout(timer);
         });
-        callback(result.data);
-    }
+
+    const timer = setTimeout(() => {
+        timeoutCallback();
+    }, timeout);
 }
 
 export const uploadPreviewData = (groupId, campaignId, callback = function() {}) => async (dispatch) => {

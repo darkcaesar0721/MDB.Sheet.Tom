@@ -390,6 +390,12 @@ const UploadList = (props) => {
                     setUploadPreviewModalOpen(true);
                 }
             }
+        }, (error) => {
+            setLoading(false);
+            toastr.error('There is a problem with server.');
+        }, () => {
+            setLoading(false);
+            toastr.warning('There is a problem with MDB file.');
         })
     }
 
@@ -436,8 +442,10 @@ const UploadList = (props) => {
                 messageApi.success('success');
             }
         }, (err) => {
+            setLoading(false);
             toastr.error('There is a problem with server.');
         }, () => {
+            setLoading(false);
             toastr.warning('There is a problem with MDB file.');
         })
     }
