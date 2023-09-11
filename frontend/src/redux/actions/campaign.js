@@ -80,7 +80,7 @@ export const getQueryColumns = (query = '', callback = function() {}) => async (
     callback(result.data);
 }
 
-export const updateCampaignField = (campaignId = {}, updateFields = {}, database_access = false, callback = function() {}) => async (dispatch) => {
+export const updateCampaignField = (campaignId = {}, updateFields = {}, database_access = false, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
     dispatch({
         type: UPDATE_CAMPAIGN_FIELD_DATA,
         data: {
@@ -89,7 +89,13 @@ export const updateCampaignField = (campaignId = {}, updateFields = {}, database
         }
     });
 
-    if (database_access)
-        await axios.post(API + '/campaign/update_field', {campaignId: campaignId, updateFields: updateFields});
-    callback();
+    if (database_access) {
+        axios.post(API + '/campaign/update_field', {campaignId: campaignId, updateFields: updateFields})
+            .then(result => {
+                callback();
+            })
+            .catch(error => {
+                errorCallback(error);
+            })
+    }
 }

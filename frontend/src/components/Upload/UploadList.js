@@ -419,7 +419,9 @@ const UploadList = (props) => {
         let updateFields = {};
         updateFields.last_temp_upload_info = {};
         updateFields.is_manually_uploaded = false;
-        props.updateCampaignField(selectedCampaign.detail, updateFields, true);
+        props.updateCampaignField(selectedCampaign.detail, updateFields, true, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const getLastPhone = function(campaign) {
@@ -471,7 +473,9 @@ const UploadList = (props) => {
     const handleCampaignFieldChange = function(campaign, key, value, databaseAccess = true) {
         const updateFields = {};
         updateFields[key] = value;
-        props.updateCampaignField(campaign.detail, updateFields, databaseAccess);
+        props.updateCampaignField(campaign.detail, updateFields, databaseAccess, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const handleTableChange = (pagination, filters, sorter) => {
