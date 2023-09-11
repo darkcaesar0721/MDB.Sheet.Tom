@@ -39,15 +39,15 @@ const AppRouter = (props) => {
             timeOut: 5000
         }
         let isErrorDisplay = false;
-        props.getSettings({}, function(message) {
+        props.getSettings(() => {}, function(message) {
             isErrorDisplay = true;
             toastr.error('There is a problem with server.');
         });
-        props.getCampaigns({}, function(message) {
+        props.getCampaigns(() => {}, function(message) {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
         });
-        props.getGroups({}, function(message) {
+        props.getGroups(() => {}, function(message) {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
         });
