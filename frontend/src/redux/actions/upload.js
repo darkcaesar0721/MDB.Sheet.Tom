@@ -7,7 +7,7 @@ import {
 } from "../actionTypes";
 
 export const getUploadLastPhone = (campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 60000;
+    const timeout = 120000;
     axios.get(API + '/upload/get_last_phone?campaignId=' + campaignId)
         .then(result => {
             if (result.data.status === 'error') {
@@ -33,7 +33,7 @@ export const getUploadLastPhone = (campaignId, callback = function() {}, errorCa
 }
 
 export const upload = (groupId, campaignId, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 60000;
+    const timeout = 120000;
     axios.post(API + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually})
         .then(result => {
             if (result.data.status === 'error') {
@@ -59,7 +59,7 @@ export const upload = (groupId, campaignId, manually = false, callback = functio
 }
 
 export const uploadPreviewData = (groupId, campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 60000;
+    const timeout = 120000;
     axios.post(API + '/upload/upload_preview', {groupId: groupId, campaignId: campaignId})
         .then(result => {
             if (result.data.status === 'error') {
@@ -85,7 +85,7 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {},
 }
 
 export const getLastInputDate = (groupId, currentDate, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 60000;
+    const timeout = 120000;
     axios.post(API + '/upload/get_last_input_date', {groupId: groupId, currentDate: currentDate})
         .then(result => {
             if (result.data.status === 'error') {

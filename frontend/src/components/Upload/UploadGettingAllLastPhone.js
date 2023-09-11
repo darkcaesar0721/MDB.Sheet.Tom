@@ -169,6 +169,9 @@ const UploadGettingAllLastPhone = (props) => {
                         });
                     }
                 }
+            }, (error) => {
+                toastr.error('There is a problem with server.');
+                cancel();
             });
         }, (error) => {
             toastr.error('There is a problem with server.');
@@ -217,6 +220,9 @@ const UploadGettingAllLastPhone = (props) => {
             props.updateSetting(setting, (error) => {
                 toastr.error('There is a problem with server.');
             });
+        }, (error) => {
+            toastr.error('There is a problem with server.');
+            cancel();
         });
     }
 

@@ -4,13 +4,14 @@ import {
 } from "../actionTypes";
 import {API} from "../../config";
 
-export const getSettings = (errorCallback = function() {}) => (dispatch) => {
+export const getSettings = (callback = function() {}, errorCallback = function() {}) => (dispatch) => {
     axios.get(API + '/setting')
         .then(result => {
             dispatch({
                 type: INIT_SETTING_DATA,
                 data: result.data
             });
+            callback(result.data);
         })
         .catch(error => {
             errorCallback(error);

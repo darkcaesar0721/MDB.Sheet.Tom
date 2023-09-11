@@ -76,7 +76,7 @@ export const deleteCampaign = (campaign = {}, callback = function() {}, errorCal
 }
 
 export const getQueryColumns = (query = '', callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 60000;
+    const timeout = 120000;
     axios.post(API + '/campaign/get_query_column', {query: query})
         .then(result => {
             callback(result.data);

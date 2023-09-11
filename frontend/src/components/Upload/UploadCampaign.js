@@ -258,6 +258,9 @@ const UploadCampaign = (props) => {
                         });
                     }
                 }
+            }, (error) => {
+                toastr.error('There is a problem with server.');
+                cancel();
             });
         }, (error) => {
             toastr.error('There is a problem with server.');
@@ -309,6 +312,9 @@ const UploadCampaign = (props) => {
             props.updateSetting(setting, (error) => {
                 toastr.error('There is a problem with server.');
             });
+        }, (error) => {
+            toastr.error('There is a problem with server.');
+            cancel();
         });
     }
 
