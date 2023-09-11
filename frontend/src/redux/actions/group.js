@@ -50,13 +50,18 @@ export const updateGroup = (group = {}, callback = function() {}, errorCallback 
         });
 }
 
-export const deleteGroup = (group = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.delete(API + '/group/' + group._id);
-    dispatch({
-        type: DELETE_GROUP_DATA,
-        data: result.data
-    });
-    callback();
+export const deleteGroup = (group = {}, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.delete(API + '/group/' + group._id)
+        .then(result => {
+            dispatch({
+                type: DELETE_GROUP_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
 }
 
 export const updateGroupCampaignField = (groupId = '', campaignId = '', updateFields = {}, databaseAccess = true, callback = function() {}) => async (dispatch) => {

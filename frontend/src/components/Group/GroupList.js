@@ -3,10 +3,18 @@ import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {PlusCircleOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
 import {useNavigate} from "react-router-dom";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 import { deleteGroup } from '../../redux/actions/group';
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 function GroupList(props) {
     const [tableParams, setTableParams] = useState({
@@ -86,7 +94,9 @@ function GroupList(props) {
     }, [props.groups]);
 
     const handleGroupDelete = function(group) {
-        props.deleteGroup(group);
+        props.deleteGroup(group, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const handleAddClick = function() {
