@@ -2,6 +2,14 @@ import { Input, Col, Row } from 'antd';
 import {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {updateSetting} from "../../redux/actions/setting";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 function MdbSchedulePath(props) {
     const [mdbPath, setMdbPath] = useState('');
@@ -22,12 +30,16 @@ function MdbSchedulePath(props) {
 
     const saveMdbPath = function() {
         const setting = Object.assign({...props.setting}, {mdb_path : mdbPath});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error("There is a problem with server.\n Can't save the mdb path");
+        });
     }
 
     const saveSchedulePath = function() {
         const setting = Object.assign({...props.setting}, {schedule_path : schedulePath});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error("There is a problem with server.\n Can't save the schedule path");
+        });
     }
 
     return (

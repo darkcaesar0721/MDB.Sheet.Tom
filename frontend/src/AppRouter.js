@@ -29,25 +29,26 @@ import UploadList from "./components/Upload/UploadList";
 
 const DASHBOARD = '/';
 
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
+
 const AppRouter = (props) => {
     let container;
 
     useEffect(function() {
-        toastr.options = {
-            positionClass : 'toast-top-right',
-            hideDuration: 300,
-            timeOut: 5000
-        }
         let isErrorDisplay = false;
-        props.getSettings(function(message) {
+        props.getSettings(function(error) {
             isErrorDisplay = true;
             toastr.error('There is a problem with server.');
         });
-        props.getCampaigns(function(message) {
+        props.getCampaigns(function(error) {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
         });
-        props.getGroups(function(message) {
+        props.getGroups(function(error) {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
         });

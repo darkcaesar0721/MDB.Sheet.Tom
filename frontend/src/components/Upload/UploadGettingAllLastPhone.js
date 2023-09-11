@@ -2,6 +2,14 @@ import {Button, Col, message, Row, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone, Loading3QuartersOutlined} from "@ant-design/icons";
 import moment from "moment";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 const UploadGettingAllLastPhone = (props) => {
     const [messageApi, contextHolder] = message.useMessage();
@@ -23,7 +31,9 @@ const UploadGettingAllLastPhone = (props) => {
     useEffect(function() {
         if (props.runningStatusList.length > 0 && !isRunningStart) {
             const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {cancel_status: false})});
-            props.updateSetting(setting);
+            props.updateSetting(setting, (error) => {
+                toastr.error('There is a problem with server.');
+            });
 
             getLastPhone(currentRunningIndex, props.runningStatusList.map(s => {
                 return {status: '', campaign: {}};
@@ -154,7 +164,9 @@ const UploadGettingAllLastPhone = (props) => {
                         }
                     } else {
                         const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: index, pause_index: -1})});
-                        props.updateSetting(setting);
+                        props.updateSetting(setting, (error) => {
+                            toastr.error('There is a problem with server.');
+                        });
                     }
                 }
             });
@@ -174,7 +186,9 @@ const UploadGettingAllLastPhone = (props) => {
         setIsResumed(false);
 
         const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {pause_index: currentRunningIndex, resume_index: -1})});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const resume = function() {
@@ -194,13 +208,17 @@ const UploadGettingAllLastPhone = (props) => {
                 }
             }
             const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: -1, pause_index: -1, cancel_status: false})});
-            props.updateSetting(setting);
+            props.updateSetting(setting, (error) => {
+                toastr.error('There is a problem with server.');
+            });
         });
     }
 
     const cancel = function() {
         const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {resume_index: -1, pause_index: -1, cancel_status: true})});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
 
         props.setOpen(false);
     }

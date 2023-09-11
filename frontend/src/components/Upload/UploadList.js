@@ -6,6 +6,8 @@ import {UploadOutlined, EyeOutlined} from "@ant-design/icons";
 import {DraggableModal, DraggableModalProvider} from "@cubetiq/antd-modal";
 import {Link} from "react-router-dom";
 import moment from "moment";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 import StyledCheckBox from "../../shared/StyledCheckBox";
 import MenuList from "../MenuList";
@@ -33,6 +35,12 @@ import UploadCampaign from "./UploadCampaign";
 import UploadPreview from "./UploadPreview";
 import UploadCampaignLastInfo from "./UploadCampaignLastInfo";
 import UploadCampaignLastPreview from "./UploadCampaignLastPreview";
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 let current_date = new Date();
 let pstDate = current_date.toLocaleString("en-US", {
@@ -77,7 +85,9 @@ const UploadList = (props) => {
         if (props.groups.filter(g => g._id === currentGroup).length === 0) {
             let setting = {...props.setting};
             setting.current_upload.group = "";
-            props.updateSetting(setting);
+            props.updateSetting(setting, (error) => {
+                toastr.error('There is a problem with server.');
+            });
             return;
         }
 
@@ -428,12 +438,16 @@ const UploadList = (props) => {
 
     const handleGroupChange = function(value) {
         const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {group: value})});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const handleWayChange = function(e) {
         const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {way: e.target.value})});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const handleFieldChange = function(campaign, key, value, databaseAccess = true) {

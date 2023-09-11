@@ -17,13 +17,17 @@ export const getSettings = (errorCallback = function() {}) => (dispatch) => {
         });
 }
 
-export const updateSetting = (setting = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.put(API + '/setting/' + setting._id, setting);
-    dispatch({
-        type: INIT_SETTING_DATA,
-        data: result.data
-    });
-    callback();
+export const updateSetting = (setting = {}, errorCallback = function() {}) => async (dispatch) => {
+    axios.put(API + '/setting/' + setting._id, setting)
+        .then(result => {
+            dispatch({
+                type: INIT_SETTING_DATA,
+                data: result.data
+            });
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
 }
 
 export const backupDB = (callback = function() {}) => async (dispatch) => {

@@ -1,12 +1,20 @@
 import {Button, Col, Input, message, Row, Spin, Upload} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 import MenuList from "../MenuList";
 import {
     updateSetting, backupDB
 } from "../../redux/actions/setting";
 import {API} from "../../config";
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 const Backup = (props) => {
     const [loading, setLoading] = useState(false);
@@ -20,7 +28,9 @@ const Backup = (props) => {
 
     const savePath = function() {
         const setting = Object.assign({...props.setting}, {backup_path : path});
-        props.updateSetting(setting);
+        props.updateSetting(setting, (error) => {
+            toastr.error("There is a problem with server.\n Can't save the backup path");
+        });
     }
 
     const handleChange = function(e) {
