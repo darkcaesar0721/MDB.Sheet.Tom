@@ -36,13 +36,18 @@ export const createGroup = (group = {}, callback = function() {}, errorCallback 
 
 }
 
-export const updateGroup = (group = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.put(API + '/group/' + group._id, group);
-    dispatch({
-        type: UPDATE_GROUP_DATA,
-        data: result.data
-    });
-    callback();
+export const updateGroup = (group = {}, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.put(API + '/group/' + group._id, group)
+        .then(result => {
+            dispatch({
+                type: UPDATE_GROUP_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
 }
 
 export const deleteGroup = (group = {}, callback = function() {}) => async (dispatch) => {

@@ -6,11 +6,19 @@ import {useNavigate, useParams} from "react-router-dom";
 import moment from "moment";
 import dragula from "dragula";
 import "dragula/dist/dragula.css";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 import {updateGroup} from "../../redux/actions/group";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 import GroupCampaignSetting from "./GroupCampaignSetting";
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 const getIndexInParent = (el) => Array.from(el.parentNode.children).indexOf(el);
 
@@ -223,6 +231,8 @@ function GroupEdit(props) {
             props.updateGroup(g, (resp) => {
                 messageApi.success('update success');
                 navigate('/groups');
+            }, (error) => {
+                toastr.error('There is a problem with server.');
             });
         }
     }
