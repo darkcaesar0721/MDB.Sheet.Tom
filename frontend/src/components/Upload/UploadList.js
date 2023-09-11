@@ -416,7 +416,13 @@ const UploadList = (props) => {
             } else {
                 messageApi.success('upload success');
             }
-        })
+        }, (error) => {
+            setLoading(false);
+            toastr.error('There is a problem with server.');
+        }, () => {
+            setLoading(false);
+            toastr.warning('There is a problem with MDB file.');
+        });
     }
 
     const cancelUpload = function() {

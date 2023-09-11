@@ -58,17 +58,30 @@ export const upload = (groupId, campaignId, manually = false, callback = functio
     }, timeout);
 }
 
-export const uploadPreviewData = (groupId, campaignId, callback = function() {}) => async (dispatch) => {
-    const result = await axios.post(API + '/upload/upload_preview', {groupId: groupId, campaignId: campaignId});
-    if (result.data.status === 'error') {
-        callback(result.data);
-    } else {
-        dispatch({
-            type: UPDATE_CAMPAIGN_DATA,
-            data: result.data.campaign
+export const uploadPreviewData = (groupId, campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 60000;
+    axios.post(API + '/upload/upload_preview', {groupId: groupId, campaignId: campaignId})
+        .then(result => {
+            if (result.data.status === 'error') {
+                callback(result.data);
+            } else {
+                dispatch({
+                    type: UPDATE_CAMPAIGN_DATA,
+                    data: result.data.campaign
+                });
+                callback(result.data);
+            }
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+        .finally(() => {
+            clearTimeout(timer);
         });
-        callback(result.data);
-    }
+
+    const timer = setTimeout(() => {
+        timeoutCallback();
+    }, timeout);
 }
 
 export const getLastInputDate = (groupId, currentDate, callback) => async (dispatch) => {
