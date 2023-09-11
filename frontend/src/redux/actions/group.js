@@ -21,13 +21,19 @@ export const getGroups = (errorCallback = function() {}) => (dispatch) => {
         });
 }
 
-export const createGroup = (group = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.post(API + '/group', group);
-    dispatch({
-        type: CREATE_GROUP_DATA,
-        data: result.data
-    });
-    callback();
+export const createGroup = (group = {}, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.post(API + '/group', group)
+        .then(result => {
+            dispatch({
+                type: CREATE_GROUP_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+
 }
 
 export const updateGroup = (group = {}, callback = function() {}) => async (dispatch) => {
