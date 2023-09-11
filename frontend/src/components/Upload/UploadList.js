@@ -453,7 +453,9 @@ const UploadList = (props) => {
     const handleFieldChange = function(campaign, key, value, databaseAccess = true) {
         const updateFields = {};
         updateFields[key] = value;
-        props.updateGroupCampaignField(group._id, campaign._id, updateFields, databaseAccess);
+        props.updateGroupCampaignField(group._id, campaign._id, updateFields, databaseAccess, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const handleObjectChange = function(campaign, object_name, key, value, databaseAccess = true) {
@@ -461,7 +463,9 @@ const UploadList = (props) => {
         object[key] = value;
         let updatedObject = {};
         updatedObject[object_name] = object;
-        props.updateGroupCampaignField(group._id, campaign._id, updatedObject, databaseAccess);
+        props.updateGroupCampaignField(group._id, campaign._id, updatedObject, databaseAccess, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const handleCampaignFieldChange = function(campaign, key, value, databaseAccess = true) {
@@ -671,7 +675,9 @@ const UploadList = (props) => {
             filter: campaign.filter,
             columns: campaign.columns
         }
-        props.updateGroupCampaignField(group._id, campaign._id, updatedCampaign);
+        props.updateGroupCampaignField(group._id, campaign._id, updatedCampaign, true, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     const showCampaignUploadLastInfo = function(campaign) {

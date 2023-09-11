@@ -64,7 +64,7 @@ export const deleteGroup = (group = {}, callback = function() {}, errorCallback 
         });
 }
 
-export const updateGroupCampaignField = (groupId = '', campaignId = '', updateFields = {}, databaseAccess = true, callback = function() {}) => async (dispatch) => {
+export const updateGroupCampaignField = (groupId = '', campaignId = '', updateFields = {}, databaseAccess = true, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
     dispatch({
         type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
         data: {
@@ -74,7 +74,13 @@ export const updateGroupCampaignField = (groupId = '', campaignId = '', updateFi
         }
     });
 
-    if (databaseAccess)
-        await axios.post(API + '/group/update_campaign_field', {groupId: groupId, campaignId: campaignId, updateFields: updateFields});
-    callback();
+    if (databaseAccess) {
+        axios.post(API + '/group/update_campaign_field', {groupId: groupId, campaignId: campaignId, updateFields: updateFields})
+            .then(result => {
+                callback();
+            })
+            .catch(error => {
+                errorCallback(error);
+            });
+    }
 }
