@@ -665,7 +665,9 @@ const UploadList = (props) => {
 
     const handleIsManuallySelectAll = function(checked) {
         const campaignIds = group.campaigns.map(campaign => campaign._id);
-        props.updateIsManually(group._id, campaignIds, checked);
+        props.updateIsManually(group._id, campaignIds, checked, function() {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     // rowSelection object indicates the need for row selection

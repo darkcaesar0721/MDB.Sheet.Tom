@@ -114,13 +114,20 @@ export const getLastInputDate = (groupId, currentDate, callback = function() {},
     }, timeout);
 }
 
-export const updateIsManually = (groupId, campaignIds, value) => async (dispatch) => {
-    dispatch({
-        type: UPDATE_IS_MANUALLY,
-        data: {
-            groupId: groupId,
-            value: value
-        }
-    });
-    await axios.post(API + '/upload/update_is_manually', {groupId: groupId, campaignIds: campaignIds, value: value});
+export const updateIsManually = (groupId, campaignIds, value, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.post(API + '/upload/update_is_manually', {groupId: groupId, campaignIds: campaignIds, value: value})
+        .then(result => {
+            dispatch({
+                type: UPDATE_IS_MANUALLY,
+                data: {
+                    groupId: groupId,
+                    value: value
+                }
+            });
+
+            callback(result);
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
 }
