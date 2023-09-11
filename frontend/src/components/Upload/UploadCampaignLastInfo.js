@@ -12,10 +12,6 @@ function UploadCampaignLastInfo(props) {
     });
     const [columns, setColumns] = useState([]);
 
-    const handleCampaignDelete = function(campaign) {
-        props.deleteCampaign(campaign);
-    }
-
     useEffect(function() {
         setTableParams({
             ...tableParams,

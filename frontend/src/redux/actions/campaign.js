@@ -50,19 +50,29 @@ export const updateCampaign = (campaign = {}, callback = function() {}, errorCal
         });
 }
 
-export const deleteCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
-    const deletedCampaign = await axios.delete(API + '/campaign/' + campaign._id);
-    dispatch({
-        type: DELETE_CAMPAIGN_DATA,
-        data: deletedCampaign.data
-    });
+export const deleteCampaign = (campaign = {}, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.delete(API + '/campaign/' + campaign._id)
+        .then(campaignResult => {
+            dispatch({
+                type: DELETE_CAMPAIGN_DATA,
+                data: campaignResult.data
+            });
 
-    const groups = await axios.get(API + '/group');
-    dispatch({
-        type: INIT_GROUP_DATA,
-        data: groups.data
-    });
-    callback();
+            axios.get(API + '/group')
+                .then(groupResult => {
+                    dispatch({
+                        type: INIT_GROUP_DATA,
+                        data: groupResult.data
+                    });
+                    callback();
+                })
+                .catch(error => {
+                    errorCallback(error);
+                });
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
 }
 
 export const getQueryColumns = (query = '', callback = function() {}) => async (dispatch) => {

@@ -3,10 +3,18 @@ import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {PlusCircleOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
 import moment from "moment";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 import {deleteCampaign} from "../../redux/actions/campaign";
 import Path from "../Settings/MdbSchedulePath";
 import MenuList from "../MenuList";
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 function CampaignList(props) {
     const [tableParams, setTableParams] = useState({
@@ -18,7 +26,9 @@ function CampaignList(props) {
     const [columns, setColumns] = useState([]);
 
     const handleCampaignDelete = function(campaign) {
-        props.deleteCampaign(campaign);
+        props.deleteCampaign(campaign, (result) => {}, (error) => {
+            toastr.error('There is a problem with server.');
+        });
     }
 
     useEffect(function() {
