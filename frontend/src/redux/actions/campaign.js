@@ -4,9 +4,7 @@ import {
     CREATE_CAMPAIGN_DATA,
     UPDATE_CAMPAIGN_DATA,
     DELETE_CAMPAIGN_DATA,
-    UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
     UPDATE_CAMPAIGN_FIELD_DATA,
-    CREATE_GROUP_DATA,
     INIT_GROUP_DATA
 } from "../actionTypes";
 import {API} from "../../config";
@@ -24,13 +22,18 @@ export const getCampaigns = (errorCallback = function() {}) => (dispatch) => {
         })
 }
 
-export const createCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.post(API + '/campaign', campaign);
-    dispatch({
-        type: CREATE_CAMPAIGN_DATA,
-        data: result.data
-    });
-    callback();
+export const createCampaign = (campaign = {}, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.post(API + '/campaign', campaign)
+        .then(result => {
+            dispatch({
+                type: CREATE_CAMPAIGN_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
 }
 
 export const updateCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {

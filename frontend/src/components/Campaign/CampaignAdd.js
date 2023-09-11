@@ -8,7 +8,7 @@ import {
     message,
     Modal,
     Row,
-    Spin, Switch, Table,
+    Spin, Table,
 } from "antd";
 import { MinusCircleOutlined, PlusOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
 import React, {useEffect, useState} from "react";
@@ -16,10 +16,18 @@ import {connect} from "react-redux";
 import { useNavigate } from 'react-router-dom';
 import dragula from "dragula";
 import "dragula/dist/dragula.css";
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 import {createCampaign, getQueryColumns} from "../../redux/actions/campaign";
+
+toastr.options = {
+    positionClass : 'toast-top-right',
+    hideDuration: 300,
+    timeOut: 5000
+}
 
 const layout = {
     labelCol: {
@@ -166,6 +174,8 @@ function CampaignAdd(props) {
                 setTimeout(function() {
                     navigate('/campaigns');
                 }, 1000);
+            }, (error) => {
+                toastr.error('There is a problem with server.');
             });
         }
     }
