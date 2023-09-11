@@ -30,7 +30,12 @@ export const updateSetting = (setting = {}, errorCallback = function() {}) => as
         })
 }
 
-export const backupDB = (callback = function() {}) => async (dispatch) => {
-    await axios.post(API + '/setting/backup');
-    callback();
+export const backupDB = (callback = function() {}, errorCallback = function() {}) => async (dispatch) => {
+    axios.post(API + '/setting/backup')
+        .then(result => {
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
 }

@@ -44,6 +44,8 @@ const Backup = (props) => {
         props.backupDB(function() {
             setLoading(false);
             messageApi.success('backup success');
+        }, (error) => {
+            toastr.error("There is a problem with server.");
         });
     }
 
