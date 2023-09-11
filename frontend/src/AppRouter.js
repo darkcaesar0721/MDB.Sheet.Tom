@@ -1,6 +1,9 @@
 import React, {Fragment, useEffect} from 'react';
 import {Routes, Route, HashRouter} from 'react-router-dom';
-import {connect} from "react-redux";
+import {connect} from "react-redux"
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
 import {
     getSettings
 } from "./redux/actions/setting";
@@ -27,11 +30,27 @@ import UploadList from "./components/Upload/UploadList";
 const DASHBOARD = '/';
 
 const AppRouter = (props) => {
+    let container;
 
     useEffect(function() {
-        props.getSettings();
-        props.getCampaigns();
-        props.getGroups();
+        toastr.options = {
+            positionClass : 'toast-top-right',
+            hideDuration: 300,
+            timeOut: 5000
+        }
+        let isErrorDisplay = false;
+        props.getSettings({}, function(message) {
+            isErrorDisplay = true;
+            toastr.error('There is a problem with server.');
+        });
+        props.getCampaigns({}, function(message) {
+            if (!isErrorDisplay)
+                toastr.error('There is a problem with server.');
+        });
+        props.getGroups({}, function(message) {
+            if (!isErrorDisplay)
+                toastr.error('There is a problem with server.');
+        });
     }, []);
 
     return (

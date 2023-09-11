@@ -8,13 +8,19 @@ import {
 } from "../actionTypes";
 import {API} from "../../config";
 
-export const getGroups = (callback = function() {}) => async (dispatch) => {
-    const result = await axios.get(API + '/group');
-    dispatch({
-        type: INIT_GROUP_DATA,
-        data: result.data
-    });
-    callback();
+export const getGroups = (callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.get(API + '/group')
+        .then(result => {
+            dispatch({
+                type: INIT_GROUP_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error.message);
+        })
+
 }
 
 export const createGroup = (group = {}, callback = function() {}) => async (dispatch) => {

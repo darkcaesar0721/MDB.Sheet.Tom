@@ -11,14 +11,18 @@ import {
 } from "../actionTypes";
 import {API} from "../../config";
 
-export const getCampaigns = (callback = function() {}) => async (dispatch) => {
-    const result = await axios.get(API + '/campaign');
-    dispatch({
-        type: INIT_CAMPAIGN_DATA,
-        data: result.data
-    });
-
-    callback();
+export const getCampaigns = (callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.get(API + '/campaign')
+        .then(result => {
+            dispatch({
+                type: INIT_CAMPAIGN_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error.message);
+        })
 }
 
 export const createCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {

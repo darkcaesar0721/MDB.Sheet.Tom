@@ -4,13 +4,18 @@ import {
 } from "../actionTypes";
 import {API} from "../../config";
 
-export const getSettings = (callback = function() {}) => async (dispatch) => {
-    const result = await axios.get(API + '/setting');
-    dispatch({
-        type: INIT_SETTING_DATA,
-        data: result.data
-    });
-    callback(result.data);
+export const getSettings = (callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.get(API + '/setting')
+        .then(result => {
+            dispatch({
+                type: INIT_SETTING_DATA,
+                data: result.data
+            });
+            callback(result.data);
+        })
+        .catch(error => {
+            errorCallback(error.message);
+        });
 }
 
 export const updateSetting = (setting = {}, callback = function() {}) => async (dispatch) => {
