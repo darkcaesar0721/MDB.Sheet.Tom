@@ -84,21 +84,34 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {},
     }, timeout);
 }
 
-export const getLastInputDate = (groupId, currentDate, callback) => async (dispatch) => {
-    const result = await axios.post(API + '/upload/get_last_input_date', {groupId: groupId, currentDate: currentDate});
-    if (result.data.status === "error")  {
-        callback(result.data);
-    } else {
-        dispatch({
-            type: UPDATE_GROUP_INPUT_DATE,
-            data: {
-                groupId: groupId,
-                currentDate: currentDate,
-                inputDate: result.data.date
+export const getLastInputDate = (groupId, currentDate, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 60000;
+    axios.post(API + '/upload/get_last_input_date', {groupId: groupId, currentDate: currentDate})
+        .then(result => {
+            if (result.data.status === 'error') {
+                callback(result.data);
+            } else {
+                dispatch({
+                    type: UPDATE_GROUP_INPUT_DATE,
+                    data: {
+                        groupId: groupId,
+                        currentDate: currentDate,
+                        inputDate: result.data.date
+                    }
+                });
+                callback(result.data);
             }
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+        .finally(() => {
+            clearTimeout(timer);
         });
-        callback(result.data);
-    }
+
+    const timer = setTimeout(() => {
+        timeoutCallback();
+    }, timeout);
 }
 
 export const updateIsManually = (groupId, campaignIds, value) => async (dispatch) => {
