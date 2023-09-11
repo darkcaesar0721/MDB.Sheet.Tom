@@ -36,13 +36,18 @@ export const createCampaign = (campaign = {}, callback = function() {}, errorCal
         });
 }
 
-export const updateCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
-    const result = await axios.put(API + '/campaign/' + campaign._id, campaign);
-    dispatch({
-        type: UPDATE_CAMPAIGN_DATA,
-        data: result.data
-    });
-    callback();
+export const updateCampaign = (campaign = {}, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    axios.put(API + '/campaign/' + campaign._id, campaign)
+        .then(result => {
+            dispatch({
+                type: UPDATE_CAMPAIGN_DATA,
+                data: result.data
+            });
+            callback();
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
 }
 
 export const deleteCampaign = (campaign = {}, callback = function() {}) => async (dispatch) => {
