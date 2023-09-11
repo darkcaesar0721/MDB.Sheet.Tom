@@ -157,6 +157,12 @@ function CampaignAdd(props) {
                  setOpen(true);
                  setButtonState('campaign');
              }
+        }, (error) => {
+            setLoading(false);
+            toastr.error('There is a problem with server.');
+        }, () => {
+            setLoading(false);
+            toastr.warning('There is a problem with MDB file.');
         });
     }
 

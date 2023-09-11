@@ -75,9 +75,22 @@ export const deleteCampaign = (campaign = {}, callback = function() {}, errorCal
         });
 }
 
-export const getQueryColumns = (query = '', callback = function() {}) => async (dispatch) => {
-    const result = await axios.post(API + '/campaign/get_query_column', {query: query});
-    callback(result.data);
+export const getQueryColumns = (query = '', callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 60000;
+    axios.post(API + '/campaign/get_query_column', {query: query})
+        .then(result => {
+            callback(result.data);
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+        .finally(() => {
+            clearTimeout(timer);
+        });
+
+    const timer = setTimeout(() => {
+        timeoutCallback();
+    }, timeout);
 }
 
 export const updateCampaignField = (campaignId = {}, updateFields = {}, database_access = false, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
