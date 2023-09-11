@@ -11,17 +11,16 @@ import {
 } from "../actionTypes";
 import {API} from "../../config";
 
-export const getCampaigns = (callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+export const getCampaigns = (errorCallback = function() {}) => (dispatch) => {
     axios.get(API + '/campaign')
         .then(result => {
             dispatch({
                 type: INIT_CAMPAIGN_DATA,
                 data: result.data
             });
-            callback();
         })
         .catch(error => {
-            errorCallback(error.message);
+            errorCallback(error);
         })
 }
 
