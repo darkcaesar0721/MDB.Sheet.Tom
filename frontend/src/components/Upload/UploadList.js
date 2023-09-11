@@ -435,6 +435,10 @@ const UploadList = (props) => {
             } else {
                 messageApi.success('success');
             }
+        }, (err) => {
+            toastr.error('There is a problem with server.');
+        }, () => {
+            toastr.warning('There is a problem with MDB file.');
         })
     }
 
