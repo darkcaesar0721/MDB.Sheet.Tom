@@ -156,7 +156,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         const dateValue = new Date(mdbRow['SystemCreateDate']);
                         const date = moment(dateValue).format('M/D/Y');
 
-                        if (date >= end_date && date <= start_date) {
+                        if (new Date(date) >= new Date(end_date) && new Date(date) <= new Date(start_date)) {
                             let row = {};
                             for (const column of groupCampaign.columns) {
                                 if (column.is_display === false) continue;
@@ -233,7 +233,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
             if (manually === false) {
                 if (rows.length > 0) {
-                    // await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+                    await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
                     for (const sheet_url of campaign.sheet_urls) {
                         const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
                         const match = regex.exec(sheet_url);
@@ -275,24 +275,24 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         })
                         upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
-                        // await googleSheetsInstance.spreadsheets.values.append({
-                        //     auth, //auth object
-                        //     spreadsheetId, //spreadsheet id
-                        //     range: sheet.properties.title, //sheet name and range of cells
-                        //     valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
-                        //     resource: {
-                        //         values: upload_rows,
-                        //     },
-                        // });
+                        await googleSheetsInstance.spreadsheets.values.append({
+                            auth, //auth object
+                            spreadsheetId, //spreadsheet id
+                            range: sheet.properties.title, //sheet name and range of cells
+                            valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
+                            resource: {
+                                values: upload_rows,
+                            },
+                        });
                     }
                 }
-                // await upload_schedule(group, campaign, setting, callback);
+                await upload_schedule(group, campaign, setting, callback);
             }
-            // Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
-            //     Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
-            //         callback({status: 'success', campaign: updatedCampaign});
-            //     });
-            // });
+            Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
+                Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
+                    callback({status: 'success', campaign: updatedCampaign});
+                });
+            });
         });
     });
 }
