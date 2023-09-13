@@ -92,7 +92,8 @@ const groupSchema = new mongoose.Schema({
                 type: Boolean,
                 default: true
             }
-        }]
+        }],
+        last_uploaded_date: Date
     }]
 });
 

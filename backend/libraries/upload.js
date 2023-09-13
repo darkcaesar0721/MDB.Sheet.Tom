@@ -296,7 +296,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
             }
             Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
                 Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
-                    callback({status: 'success', campaign: updatedCampaign});
+                    const today = moment().format("MM/DD/YYYY");
+                    Groups.updateOne({_id: groupId, "campaigns.detail": campaignId}, {"campaigns.$.last_uploaded_date": today}, (err, doc) => {
+                        callback({status: 'success', campaign: updatedCampaign});
+                    });
                 });
             });
         });
