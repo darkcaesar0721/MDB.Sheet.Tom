@@ -5,7 +5,7 @@ import {connect} from "react-redux";
 import {UploadOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled} from "@ant-design/icons";
 import {DraggableModal, DraggableModalProvider} from "@cubetiq/antd-modal";
 import {Link} from "react-router-dom";
-import moment from "moment-timezone";
+import moment from "moment";
 
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
@@ -44,10 +44,12 @@ toastr.options = {
     timeOut: 5000
 }
 
-moment.tz.setDefault('America/Los_Angeles');
-
-const today = moment().format("M/D/Y");
-const weekDay = moment().format('dddd');
+let current_date = new Date();
+let pstDate = current_date.toLocaleString("en-US", {
+    timeZone: "America/Los_Angeles"
+});
+const today = moment(pstDate).format("M/D/Y");
+const weekDay = moment(pstDate).format('dddd');
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -115,9 +117,9 @@ const UploadList = (props) => {
                 if (campaign.weekday[weekDay] === false) {
                     campaign.status = 'unrunning';
                 } else {
-                    if (!campaign.last_upload_start_datetime || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y')) !== new Date(today)) {
+                    if (!campaign.last_upload_start_datetime || moment(campaign.last_upload_start_datetime).format('M/D/Y') !== today) {
                         campaign.status = 'running';
-                    } else if (!campaign.last_upload_end_datetime || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y')) !== new Date(moment(campaign.last_upload_end_datetime).format('M/D/Y')) || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y hh:mm:ss')) > new Date(moment(campaign.last_upload_end_datetime).format('M/D/Y hh:mm:ss'))) {
+                    } else if (!campaign.last_upload_end_datetime || moment(campaign.last_upload_start_datetime).format('M/D/Y') !== moment(campaign.last_upload_end_datetime).format('M/D/Y') || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y hh:mm:ss')) > new Date(moment(campaign.last_upload_end_datetime).format('M/D/Y hh:mm:ss'))) {
                         campaign.status = 'problem';
                     } else {
                         campaign.status = 'done';
@@ -603,6 +605,18 @@ const UploadList = (props) => {
         startUploadCampaigns(campaigns);
     }
 
+    const handleManuallyStepUploadBtnClick = function() {
+        let campaigns = [];
+        for (const campaign of group.campaigns) {
+            if (campaign.status === 'problem' || campaign.status === 'running') {
+                campaigns.push(campaign);
+            }
+
+            if (campaign.is_stop_running_status) break;
+        }
+        startUploadCampaigns(campaigns);
+    }
+
     const validation = function(campaigns) {
         if (campaigns.length === 0) {
             messageApi.warning('Please select campaign list.');
@@ -797,7 +811,7 @@ const UploadList = (props) => {
                 }
                 {
                     currentWay === 'ALL' ?
-                        <Col span={1}>
+                        <Col span={2}>
                             {
                                 <Popconfirm
                                     title="Upload data"
@@ -811,20 +825,38 @@ const UploadList = (props) => {
                                     </Button>
                                 </Popconfirm>
                             }
-                        </Col> : <Col span={1}></Col>
+                        </Col> : <Col span={2}></Col>
                 }
-                <Col span={3} offset={2}>
+                {
+                    currentWay === 'ALL' ?
+                        <Col span={2}>
+                            {
+                                <Popconfirm
+                                    title="Upload data"
+                                    description="Are you sure to upload manually the rows of selected campaign?"
+                                    onConfirm={handleManuallyStepUploadBtnClick}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button type="primary" style={{marginLeft: '0px'}}>
+                                        Manual - Step
+                                    </Button>
+                                </Popconfirm>
+                            }
+                        </Col> : <Col span={2}></Col>
+                }
+                <Col span={2} offset={1}>
                     <Select
                         size="large"
                         defaultValue=""
                         onChange={handleGroupChange}
-                        style={{ width: 200, marginLeft: '-15px' }}
+                        style={{ width: 130, marginLeft: '-2px'}}
                         options={groupOptions}
                         value={currentGroup}
                     />
                 </Col>
                 <Col span={3}>
-                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-15px'}}>
+                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-10px'}} >
                         <Radio value="ALL">Upload all campaigns</Radio>
                         <Radio value="ONE">Upload one by one</Radio>
                     </Radio.Group>

@@ -3,7 +3,7 @@ import {API} from "../../config";
 import {
     UPDATE_CAMPAIGN_DATA,
     UPDATE_GROUP_INPUT_DATE,
-    UPDATE_IS_MANUALLY, UPDATE_IS_STOP_CAMPAIGN_RUNNING
+    UPDATE_IS_MANUALLY, UPDATE_IS_STOP_CAMPAIGN_RUNNING, UPDATE_UPLOAD_DATETIME
 } from "../actionTypes";
 
 export const getUploadLastPhone = (campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
@@ -36,8 +36,27 @@ export const upload = (groupId, campaignId, manually = false, callback = functio
     const timeout = 120000;
     axios.post(API + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually})
         .then(result => {
-            if (result.data.status === 'error') {
-                callback(result.data);
+            if (!manually) {
+                axios.post(API + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
+                    .then(res => {
+                        if (result.data.status === 'error') {
+                            callback(result.data);
+                        } else {
+                            dispatch({
+                                type: UPDATE_CAMPAIGN_DATA,
+                                data: result.data.campaign
+                            });
+                            dispatch({
+                                type: UPDATE_UPLOAD_DATETIME,
+                                data: {
+                                    groupId: groupId,
+                                    campaignId: campaignId,
+                                    uploadDateTime: res.data
+                                }
+                            });
+                            callback(result.data);
+                        }
+                    })
             } else {
                 dispatch({
                     type: UPDATE_CAMPAIGN_DATA,
@@ -62,15 +81,26 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {},
     const timeout = 120000;
     axios.post(API + '/upload/upload_preview', {groupId: groupId, campaignId: campaignId})
         .then(result => {
-            if (result.data.status === 'error') {
-                callback(result.data);
-            } else {
-                dispatch({
-                    type: UPDATE_CAMPAIGN_DATA,
-                    data: result.data.campaign
-                });
-                callback(result.data);
-            }
+            axios.post(API + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
+                .then(res => {
+                    if (result.data.status === 'error') {
+                        callback(result.data);
+                    } else {
+                        dispatch({
+                            type: UPDATE_CAMPAIGN_DATA,
+                            data: result.data.campaign
+                        });
+                        dispatch({
+                            type: UPDATE_UPLOAD_DATETIME,
+                            data: {
+                                groupId: groupId,
+                                campaignId: campaignId,
+                                uploadDateTime: res.data
+                            }
+                        });
+                        callback(result.data);
+                    }
+                })
         })
         .catch(error => {
             errorCallback(error);
