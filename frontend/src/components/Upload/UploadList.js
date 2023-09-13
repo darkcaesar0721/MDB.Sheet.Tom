@@ -23,8 +23,8 @@ import {
 } from "../../redux/actions/group";
 import {
     getLastInputDate,
-    getUploadLastPhone,
-    updateIsManually,
+    getUploadLastPhone, isStopCampaignRunning,
+    updateIsManually, updateIsStopCampaignRunning,
     upload,
     uploadPreviewData
 } from "../../redux/actions/upload";
@@ -128,6 +128,19 @@ const UploadList = (props) => {
         });
 
         let columns = [];
+        if (currentWay === 'ALL') {
+            columns = [...columns, {
+                title: 'stop',
+                key: 'is_stop_running_status',
+                width: 40,
+                render: (_, r) => {
+                    const value = r.is_stop_running_status ? r.is_stop_running_status : false;
+                    return (
+                        <Radio checked={value} onChange={(e) => {handleIsStopRunning(e, r)}}></Radio>
+                    )
+                }
+            }];
+        }
         columns = [...columns, {
             title: 'no',
             key: 'no',
@@ -369,6 +382,12 @@ const UploadList = (props) => {
         setTblColumns(columns);
 
     }, [group, currentGroup, currentWay]);
+
+    const handleIsStopRunning = function(e, campaign) {
+        props.updateIsStopCampaignRunning(group._id, campaign._id, (result) => {}, (error) => {
+            toastr.warning('There is a problem with MDB file.');
+        })
+    }
 
     const upload = function(campaign, isManually = false) {
         setLoading(true);
@@ -977,6 +996,6 @@ export default connect(
     {
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
-        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB
+        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning
     }
 )(UploadList);

@@ -3,7 +3,7 @@ import {API} from "../../config";
 import {
     UPDATE_CAMPAIGN_DATA,
     UPDATE_GROUP_INPUT_DATE,
-    UPDATE_IS_MANUALLY
+    UPDATE_IS_MANUALLY, UPDATE_IS_STOP_CAMPAIGN_RUNNING
 } from "../actionTypes";
 
 export const getUploadLastPhone = (campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
@@ -125,6 +125,24 @@ export const updateIsManually = (groupId, campaignIds, value, callback = functio
                 }
             });
 
+            callback(result);
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
+}
+
+export const updateIsStopCampaignRunning = (groupId, campaignId, callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    dispatch({
+        type: UPDATE_IS_STOP_CAMPAIGN_RUNNING,
+        data: {
+            groupId: groupId,
+            campaignId: campaignId
+        }
+    });
+
+    axios.post(API + '/upload/stop_campaign_running', {groupId: groupId, campaignId: campaignId})
+        .then(result => {
             callback(result);
         })
         .catch(error => {
