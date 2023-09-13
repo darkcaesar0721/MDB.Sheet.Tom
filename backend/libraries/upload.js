@@ -233,7 +233,9 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
             if (manually === false) {
                 if (rows.length > 0) {
-                    await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+                    if (process.env.ENVIRONMENT === 'production') {
+                        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+                    }
                     for (const sheet_url of campaign.sheet_urls) {
                         const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
                         const match = regex.exec(sheet_url);
@@ -275,18 +277,22 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         })
                         upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
 
-                        await googleSheetsInstance.spreadsheets.values.append({
-                            auth, //auth object
-                            spreadsheetId, //spreadsheet id
-                            range: sheet.properties.title, //sheet name and range of cells
-                            valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
-                            resource: {
-                                values: upload_rows,
-                            },
-                        });
+                        if (process.env.ENVIRONMENT === 'production') {
+                            await googleSheetsInstance.spreadsheets.values.append({
+                                auth, //auth object
+                                spreadsheetId, //spreadsheet id
+                                range: sheet.properties.title, //sheet name and range of cells
+                                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
+                                resource: {
+                                    values: upload_rows,
+                                },
+                            });
+                        }
                     }
                 }
-                await upload_schedule(group, campaign, setting, callback);
+                if (process.env.ENVIRONMENT === 'production') {
+                    await upload_schedule(group, campaign, setting, callback);
+                }
             }
             Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
                 Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
