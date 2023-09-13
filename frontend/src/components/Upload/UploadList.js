@@ -2,12 +2,13 @@ import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Sw
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 
-import {UploadOutlined, EyeOutlined} from "@ant-design/icons";
+import {UploadOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled} from "@ant-design/icons";
 import {DraggableModal, DraggableModalProvider} from "@cubetiq/antd-modal";
 import {Link} from "react-router-dom";
-import moment from "moment";
-import toastr from 'toastr'
-import 'toastr/build/toastr.min.css'
+import moment from "moment-timezone";
+
+import toastr from 'toastr';
+import 'toastr/build/toastr.min.css';
 
 import StyledCheckBox from "../../shared/StyledCheckBox";
 import MenuList from "../MenuList";
@@ -23,10 +24,11 @@ import {
 } from "../../redux/actions/group";
 import {
     getLastInputDate,
-    getUploadLastPhone, isStopCampaignRunning,
-    updateIsManually, updateIsStopCampaignRunning,
+    getUploadLastPhone,
+    updateIsManually,
     upload,
-    uploadPreviewData
+    uploadPreviewData,
+    updateIsStopCampaignRunning
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -42,12 +44,10 @@ toastr.options = {
     timeOut: 5000
 }
 
-let current_date = new Date();
-let pstDate = current_date.toLocaleString("en-US", {
-    timeZone: "America/Los_Angeles"
-});
-let currentDate = moment(pstDate).format('M/D/YYYY');
-const wday = moment(pstDate).format('dddd');
+moment.tz.setDefault('America/Los_Angeles');
+
+const today = moment().format("M/D/Y");
+const weekDay = moment().format('dddd');
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -111,6 +111,18 @@ const UploadList = (props) => {
                 for(const key of filterKeys) {
                     campaign[key] = campaign.filter[key];
                 }
+
+                if (campaign.weekday[weekDay] === false) {
+                    campaign.status = 'unrunning';
+                } else {
+                    if (!campaign.last_upload_start_datetime || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y')) !== new Date(today)) {
+                        campaign.status = 'running';
+                    } else if (!campaign.last_upload_end_datetime || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y')) !== new Date(moment(campaign.last_upload_end_datetime).format('M/D/Y')) || new Date(moment(campaign.last_upload_start_datetime).format('M/D/Y hh:mm:ss')) > new Date(moment(campaign.last_upload_end_datetime).format('M/D/Y hh:mm:ss'))) {
+                        campaign.status = 'problem';
+                    } else {
+                        campaign.status = 'done';
+                    }
+                }
                 return campaign;
             })}));
         setSelectedManualUploadCampaignKeys(manualUploadCampaignKeys);
@@ -141,6 +153,29 @@ const UploadList = (props) => {
                 }
             }];
         }
+        columns = [...columns, {
+            title: 'status',
+            key: 'status',
+            width: 30,
+            render: (_, r) => {
+                switch (r.status) {
+                    case 'unrunning':
+                        return (<></>)
+                    case 'running':
+                        return (
+                            <CloseCircleFilled style={{color: "#1573f8"}}/>
+                        )
+                    case 'problem':
+                        return (
+                            <ExclamationCircleFilled style={{color: "#f3359e"}}/>
+                        )
+                    case 'done':
+                        return (
+                            <CheckCircleFilled style={{color: "#52c41a"}}/>
+                        )
+                }
+            }
+        }];
         columns = [...columns, {
             title: 'no',
             key: 'no',
@@ -552,7 +587,7 @@ const UploadList = (props) => {
 
     const handleAutoUploadBtnClick = function() {
         let campaigns = group.campaigns.filter(c => {
-            if (!c.is_manually_upload && c.weekday[wday] === true) return true;
+            if (!c.is_manually_upload && c.weekday[weekDay] === true) return true;
 
             return false;
         });
@@ -595,7 +630,7 @@ const UploadList = (props) => {
 
     const startUploadCampaigns = function(campaigns, manual = false) {
         if (validation(campaigns)) {
-            if (moment(new Date(group.last_control_date)).format('M/D/Y') === currentDate) {
+            if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
                 setRunningStatusList(campaigns.map((c, i) => {
                     let campaign = {...c};
                     campaign.key = i;
@@ -611,7 +646,7 @@ const UploadList = (props) => {
             } else {
                 setLoading(true);
                 setTip('Wait for getting input date...');
-                props.getLastInputDate(group._id, currentDate, function(result) {
+                props.getLastInputDate(group._id, today, function(result) {
                     setLoading(false);
                     if (result.status === 'error') {
                         messageApi.warning(result.description);
@@ -892,7 +927,7 @@ const UploadList = (props) => {
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title={<div><span style={{fontSize: '18px'}}>UPLOAD AUTO STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === currentDate ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
+                    title={<div><span style={{fontSize: '18px'}}>UPLOAD AUTO STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
                     open={openUploadAutoStatusModal}
                     header={null}
                     footer={null}
@@ -920,7 +955,7 @@ const UploadList = (props) => {
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title={<div><span style={{fontSize: '18px'}}>UPLOAD MANUAL STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === currentDate ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
+                    title={<div><span style={{fontSize: '18px'}}>UPLOAD MANUAL STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
                     open={openUploadManualStatusModal}
                     header={null}
                     footer={null}
