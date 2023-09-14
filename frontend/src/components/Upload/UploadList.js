@@ -147,19 +147,19 @@ const UploadList = (props) => {
         });
 
         let columns = [];
-        if (currentWay === 'ALL') {
-            columns = [...columns, {
-                title: 'stop',
-                key: 'is_stop_running_status',
-                width: 40,
-                render: (_, r) => {
-                    const value = r.is_stop_running_status ? r.is_stop_running_status : false;
-                    return (
-                        <Radio checked={value} onChange={(e) => {handleIsStopRunning(e, r)}}></Radio>
-                    )
-                }
-            }];
-        }
+        // if (currentWay === 'ALL') {
+        //     columns = [...columns, {
+        //         title: 'stop',
+        //         key: 'is_stop_running_status',
+        //         width: 40,
+        //         render: (_, r) => {
+        //             const value = r.is_stop_running_status ? r.is_stop_running_status : false;
+        //             return (
+        //                 <Radio checked={value} onChange={(e) => {handleIsStopRunning(e, r)}}></Radio>
+        //             )
+        //         }
+        //     }];
+        // }
         columns = [...columns, {
             title: 'status',
             key: 'status',
@@ -763,7 +763,7 @@ const UploadList = (props) => {
             <Row style={{marginTop: '1rem'}}>
                 {
                     currentWay === 'ALL' ?
-                        <Col span={1}>
+                        <Col span={2}>
                             {
                                 <Popconfirm
                                     title="Upload Manually data"
@@ -777,7 +777,7 @@ const UploadList = (props) => {
                                     </Button>
                                 </Popconfirm>
                             }
-                        </Col> : <Col span={1}></Col>
+                        </Col> : <Col span={2}></Col>
                 }
                 {
                     currentWay === 'ALL' ?
@@ -790,43 +790,43 @@ const UploadList = (props) => {
                                     okText="Yes"
                                     cancelText="No"
                                 >
-                                    <Button type="primary" style={{marginLeft: '20px'}}>
+                                    <Button type="primary" style={{marginLeft: '-20px'}}>
                                         Daily - Manual
                                     </Button>
                                 </Popconfirm>
                             }
                         </Col> : <Col span={2}></Col>
                 }
-                {
-                    currentWay === 'ALL' ?
-                        <Col span={2}>
-                            {
-                                <Popconfirm
-                                    title="Upload data"
-                                    description="Are you sure to upload manually the rows of selected campaign?"
-                                    onConfirm={handleManuallyStepUploadBtnClick}
-                                    okText="Yes"
-                                    cancelText="No"
-                                >
-                                    <Button type="primary" style={{marginLeft: '0px'}}>
-                                        Manual - Step
-                                    </Button>
-                                </Popconfirm>
-                            }
-                        </Col> : <Col span={2}></Col>
-                }
-                <Col span={2} offset={1}>
+                {/*{*/}
+                {/*    currentWay === 'ALL' ?*/}
+                {/*        <Col span={2}>*/}
+                {/*            {*/}
+                {/*                <Popconfirm*/}
+                {/*                    title="Upload data"*/}
+                {/*                    description="Are you sure to upload manually the rows of selected campaign?"*/}
+                {/*                    onConfirm={handleManuallyStepUploadBtnClick}*/}
+                {/*                    okText="Yes"*/}
+                {/*                    cancelText="No"*/}
+                {/*                >*/}
+                {/*                    <Button type="primary" style={{marginLeft: '0px'}}>*/}
+                {/*                        Manual - Step*/}
+                {/*                    </Button>*/}
+                {/*                </Popconfirm>*/}
+                {/*            }*/}
+                {/*        </Col> : <Col span={2}></Col>*/}
+                {/*}*/}
+                <Col span={3} offset={1}>
                     <Select
                         size="large"
                         defaultValue=""
                         onChange={handleGroupChange}
-                        style={{ width: 130, marginLeft: '-2px'}}
+                        style={{ width: 130, marginLeft: '40px'}}
                         options={groupOptions}
                         value={currentGroup}
                     />
                 </Col>
                 <Col span={3}>
-                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-10px'}} >
+                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-50px'}} >
                         <Radio value="ALL">Upload all campaigns</Radio>
                         <Radio value="ONE">Upload one by one</Radio>
                     </Radio.Group>
