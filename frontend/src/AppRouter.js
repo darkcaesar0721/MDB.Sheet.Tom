@@ -40,7 +40,7 @@ const AppRouter = (props) => {
 
     useEffect(function() {
         let isErrorDisplay = false;
-        props.getSettings(() => {}, function(error) {
+        props.getSettings('', () => {}, function(error) {
             isErrorDisplay = true;
             toastr.error('There is a problem with server.');
         });

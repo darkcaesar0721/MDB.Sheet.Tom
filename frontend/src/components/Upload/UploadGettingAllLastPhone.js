@@ -1,6 +1,6 @@
-import {Button, Col, message, Row, Table} from "antd";
+import {Button, Col, message, Row, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
-import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone, Loading3QuartersOutlined} from "@ant-design/icons";
+import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone} from "@ant-design/icons";
 import moment from "moment";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -13,13 +13,10 @@ toastr.options = {
 
 const UploadGettingAllLastPhone = (props) => {
     const [messageApi, contextHolder] = message.useMessage();
-    const [isPaused, setIsPaused] = useState(false);
-    const [isResumed, setIsResumed] = useState(true);
-    const [isClose, setIsClose] = useState(false);
-    const [currentRunningIndex, setCurrentRunningIndex] = useState(0);
     const [columns, setColumns] = useState([]);
     const [isRunningStart, setIsRunningStart] = useState(false);
-    const [statusResult, setStatusResult] = useState([]);
+    const [campaigns, setCampaigns] = useState([]);
+    const [runCampaignsByServer, setRunCampaignsByServer] = useState([]);
 
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -29,18 +26,54 @@ const UploadGettingAllLastPhone = (props) => {
     });
 
     useEffect(function() {
-        if (props.runningStatusList.length > 0 && !isRunningStart) {
+        if (props.group.campaigns.length > 0) {
+            setCampaigns(props.group.campaigns.filter(c => {
+                return !!c.is_manually_upload;
+            }));
+        }
+    }, [props.group]);
+
+    useEffect(function() {
+        if (campaigns.length > 0 && !isRunningStart) {
+            setRunCampaignsByServer(props.servers.map((server, index) => {
+                let runCampaigns = {server: server, campaigns: []};
+                if (index < campaigns.length) {
+                    for (let i = index; i < campaigns.length; i = i + props.servers.length) {
+                        runCampaigns.campaigns.push(campaigns[i]);
+                    }
+                }
+                return runCampaigns;
+            }));
+
             const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {cancel_status: false})});
             props.updateSetting(setting, (error) => {
                 toastr.error('There is a problem with server.');
             });
+        }
+    }, [campaigns]);
 
-            getLastPhone(currentRunningIndex, props.runningStatusList.map(s => {
-                return {status: '', campaign: {}};
-            }));
+    useEffect(function() {
+        if (runCampaignsByServer.length > 0 && !isRunningStart) {
+            const runningUpload = function(index) {
+                if (index === runCampaignsByServer.length || runCampaignsByServer[index].campaigns.length === 0) return;
+                getLastPhone(runCampaignsByServer[index], 0);
+                setTimeout(() => {
+                    runningUpload(index + 1);
+                }, 3000);
+            }
+            runningUpload(0);
             setIsRunningStart(true);
         }
-    }, [props.runningStatusList]);
+    }, [runCampaignsByServer]);
+
+    useEffect(function() {
+        if (campaigns.length > 0 && campaigns.filter(c => c.state === '' || c.state === 'loading').length === 0) {
+            props.backupDB((result) => {}, (error) => {
+                toastr.error('There is a problem with server.');
+            });
+            messageApi.success('upload success');
+        }
+    }, [campaigns]);
 
     useEffect(function() {
         setColumns([
@@ -50,36 +83,34 @@ const UploadGettingAllLastPhone = (props) => {
                 dataIndex: 'no',
                 width: 30,
                 render: (_, r) => {
+                    let index = -1;
+                    campaigns.forEach((c, i) => {
+                        if (c._id === r._id) index = i;
+                    })
                     return (
-                        <span>{r.index + 1}</span>
+                        <span>{index + 1}</span>
                     )
                 }
             },
             {
-                title: 'Status',
-                key: 'status',
-                width: 90,
+                title: 'State',
+                key: 'state',
+                width: 50,
                 render: (_, r) => {
                     let element = '';
-                    if (isPaused === true && r.index === currentRunningIndex) {
-                        element = <Loading3QuartersOutlined />;
-                    } else if (isPaused === true && r.index > currentRunningIndex) {
-                        element = '';
-                    } else {
-                        switch (r.status) {
-                            case 'error':
-                                element = <WarningOutlined />;
-                                break;
-                            case 'loading':
-                                element = <LoadingOutlined />;
-                                break;
-                            case 'success':
-                                element = <CheckCircleTwoTone twoToneColor="#52c41a" />;
-                                break;
-                            case '':
-                                element = '';
-                                break;
-                        }
+                    switch (r.state) {
+                        case 'success':
+                            element = <CheckCircleTwoTone twoToneColor="#52c41a" />;
+                            break;
+                        case 'loading':
+                            element = <LoadingOutlined />;
+                            break;
+                        case 'error':
+                            element = <WarningOutlined />;
+                            break;
+                        case '':
+                            element = '';
+                            break;
                     }
                     return (
                         <>
@@ -95,12 +126,12 @@ const UploadGettingAllLastPhone = (props) => {
             },
             {
                 title: 'LastUploadDate',
-                dataIndex: 'last_upload_datetime',
+                key: 'last_upload_datetime',
                 render: (_, r) => {
                     return (
                         <>
                             {
-                                <span>{r.last_upload_datetime === "" || r.last_upload_datetime === undefined || r.last_upload_datetime === null ? "" : moment(r.last_upload_datetime).format('M/D/Y, hh:mm A')}</span>
+                                <span>{r.last_upload_datetime !== "" ? moment(r.last_upload_datetime).format('M/D/Y, hh:mm A') : ""}</span>
                             }
                         </>
                     )
@@ -113,8 +144,7 @@ const UploadGettingAllLastPhone = (props) => {
                     return (
                         <>
                             {
-                                (isPaused === true && currentRunningIndex <= r.index) || (isPaused !== true && currentRunningIndex <= r.index) ?
-                                    <span></span> : <span>{r.last_phone}</span>
+                                <span>{r.state === 'success' || r.state === 'warning' ? r.last_phone : ''}</span>
                             }
                         </>
                     )
@@ -127,52 +157,27 @@ const UploadGettingAllLastPhone = (props) => {
                     return (
                         <>
                             {
-                                (isPaused === true && currentRunningIndex <= r.index) || (isPaused !== true && currentRunningIndex <= r.index) ?
-                                    <span></span> : <span>{r.system_create_datetime === "" || r.system_create_datetime === undefined || r.system_create_datetime === null ? "" : moment(r.system_create_datetime).format('M/D/Y, hh:mm A')}</span>
+                                <span>{(r.state === 'success' || r.state === 'warning' ) && r.system_create_datetime !== "" ? moment(r.system_create_datetime).format('M/D/Y, hh:mm A') : ""}</span>
                             }
                         </>
                     )
                 }
             },
+            {
+                title: 'Error Description',
+                dataIndex: 'description',
+                key: 'description',
+            },
         ])
-    }, [props.runningStatusList, currentRunningIndex, isPaused]);
+    }, [campaigns]);
 
-    const getLastPhone = function(index, statusLists = []) {
-        setCurrentRunningIndex(index);
-        setStatusResult(statusLists);
+    const getLastPhone = function(runCampaignByServer, index) {
+        props.getUploadLastPhone(props.group._id, runCampaignByServer.campaigns[index]._id, runCampaignByServer.campaigns[index].detail, runCampaignByServer, index, function(result) {
+            if (result.setting.current_upload.cancel_status === true) return;
 
-        props.getUploadLastPhone(props.runningStatusList[index].detail, function(result) {
-            props.getSettings(function(settings) {
-                if (settings.current_upload.cancel_status === false) {
-                    statusLists[index]['status'] = result.status;
-                    statusLists[index]['campaign'] = result.campaign;
-                    if (props.runningStatusList.length > (index + 1)) {
-                        statusLists[index + 1]['status'] = 'loading';
-                    }
-                    setStatusResult(statusLists);
-                    props.updateRunningStatusList(statusLists);
-
-                    if (settings.current_upload.pause_index !== index) {
-                        if (props.runningStatusList.length === (index + 1)) {
-                            setIsClose(true);
-                            setCurrentRunningIndex(index + 1);
-                            setTimeout(function() {
-                                messageApi.success('Get all last phone success');
-                            }, 1000);
-                        } else {
-                            getLastPhone(index + 1, statusLists);
-                        }
-                    } else {
-                        const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: index, pause_index: -1})});
-                        props.updateSetting(setting, (error) => {
-                            toastr.error('There is a problem with server.');
-                        });
-                    }
-                }
-            }, (error) => {
-                toastr.error('There is a problem with server.');
-                cancel();
-            });
+            if ((index + 1) !== runCampaignByServer.campaigns.length) {
+                getLastPhone(runCampaignByServer, index + 1);
+            }
         }, (error) => {
             toastr.error('There is a problem with server.');
             cancel();
@@ -190,44 +195,8 @@ const UploadGettingAllLastPhone = (props) => {
         });
     };
 
-    const pause = function() {
-        setIsPaused(true);
-        setIsResumed(false);
-
-        const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {pause_index: currentRunningIndex, resume_index: -1})});
-        props.updateSetting(setting, (error) => {
-            toastr.error('There is a problem with server.');
-        });
-    }
-
-    const resume = function() {
-        setIsPaused(false);
-        setIsResumed(true);
-
-        props.getSettings(function(settings) {
-            if (settings.current_upload.resume_index !== undefined && parseInt(settings.current_upload.resume_index) !== -1) {
-                if (props.runningStatusList.length === (parseInt(settings.current_upload.resume_index) + 1)) {
-                    setIsClose(true);
-                    setCurrentRunningIndex(currentRunningIndex + 1);
-                    setTimeout(function () {
-                        messageApi.success('Get all last phone success');
-                    }, 1000)
-                } else {
-                    getLastPhone(parseInt(settings.current_upload.resume_index) + 1, statusResult);
-                }
-            }
-            const setting = Object.assign({...settings}, {current_upload : Object.assign({...settings.current_upload}, {resume_index: -1, pause_index: -1, cancel_status: false})});
-            props.updateSetting(setting, (error) => {
-                toastr.error('There is a problem with server.');
-            });
-        }, (error) => {
-            toastr.error('There is a problem with server.');
-            cancel();
-        });
-    }
-
     const cancel = function() {
-        const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {resume_index: -1, pause_index: -1, cancel_status: true})});
+        const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {cancel_status: true})});
         props.updateSetting(setting, (error) => {
             toastr.error('There is a problem with server.');
         });
@@ -239,12 +208,7 @@ const UploadGettingAllLastPhone = (props) => {
         <>
             {contextHolder}
             <Row>
-                <Col span={2}>
-                    <Button type="primary" disabled={!isClose} onClick={(e) => {props.setOpen(false)}}>Close Window</Button>
-                </Col>
-                <Col span={15} offset={5}>
-                    <Button type="primary" disabled={isPaused} onClick={pause}>Pause</Button>
-                    <Button type="primary" disabled={isResumed} onClick={resume} style={{marginLeft: '0.4rem'}}>Resume</Button>
+                <Col span={2} offset={20}>
                     <Button type="primary" onClick={cancel} style={{marginLeft: '0.4rem'}}>Cancel</Button>
                 </Col>
             </Row>
@@ -254,7 +218,7 @@ const UploadGettingAllLastPhone = (props) => {
                         bordered={true}
                         size="small"
                         columns={columns}
-                        dataSource={props.runningStatusList}
+                        dataSource={campaigns}
                         pagination={tableParams.pagination}
                         onChange={handleTableChange}
                         className="antd-custom-table upload-status-list"
@@ -262,7 +226,6 @@ const UploadGettingAllLastPhone = (props) => {
                     />
                 </Col>
             </Row>
-
         </>
     )
 }

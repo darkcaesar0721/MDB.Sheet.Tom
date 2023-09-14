@@ -28,7 +28,7 @@ import {
     updateIsManually,
     upload,
     uploadPreviewData,
-    updateIsStopCampaignRunning
+    updateIsStopCampaignRunning, updateUploadGroup
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -70,10 +70,10 @@ const UploadList = (props) => {
     const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
     const [uploadCampaignLastPreviewModalOpen, setUploadCampaignLastPreviewModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
-    const [openUploadAutoStatusModal, setOpenUploadAutoStatusModal] = useState(false);
-    const [openUploadManualStatusModal, setOpenUploadManualStatusModal] = useState(false);
-    const [runningStatusList, setRunningStatusList] = useState([]);
-    const [uploadDoneStatus, setUploadDoneStatus] = useState(false);
+    const [openUploadStatusModal, setOpenUploadStatusModal] = useState(false);
+    const [currentUploadRunningWay, setCurrentUploadRunningWay] = useState('');
+
+    const servers = [3000, 3001, 3002, 3003];
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -125,10 +125,15 @@ const UploadList = (props) => {
                         campaign.status = 'done';
                     }
                 }
+                campaign.filter_amount = customFilterAmount(campaign);
                 return campaign;
             })}));
         setSelectedManualUploadCampaignKeys(manualUploadCampaignKeys);
     }, [props.groups, props.campaigns, currentGroup]);
+
+    useEffect(function() {
+
+    }, []);
 
     useEffect(function() {
         if (group.campaigns === undefined) return;
@@ -342,15 +347,9 @@ const UploadList = (props) => {
         }];
         columns = [...columns, {
             title: 'Filter Amount',
-            key: 'count',
+            dataIndex: 'filter_amount',
+            key: 'filter_amount',
             width: 90,
-            render: (_, record) => {
-                return (
-                    <>
-                        <span>{customFilterAmount(record)}</span>
-                    </>
-                )
-            }
         }];
         columns = [...columns, {
             title: 'Qty Available',
@@ -434,7 +433,7 @@ const UploadList = (props) => {
         else
             setTip("Wait for uploading....");
 
-        props.upload(group._id, campaign.detail, isManually, function(result) {
+        props.upload(group._id, campaign._id, campaign.detail, {}, -1, isManually, function(result) {
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
@@ -442,8 +441,8 @@ const UploadList = (props) => {
                 if (!isManually)
                     messageApi.success('upload success');
                 else {
-                    setSelectedCampaign(campaign);
-                    setUploadPreviewModalOpen(true);
+                    // setSelectedCampaign(campaign);
+                    // setUploadPreviewModalOpen(true);
                 }
             }
         }, (error) => {
@@ -496,7 +495,7 @@ const UploadList = (props) => {
         setLoading(true);
         setTip("Wait for getting last phone....");
 
-        props.getUploadLastPhone(campaign.detail, function(result) {
+        props.getUploadLastPhone(group._id, campaign._id, campaign.detail, {}, -1, function(result) {
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
@@ -593,16 +592,12 @@ const UploadList = (props) => {
 
             return false;
         });
-        startUploadCampaigns(campaigns);
+        startUploadCampaigns(campaigns, 'daily_manual');
     }
 
     const handleManuallyUploadBtnClick = function() {
-        let campaigns = group.campaigns.filter(c => {
-            if (c.is_manually_upload) return true;
-
-            return false;
-        });
-        startUploadCampaigns(campaigns);
+        let campaigns = group.campaigns.filter(c => !!c.is_manually_upload);
+        startUploadCampaigns(campaigns, 'manual');
     }
 
     const handleManuallyStepUploadBtnClick = function() {
@@ -614,7 +609,7 @@ const UploadList = (props) => {
 
             if (campaign.is_stop_running_status) break;
         }
-        startUploadCampaigns(campaigns);
+        startUploadCampaigns(campaigns, 'manual_step');
     }
 
     const validation = function(campaigns) {
@@ -642,21 +637,10 @@ const UploadList = (props) => {
         return true;
     }
 
-    const startUploadCampaigns = function(campaigns, manual = false) {
+    const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
             if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-                setRunningStatusList(campaigns.map((c, i) => {
-                    let campaign = {...c};
-                    campaign.key = i;
-                    campaign.index = i;
-                    campaign.status = (i === 0 ? 'loading' : '');
-                    campaign.filter_amount = customFilterAmount(c);
-                    campaign.description = "";
-                    return campaign;
-                }));
-
-                if (manual) setOpenUploadManualStatusModal(true);
-                else setOpenUploadAutoStatusModal(true);
+                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
             } else {
                 setLoading(true);
                 setTip('Wait for getting input date...');
@@ -665,18 +649,7 @@ const UploadList = (props) => {
                     if (result.status === 'error') {
                         messageApi.warning(result.description);
                     } else {
-                        setRunningStatusList(campaigns.map((c, i) => {
-                            let campaign = {...c};
-                            campaign.key = i;
-                            campaign.index = i;
-                            campaign.status = (i === 0 ? 'loading' : '');
-                            campaign.filter_amount = customFilterAmount(c);
-                            campaign.description = "";
-                            return campaign;
-                        }));
-
-                        if (manual) setOpenUploadManualStatusModal(true);
-                        else setOpenUploadAutoStatusModal(true);
+                        initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
                     }
                 }, (error) => {
                     setLoading(false);
@@ -689,46 +662,44 @@ const UploadList = (props) => {
         }
     }
 
-    const handleGetAllLastPhoneBtnClick = function() {
-        let campaigns = group.campaigns.filter(c => {
-            if (c.is_manually_upload) return true;
+    const initRunningCampaignsAndShowBatchingModal = function(campaigns, runningWay) {
+        initGroupUploadState(campaigns);
 
-            return false;
-        });
+        setCurrentUploadRunningWay(runningWay);
+        setOpenUploadStatusModal(true);
+    }
+
+    const handleGetAllLastPhoneBtnClick = function() {
+        let campaigns = group.campaigns.filter(c => !!c.is_manually_upload);
 
         if (campaigns.length === 0) {
             messageApi.warning('Please select campaign list.');
             return;
         }
-
-        setRunningStatusList(campaigns.map((c, i) => {
-            let campaign = {...c};
-            campaign.key = i;
-            campaign.index = i;
-            campaign.status = (i === 0 ? 'loading' : '');
-            return campaign;
-        }));
-
+        initGroupUploadState(campaigns);
         setOpenGetAllLastPhoneModal(true);
     }
 
-    const updateRunningStatusList = function(statusLists = []) {
-        setRunningStatusList(oldState => runningStatusList.map((s, i) => {
-            const updatedCampaign = {
-                last_phone: statusLists[i]['campaign'].last_phone,
-                system_create_datetime: statusLists[i]['campaign'].system_create_datetime,
-                is_get_last_phone: statusLists[i]['campaign'].is_get_last_phone,
-                qty_available: statusLists[i]['campaign'].qty_available,
-                qty_uploaded: statusLists[i]['campaign'].qty_uploaded,
-                last_upload_datetime: statusLists[i]['campaign'].last_upload_datetime,
+    const initGroupUploadState = function(campaigns) {
+        let updatedGroup = {};
+        updatedGroup = props.groups.filter(g => g._id === group._id)[0];
+
+        updatedGroup.campaigns.forEach((campaign, index) => {
+            let exist = false;
+            for (let i = 0; i < (servers.length <= campaigns.length ? servers.length : campaigns.length); i++) {
+                if (campaign._id === campaigns[i]._id) {
+                    updatedGroup.campaigns[index].state = 'loading';
+                    updatedGroup.campaigns[index].description = '';
+                    exist = true;
+                }
             }
 
-            if (statusLists[i]['status'] === 'success') {
-                return Object.assign({...s}, updatedCampaign, {status: statusLists[i]['status'], description: statusLists[i]['description']});
-            } else {
-                return Object.assign({...s}, {status: statusLists[i]['status'], description: statusLists[i]['description']});
+            if (!exist) {
+                updatedGroup.campaigns[index].state = '';
+                updatedGroup.campaigns[index].description = '';
             }
-        }))
+        });
+        updateUploadGroup(updatedGroup);
     }
 
     const handleIsManuallySelectAll = function(checked) {
@@ -738,14 +709,11 @@ const UploadList = (props) => {
         });
     }
 
-    // rowSelection object indicates the need for row selection
     const rowSelection = {
         onChange: (selectedRowKeys, selectedRows) => {
             setSelectedManualUploadCampaignKeys((oldState) => {
                 return [...selectedRowKeys];
             });
-
-            // handleIsManuallySelect(selectedRowKeys);
         },
         onSelect: (record, selected) => {
             handleFieldChange(record, 'is_manually_upload', selected);
@@ -946,69 +914,34 @@ const UploadList = (props) => {
                 >
                     <UploadGettingAllLastPhone
                         setOpen={setOpenGetAllLastPhoneModal}
-                        campaigns={runningStatusList}
+                        group={group}
                         getUploadLastPhone={props.getUploadLastPhone}
                         setting={props.setting}
                         updateSetting={props.updateSetting}
-                        getSettings={props.getSettings}
-                        runningStatusList={runningStatusList}
-                        updateRunningStatusList={updateRunningStatusList}
+                        backupDB={props.backupDB}
+                        servers={servers}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title={<div><span style={{fontSize: '18px'}}>UPLOAD AUTO STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
-                    open={openUploadAutoStatusModal}
+                    title={<div><span style={{fontSize: '18px'}}>UPLOAD STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
+                    open={openUploadStatusModal}
                     header={null}
                     footer={null}
                     closable={false}
                     width={1500}
                 >
                     <UploadCampaign
-                        setOpen={setOpenUploadAutoStatusModal}
-                        campaigns={runningStatusList}
-                        upload={props.upload}
+                        setOpen={setOpenUploadStatusModal}
                         group={group}
+                        upload={props.upload}
                         setting={props.setting}
                         updateSetting={props.updateSetting}
-                        getSettings={props.getSettings}
-                        runningStatusList={runningStatusList}
-                        updateRunningStatusList={updateRunningStatusList}
-                        setUploadDoneStatus={setUploadDoneStatus}
-                        uploadDoneStatus={uploadDoneStatus}
-                        setLoading={setLoading}
-                        setTip={setTip}
                         backupDB={props.backupDB}
-                    />
-                </DraggableModal>
-            </DraggableModalProvider>
-
-            <DraggableModalProvider>
-                <DraggableModal
-                    title={<div><span style={{fontSize: '18px'}}>UPLOAD MANUAL STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
-                    open={openUploadManualStatusModal}
-                    header={null}
-                    footer={null}
-                    closable={false}
-                    width={1500}
-                >
-                    <UploadCampaign
-                        setOpen={setOpenUploadManualStatusModal}
-                        campaigns={runningStatusList}
-                        upload={props.upload}
-                        group={group}
-                        setting={props.setting}
-                        updateSetting={props.updateSetting}
-                        getSettings={props.getSettings}
-                        runningStatusList={runningStatusList}
-                        updateRunningStatusList={updateRunningStatusList}
-                        setUploadDoneStatus={setUploadDoneStatus}
-                        uploadDoneStatus={uploadDoneStatus}
-                        setLoading={setLoading}
-                        setTip={setTip}
-                        backupDB={props.backupDB}
+                        servers={servers}
+                        runningWay={currentUploadRunningWay}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
@@ -1063,6 +996,6 @@ export default connect(
     {
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
-        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning
+        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup
     }
 )(UploadList);

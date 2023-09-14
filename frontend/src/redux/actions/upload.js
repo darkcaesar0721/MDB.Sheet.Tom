@@ -1,24 +1,58 @@
 import axios from "axios";
 import {API} from "../../config";
 import {
-    UPDATE_CAMPAIGN_DATA,
+    UPDATE_CAMPAIGN_DATA, UPDATE_CAMPAIGN_FIELD_DATA, UPDATE_GROUP_CAMPAIGN_FIELD_DATA, UPDATE_GROUP_DATA,
     UPDATE_GROUP_INPUT_DATE,
     UPDATE_IS_MANUALLY, UPDATE_IS_STOP_CAMPAIGN_RUNNING, UPDATE_UPLOAD_DATETIME
 } from "../actionTypes";
 
-export const getUploadLastPhone = (campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 120000;
-    axios.get(API + '/upload/get_last_phone?campaignId=' + campaignId)
+export const getUploadLastPhone = (groupId, groupCampaignId, campaignId, runCampaignByServer = {}, index = -1, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 180000;
+    const api = index !== -1 ? 'http://localhost:' + runCampaignByServer.server + '/api' : API;
+    axios.get(api + '/upload/get_last_phone?campaignId=' + campaignId)
         .then(result => {
-            if (result.data.status === 'error') {
-                callback(result.data);
-            } else {
-                dispatch({
-                    type: UPDATE_CAMPAIGN_DATA,
-                    data: result.data.campaign
+            axios.get(api + '/setting')
+                .then(res => {
+                    let updateFields = {};
+                    if (result.data.status === 'error') {
+                        updateFields['state'] = 'warning';
+                        updateFields['description'] = result.data.description;
+                    } else {
+                        dispatch({
+                            type: UPDATE_CAMPAIGN_DATA,
+                            data: result.data.campaign
+                        });
+                        updateFields['state'] = 'success';
+                        updateFields['description'] = '';
+                    }
+
+                    if (index !== -1) {
+                        dispatch({
+                            type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
+                            data: {
+                                groupId: groupId,
+                                campaignId: groupCampaignId,
+                                updateFields: updateFields
+                            }
+                        });
+                        if ((index + 1) !== runCampaignByServer.campaigns.length) {
+                            dispatch({
+                                type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
+                                data: {
+                                    groupId: groupId,
+                                    campaignId: runCampaignByServer.campaigns[index + 1]._id,
+                                    updateFields: {
+                                        state: 'loading',
+                                        description: ''
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    let response = result.data;
+                    response.setting = res.data;
+                    callback(response);
                 });
-                callback(result.data);
-            }
         })
         .catch(error => {
             errorCallback(error);
@@ -32,15 +66,18 @@ export const getUploadLastPhone = (campaignId, callback = function() {}, errorCa
     }, timeout);
 }
 
-export const upload = (groupId, campaignId, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 120000;
-    axios.post(API + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually})
+export const upload = (groupId, groupCampaignId, campaignId, runCampaignByServer = {}, index = -1, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
+    const timeout = 180000;
+    const api = index !== -1 ? 'http://localhost:' + runCampaignByServer.server + '/api' : API;
+    axios.post(api + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually})
         .then(result => {
             if (!manually) {
-                axios.post(API + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
+                axios.post(api + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
                     .then(res => {
+                        let updateFields = {};
                         if (result.data.status === 'error') {
-                            callback(result.data);
+                            updateFields['state'] = 'warning';
+                            updateFields['description'] = result.data.description;
                         } else {
                             dispatch({
                                 type: UPDATE_CAMPAIGN_DATA,
@@ -51,11 +88,39 @@ export const upload = (groupId, campaignId, manually = false, callback = functio
                                 data: {
                                     groupId: groupId,
                                     campaignId: campaignId,
-                                    uploadDateTime: res.data
+                                    uploadDateTime: res.data.uploadDateTime
                                 }
                             });
-                            callback(result.data);
+                            updateFields['state'] = 'success';
+                            updateFields['description'] = '';
                         }
+
+                        if (index !== -1) {
+                            dispatch({
+                                type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
+                                data: {
+                                    groupId: groupId,
+                                    campaignId: groupCampaignId,
+                                    updateFields: updateFields
+                                }
+                            });
+                            if ((index + 1) !== runCampaignByServer.campaigns.length) {
+                                dispatch({
+                                    type: UPDATE_GROUP_CAMPAIGN_FIELD_DATA,
+                                    data: {
+                                        groupId: groupId,
+                                        campaignId: runCampaignByServer.campaigns[index + 1]._id,
+                                        updateFields: {
+                                            state: 'loading',
+                                            description: ''
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        let response = result.data;
+                        response.setting = res.data.setting;
+                        callback(response);
                     })
             } else {
                 dispatch({
@@ -95,7 +160,7 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {},
                             data: {
                                 groupId: groupId,
                                 campaignId: campaignId,
-                                uploadDateTime: res.data
+                                uploadDateTime: res.data.uploadDateTime
                             }
                         });
                         callback(result.data);
@@ -178,4 +243,11 @@ export const updateIsStopCampaignRunning = (groupId, campaignId, callback = func
         .catch(error => {
             errorCallback(error);
         });
+}
+
+export const updateUploadGroup = (group) => (dispatch) => {
+    dispatch({
+        type: UPDATE_GROUP_DATA,
+        data: group
+    });
 }

@@ -4,8 +4,9 @@ import {
 } from "../actionTypes";
 import {API} from "../../config";
 
-export const getSettings = (callback = function() {}, errorCallback = function() {}) => (dispatch) => {
-    axios.get(API + '/setting')
+export const getSettings = (server = '', callback = function() {}, errorCallback = function() {}) => (dispatch) => {
+    const url = server ? 'http://localhost:' + server + '/api/setting' : API + '/setting';
+    axios.get(url)
         .then(result => {
             dispatch({
                 type: INIT_SETTING_DATA,
@@ -18,8 +19,9 @@ export const getSettings = (callback = function() {}, errorCallback = function()
         });
 }
 
-export const updateSetting = (setting = {}, errorCallback = function() {}) => async (dispatch) => {
-    axios.put(API + '/setting/' + setting._id, setting)
+export const updateSetting = (setting = {}, errorCallback = function() {}, server = '') => async (dispatch) => {
+    const url = server ? 'http://localhost:' + server + '/api/setting/' + setting._id : API + '/setting/' + setting._id;
+    axios.put(url, setting)
         .then(result => {
             dispatch({
                 type: INIT_SETTING_DATA,
