@@ -694,6 +694,8 @@ const UploadList = (props) => {
                 }
             }
 
+            updatedGroup.campaigns[index].start_status = updatedGroup.campaigns[index].status;
+
             if (!exist) {
                 updatedGroup.campaigns[index].state = '';
                 updatedGroup.campaigns[index].description = '';

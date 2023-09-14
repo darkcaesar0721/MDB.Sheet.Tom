@@ -47,7 +47,7 @@ const UploadCampaign = (props) => {
                 case 'manual_step':
                     let newState = [];
                     for (const campaign of props.group.campaigns) {
-                        if (campaign.status === 'problem' || campaign.status === 'running') {
+                        if (campaign.start_status === 'problem' || campaign.start_status === 'running') {
                             newState.push(campaign);
                         }
 
