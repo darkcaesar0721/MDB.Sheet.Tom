@@ -73,7 +73,7 @@ const UploadList = (props) => {
     const [openUploadStatusModal, setOpenUploadStatusModal] = useState(false);
     const [currentUploadRunningWay, setCurrentUploadRunningWay] = useState('');
 
-    const servers = [3000, 3001, 3002, 3003];
+    const servers = [3000, 3001, 3002, 3003, 3004];
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';
@@ -434,6 +434,7 @@ const UploadList = (props) => {
             setTip("Wait for uploading....");
 
         props.upload(group._id, campaign._id, campaign.detail, {}, -1, isManually, function(result) {
+            props.backupDB();
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
@@ -465,6 +466,7 @@ const UploadList = (props) => {
         setLoading(true);
         setTip("Wait for uploading data....");
         props.uploadPreviewData(group._id, selectedCampaign.detail, function(result) {
+            props.backupDB();
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
@@ -496,6 +498,7 @@ const UploadList = (props) => {
         setTip("Wait for getting last phone....");
 
         props.getUploadLastPhone(group._id, campaign._id, campaign.detail, {}, -1, function(result) {
+            props.backupDB();
             setLoading(false);
             if (result.status === 'error') {
                 messageApi.warning(result.description);
