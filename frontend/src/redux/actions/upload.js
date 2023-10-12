@@ -66,6 +66,14 @@ export const getUploadLastPhone = (groupId, groupCampaignId, campaignId, runCamp
     }, timeout);
 }
 
+export const uploadLeads = (groupId, campaignId, callback) => (dispatch) => {
+    const timeout = 120000;
+    axios.post(API + '/upload/upload_leads', {groupId: groupId, campaignId: campaignId})
+        .then(result => {
+            callback(result.data);
+        });
+}
+
 export const upload = (groupId, groupCampaignId, campaignId, runCampaignByServer = {}, index = -1, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
     const timeout = 180000;
     const api = index !== -1 ? 'http://localhost:' + runCampaignByServer.server + '/api' : API;

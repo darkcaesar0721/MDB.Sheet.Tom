@@ -28,7 +28,7 @@ import {
     updateIsManually,
     upload,
     uploadPreviewData,
-    updateIsStopCampaignRunning, updateUploadGroup
+    updateIsStopCampaignRunning, updateUploadGroup, uploadLeads
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -756,6 +756,19 @@ const UploadList = (props) => {
         setUploadCampaignLastPreviewModalOpen(true);
     }
 
+    const handleReUpload = function() {
+        setLoading(true);
+        setTip('Wait for uploading...');
+        props.uploadLeads(group._id, selectedCampaign._id, function(result) {
+            setLoading(false);
+            if (result.status === 'error') {
+                messageApi.warning(result.description);
+            } else {
+                messageApi.success('success');
+            }
+        })
+    }
+
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
@@ -982,10 +995,18 @@ const UploadList = (props) => {
                 onOk={() => setUploadCampaignLastPreviewModalOpen(false)}
                 onCancel={() => setUploadCampaignLastPreviewModalOpen(false)}
                 width={1300}
+                footer={[
+                    <Button key="upload" type="warning" onClick={handleReUpload}>ReUpload</Button>,
+                    <Button key="close" type="primary" onClick={() => setUploadCampaignLastPreviewModalOpen(false)}>
+                        close
+                    </Button>
+                ]}
             >
                 <UploadCampaignLastPreview
                     campaign={selectedCampaign}
                     campaigns={props.campaigns}
+                    loading={loading}
+                    tip={tip}
                 />
             </Modal>
         </Spin>
@@ -1001,6 +1022,6 @@ export default connect(
     {
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
-        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup
+        getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
     }
 )(UploadList);

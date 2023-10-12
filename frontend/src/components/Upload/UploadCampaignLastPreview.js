@@ -1,4 +1,4 @@
-import {Col, Row, Table} from "antd";
+import {Col, Row, Spin, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import moment from "moment/moment";
 
@@ -50,8 +50,10 @@ const UploadCampaignLastPreview = (props) => {
         });
     };
 
+    const loading = props.loading === undefined ? false : props.loading;
+
     return (
-        <>
+        <Spin spinning={loading} tip={props.tip} delay={500}>
             <Row>
                 <Col span={3} className={"align-right"}>
                     Query Name:
@@ -123,7 +125,7 @@ const UploadCampaignLastPreview = (props) => {
                     />
                 </Col>
             </Row>
-        </>
+        </Spin>
     )
 }
 
