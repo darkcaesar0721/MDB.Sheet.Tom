@@ -403,7 +403,11 @@ const uploadLeads = async function (groupId = "", campaignId = "", callback = fu
 
     await check_uploaded_sheet(groupCampaign, campaign, false, callback);
 
-    callback({status: 'success'});
+    campaign.last_upload_datetime = moment().format('M/D/Y hh:mm A');
+
+    Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
+        callback({status: 'success'});
+    });
 }
 
 const send_whatsapp_message = async function (group = {}, groupCampaign = {}, campaign = {}, setting = {}, callback) {
@@ -663,6 +667,10 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     campaign.last_upload_datetime = moment().format('M/D/Y hh:mm A');
 
     await upload_schedule(group, campaign, setting, callback);
+
+    if (process.env.ENVIRONMENT === 'production') {
+        await check_uploaded_sheet(groupCampaign, campaign, true, callback);
+    }
 
     Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
         Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
