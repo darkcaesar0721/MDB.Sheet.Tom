@@ -1,5 +1,7 @@
 const { google } = require("googleapis");
 const ODBC = require("odbc");
+const axios = require("axios");
+const qs = require("qs");
 const moment = require('moment-timezone');
 moment.tz.setDefault('America/Los_Angeles');
 const auth = new google.auth.GoogleAuth({
@@ -10,8 +12,6 @@ const auth = new google.auth.GoogleAuth({
 const Campaigns = require('../models/campaign.model');
 const Groups = require('../models/group.model');
 const Settings = require("../models/setting.model");
-const axios = require("axios");
-const qs = require("qs");
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
