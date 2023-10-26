@@ -595,6 +595,7 @@ const UploadList = (props) => {
 
             return false;
         });
+        console.log(campaigns);
         startUploadCampaigns(campaigns, 'daily_manual');
     }
 
