@@ -66,12 +66,18 @@ const UploadList = (props) => {
     const [group, setGroup] = useState({});
     const [selectedManualUploadCampaignKeys, setSelectedManualUploadCampaignKeys] = useState([]);
     const [selectedCampaign, setSelectedCampaign] = useState(null);
+    
     const [settingModalOpen, setSettingModalOpen] = useState(false);
     const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
     const [uploadCampaignLastPreviewModalOpen, setUploadCampaignLastPreviewModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
     const [openUploadStatusModal, setOpenUploadStatusModal] = useState(false);
+    const [openSystemCreateDateCheckModal, setOpenSystemCreateDateCheckModal] = useState(false);
+
     const [currentUploadRunningWay, setCurrentUploadRunningWay] = useState('');
+    const [currentUploadRunningCampaigns, setCurrentUploadRunningCampaigns] = useState([]);
+
+    const [unValidationCampaigns, setUnValidationCampaigns] = useState([]);
 
     const servers = [3000, 3001, 3002, 3003, 3004];
 
@@ -595,13 +601,48 @@ const UploadList = (props) => {
 
             return false;
         });
-        console.log(campaigns);
-        startUploadCampaigns(campaigns, 'daily_manual');
+        setCurrentUploadRunningWay('daily_manual');
+        setCurrentUploadRunningCampaigns(campaigns);
+        
+        if (validationSystemCreateDatePeriod(campaigns)) {
+            startUploadCampaigns(campaigns, 'daily_manual'); 
+        }
     }
 
     const handleManuallyUploadBtnClick = function() {
         let campaigns = group.campaigns.filter(c => !!c.is_manually_upload);
-        startUploadCampaigns(campaigns, 'manual');
+        setCurrentUploadRunningWay('manual');
+        setCurrentUploadRunningCampaigns(campaigns);
+
+        if (validationSystemCreateDatePeriod(campaigns)) {
+            startUploadCampaigns(campaigns, 'manual'); 
+        }
+    }
+
+    const validationSystemCreateDatePeriod = function(campaigns) {
+        let unValidationCampaigns = [];
+
+        const flagDate = moment().subtract(5, 'days').format('M/D/Y');
+        for(const campaign of campaigns) {
+            const systemCreateDateTime = new Date(campaign.system_create_datetime);
+            const systemCreateDate = moment(systemCreateDateTime).format('M/D/Y');
+            
+            if (new Date(systemCreateDate) < new Date(flagDate)) {
+                unValidationCampaigns = [...unValidationCampaigns, campaign];
+            }
+        }
+        
+        if (unValidationCampaigns.length > 0) {
+            setUnValidationCampaigns(unValidationCampaigns);
+            setOpenSystemCreateDateCheckModal(true);
+            return false;
+        }
+        return true;
+    }
+
+    const handleRunBatch = function() {
+        setOpenSystemCreateDateCheckModal(false);
+        startUploadCampaigns(currentUploadRunningCampaigns, currentUploadRunningWay);
     }
 
     const handleManuallyStepUploadBtnClick = function() {
@@ -1009,6 +1050,49 @@ const UploadList = (props) => {
                     loading={loading}
                     tip={tip}
                 />
+            </Modal>
+            <Modal
+                title="Older then 5 days"
+                centered
+                open={openSystemCreateDateCheckModal}
+                onOk={() => setOpenSystemCreateDateCheckModal(false)}
+                onCancel={() => setOpenSystemCreateDateCheckModal(false)}
+                width={1300}
+                footer={[
+                    <Button key="close" onClick={() => setOpenSystemCreateDateCheckModal(false)}>
+                        Stop Batch
+                    </Button>,
+                    <Button key="upload" type="primary" onClick={handleRunBatch}>Run Batch</Button>
+                ]}
+            >
+                {
+                    <>
+                        <Row>
+                            <Col span={1} style={{color: "blue", fontSize: "1.05rem"}}>No</Col>
+                            <Col span={7} style={{color: "blue", fontSize: "1.05rem"}}>Query</Col>
+                            <Col span={4} style={{color: "blue", fontSize: "1.05rem"}}>Schedule</Col>
+                            <Col span={4} style={{color: "blue", fontSize: "1.05rem"}}>LastUploadDate</Col>
+                            <Col span={4} style={{color: "blue", fontSize: "1.05rem"}}>LastPhone</Col>
+                            <Col span={4} style={{color: "blue", fontSize: "1.05rem"}}>SystemCreateDate</Col>
+                        </Row>
+                        {
+                            unValidationCampaigns.map((campaign, index) => {
+                                return (
+                                    <>
+                                        <Row>
+                                            <Col span={1}>{index + 1}</Col>
+                                            <Col span={7}>{campaign.query}</Col>
+                                            <Col span={4}>{campaign.schedule}</Col>
+                                            <Col span={4}>{moment(campaign.last_upload_datetime).format('M/D/Y, hh:mm A')}</Col>
+                                            <Col span={4}>{campaign.last_phone}</Col>
+                                            <Col span={4}>{moment(campaign.system_create_datetime).format('M/D/Y, hh:mm A')}</Col>
+                                        </Row>
+                                    </>
+                                )
+                            })
+                        }
+                    </>
+                }
             </Modal>
         </Spin>
     )
