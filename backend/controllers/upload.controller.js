@@ -69,7 +69,7 @@ router.post('/get_last_input_date', async (req, res) => {
         if (result.status === "error") {
             res.json(result);
         } else {
-            Groups.updateOne({_id: req.body.groupId}, {last_control_date: req.body.currentDate, last_input_date: result.date}, function(err, doc) {
+            Groups.updateOne({_id: req.body.groupId}, {last_control_date: req.body.currentDate, last_input_date: result.inputDate, last_service_date: result.serviceDate}, function(err, doc) {
                 res.json(result);
             });
         }

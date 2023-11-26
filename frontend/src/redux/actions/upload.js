@@ -199,7 +199,8 @@ export const getLastInputDate = (groupId, currentDate, callback = function() {},
                     data: {
                         groupId: groupId,
                         currentDate: currentDate,
-                        inputDate: result.data.date
+                        inputDate: result.data.inputDate,
+                        serviceDate: result.data.serviceDate,
                     }
                 });
                 callback(result.data);

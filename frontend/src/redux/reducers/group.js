@@ -86,13 +86,13 @@ function group(state = initialState, action) {
         }
         case UPDATE_GROUP_INPUT_DATE:
         {
-            const {groupId, currentDate, inputDate} = action.data;
+            const {groupId, currentDate, inputDate, serviceDate} = action.data;
 
             return Object.assign(
                 {...state}, {data: [...state.data].map(
                         g => {
                             if (g._id === groupId) {
-                                return Object.assign({...g}, {last_control_date: currentDate, last_input_date: inputDate});
+                                return Object.assign({...g}, {last_control_date: currentDate, last_input_date: inputDate, last_service_date: serviceDate});
                             } else {
                                 return g;
                             }

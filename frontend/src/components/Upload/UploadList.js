@@ -986,7 +986,20 @@ const UploadList = (props) => {
 
             <DraggableModalProvider>
                 <DraggableModal
-                    title={<div><span style={{fontSize: '18px'}}>UPLOAD STATUS LIST</span><span style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}>{moment(new Date(group.last_input_date)).format('M/D/Y')}</span></div>}
+                    title={
+                        <div>
+                            <span style={{fontSize: '18px'}}>UPLOAD STATUS LIST</span>
+                            <span
+                                style={moment(new Date(group.last_input_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}
+                            >
+                                {moment(new Date(group.last_input_date)).format('M/D/Y')}
+                            </span>
+                            <span
+                                style={moment(new Date(group.last_service_date)).format('M/D/Y') === today ? {marginLeft: '20px', fontSize: '18px'} : {marginLeft: '20px', fontSize: '25px', color: 'red', fontWeight: 1000}}
+                            >
+                                {moment(new Date(group.last_service_date)).format('M/D/Y')}
+                            </span>
+                        </div>}
                     open={openUploadStatusModal}
                     header={null}
                     footer={null}
