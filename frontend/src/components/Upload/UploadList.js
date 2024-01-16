@@ -79,7 +79,7 @@ const UploadList = (props) => {
 
     const [unValidationCampaigns, setUnValidationCampaigns] = useState([]);
 
-    const servers = [3000, 3001, 3002, 3003, 3004];
+    const servers = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009];
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
     const currentWay = props.setting.current_upload && props.setting.current_upload.way ? props.setting.current_upload.way : '';

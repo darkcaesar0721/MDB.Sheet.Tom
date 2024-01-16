@@ -360,7 +360,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
             }
 
             if (process.env.ENVIRONMENT === 'production') {
-                await check_uploaded_sheet(groupCampaign, campaign, true, callback);
+                // await check_uploaded_sheet(groupCampaign, campaign, true, callback);
             }
 
             Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
@@ -377,7 +377,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
 const check_uploaded_sheet = async function(groupCampaign = {}, campaign = {}, isChecked = true, callback = {}) {
     const urls = campaign.sheet_urls;
-    const last_phone = campaign.last_phone;
+        const last_phone = campaign.last_phone;
 
     const authClientObject = await auth.getClient();//Google sheets instance
     const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
