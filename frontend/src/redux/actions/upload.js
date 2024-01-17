@@ -3,7 +3,8 @@ import {API} from "../../config";
 import {
     UPDATE_CAMPAIGN_DATA, UPDATE_CAMPAIGN_FIELD_DATA, UPDATE_GROUP_CAMPAIGN_FIELD_DATA, UPDATE_GROUP_DATA,
     UPDATE_GROUP_INPUT_DATE,
-    UPDATE_IS_MANUALLY, UPDATE_IS_STOP_CAMPAIGN_RUNNING, UPDATE_UPLOAD_DATETIME
+    UPDATE_IS_MANUALLY, UPDATE_IS_STOP_CAMPAIGN_RUNNING, UPDATE_UPLOAD_DATETIME,
+    INIT_SETTING_DATA
 } from "../actionTypes";
 
 export const getUploadLastPhone = (groupId, groupCampaignId, campaignId, runCampaignByServer = {}, index = -1, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
@@ -70,6 +71,19 @@ export const uploadLeads = (groupId, campaignId, callback) => (dispatch) => {
     const timeout = 120000;
     axios.post(API + '/upload/upload_leads', {groupId: groupId, campaignId: campaignId})
         .then(result => {
+            callback(result.data);
+        });
+}
+
+export const sendCompanyQty = (callback) => (dispatch) => {
+    axios.post(API + '/upload/send_company_qty')
+        .then(result => {
+            if (result.data.status === 'success') {
+                dispatch({
+                    type: INIT_SETTING_DATA,
+                    data: result.data.setting
+                });
+            }
             callback(result.data);
         });
 }

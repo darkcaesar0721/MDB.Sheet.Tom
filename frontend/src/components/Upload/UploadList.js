@@ -28,7 +28,8 @@ import {
     updateIsManually,
     upload,
     uploadPreviewData,
-    updateIsStopCampaignRunning, updateUploadGroup, uploadLeads
+    updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
+    sendCompanyQty
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -825,6 +826,19 @@ const UploadList = (props) => {
         })
     }
 
+    const handleCompanyQtySendBtnClick = function() {
+        setLoading(true);
+        setTip('Wait for sending...');
+        props.sendCompanyQty(function(result) {
+            setLoading(false);
+            if (result.status === 'error') {
+                messageApi.warning(result.description);
+            } else {
+                messageApi.success('success');
+            }
+        })
+    }
+
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
@@ -925,7 +939,15 @@ const UploadList = (props) => {
             {
                 currentWay === 'ALL' ?
                     <Row>
-                        <Col span={2} offset={22}>
+                        <Col span={2} offset={17}>
+                            <Input value={props.setting.last_system_create_date_time_for_company_qty} readonly={true}/>
+                        </Col>
+                        <Col span={2}>
+                            <Button type="primary" onClick={handleCompanyQtySendBtnClick}>
+                                Send Company Qty
+                            </Button>
+                        </Col>
+                        <Col span={2} offset={1}>
                             <Popconfirm
                                 title="All Last Phone"
                                 description="Are you sure to get last phone of all campaigns?"
@@ -1154,5 +1176,6 @@ export default connect(
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
         getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
+        sendCompanyQty
     }
 )(UploadList);

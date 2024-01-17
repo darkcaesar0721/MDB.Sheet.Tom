@@ -7,6 +7,7 @@ const Campaigns = require('../models/campaign.model');
 const Settings = require("../models/setting.model");
 
 const uploadLibrary = require('../libraries/upload');
+const companyQtyLibrary = require('../libraries/companyQty');
 
 router.post('/', async (req, res) => {
     const {groupId, campaignId, manually} = req.body;
@@ -103,5 +104,11 @@ router.post('/stop_campaign_running', async  (req, res) => {
         });
     });
 });
+
+router.post('/send_company_qty', async (req, res) => {
+    companyQtyLibrary.send(function(result) {
+        res.json(result);
+    });
+})
 
 module.exports = router;

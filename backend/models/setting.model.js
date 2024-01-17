@@ -4,6 +4,7 @@ const settingSchema = new mongoose.Schema({
     backup_path: String,
     mdb_path: String,
     schedule_path: String,
+    last_system_create_date_time_for_company_qty: String,
     whatsapp: {
         global_send_status: {
             type: Boolean,
