@@ -245,3 +245,7 @@ label, span, div, input {
 .m-t-10 {
   margin-top: 10px;
 }
+
+.upload-status-modal .ant-table {
+  margin-bottom: 100px;
+}
