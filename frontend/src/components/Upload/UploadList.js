@@ -609,6 +609,20 @@ const UploadList = (props) => {
         }
     }
 
+    const handlePendingUploadBtnClick = function() {
+        let campaigns = group.campaigns.filter(c => {
+            if (c.status !== 'done' && c.weekday[weekDay] === true) return true;
+
+            return false;
+        });
+        setCurrentUploadRunningWay('pending_campaigns');
+        setCurrentUploadRunningCampaigns(campaigns);
+        
+        if (validationSystemCreateDatePeriod(campaigns)) {
+            startUploadCampaigns(campaigns, 'pending_campaigns');
+        }
+    }
+
     const handleManuallyUploadBtnClick = function() {
         let campaigns = group.campaigns.filter(c => !!c.is_manually_upload);
         setCurrentUploadRunningWay('manual');
@@ -692,7 +706,7 @@ const UploadList = (props) => {
                 props.getLastInputDate(group._id, today, function(result) {
                     setLoading(false);
                     if (result.status === 'error') {
-                        messageApi.warning(result.description);
+                    messageApi.warning(result.description);
                     } else {
                         initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
                     }
@@ -855,6 +869,24 @@ const UploadList = (props) => {
                             }
                         </Col> : <Col span={2}></Col>
                 }
+                {
+                    currentWay === 'ALL' ?
+                        <Col span={2}>
+                            {
+                                <Popconfirm
+                                    title="Upload data"
+                                    description="Are you sure to upload the row of this campaign?"
+                                    onConfirm={handlePendingUploadBtnClick}
+                                    okText="Yes"
+                                    cancelText="No"
+                                >
+                                    <Button type="primary" style={{marginLeft: '-20px'}}>
+                                        Pending campaign
+                                    </Button>
+                                </Popconfirm>
+                            }
+                        </Col> : <Col span={2}></Col>
+                }
                 {/*{*/}
                 {/*    currentWay === 'ALL' ?*/}
                 {/*        <Col span={2}>*/}
@@ -1005,6 +1037,7 @@ const UploadList = (props) => {
                     footer={null}
                     closable={false}
                     width={1500}
+                    className="upload-status-modal"
                 >
                     <UploadCampaign
                         setOpen={setOpenUploadStatusModal}
