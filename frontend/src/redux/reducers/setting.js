@@ -5,6 +5,7 @@ const initialState = {
     mdb_path: '',
     schedule_path: '',
     last_system_create_date_time_for_company_qty: '',
+    is_auto_whatsapp_sending_for_company_qty: true,
     whatsapp: {
         global_send_status: true,
         default_message_template: '',

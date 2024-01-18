@@ -2,7 +2,7 @@ import {Spin, Select, Button, Checkbox, Col, message, Popconfirm, Radio, Row, Sw
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 
-import {UploadOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled} from "@ant-design/icons";
+import {UploadOutlined, EyeOutlined, CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled, CheckOutlined, CloseOutlined} from "@ant-design/icons";
 import {DraggableModal, DraggableModalProvider} from "@cubetiq/antd-modal";
 import {Link} from "react-router-dom";
 import moment from "moment";
@@ -839,6 +839,14 @@ const UploadList = (props) => {
         })
     }
 
+    const handleAutoWhatsAppSendingForCampaignQtyChange = function(v) {
+        let setting = {...props.setting};
+        setting.is_auto_whatsapp_sending_for_company_qty = v;
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
+    }
+
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
@@ -939,7 +947,18 @@ const UploadList = (props) => {
             {
                 currentWay === 'ALL' ?
                     <Row>
-                        <Col span={2} offset={17}>
+
+                        <Col span={3} offset={13}>
+                            <span>Auto WhatsApp Sending:</span>
+                            <Switch
+                                checkedChildren={<CheckOutlined />}
+                                unCheckedChildren={<CloseOutlined />}
+                                size="large"
+                                onChange={handleAutoWhatsAppSendingForCampaignQtyChange}
+                                checked={props.setting.is_auto_whatsapp_sending_for_company_qty}
+                            />
+                        </Col>
+                        <Col span={2}>
                             <Input value={props.setting.last_system_create_date_time_for_company_qty} readonly={true}/>
                         </Col>
                         <Col span={2}>
