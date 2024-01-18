@@ -8,6 +8,9 @@ import {
     getSettings
 } from "./redux/actions/setting";
 import {
+    getCompanies
+} from "./redux/actions/company";
+import {
     getCampaigns
 } from "./redux/actions/campaign";
 import {
@@ -16,6 +19,10 @@ import {
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
+
+import CompanyList from "./components/Company/CompanyList";
+import CompanyAdd from "./components/Company/CompanyAdd";
+import CompanyEdit from "./components/Company/CompanyEdit";
 
 import CampaignList from "./components/Campaign/CampaignList";
 import CampaignAdd from "./components/Campaign/CampaignAdd";
@@ -36,13 +43,16 @@ toastr.options = {
 }
 
 const AppRouter = (props) => {
-    let container;
 
     useEffect(function() {
         let isErrorDisplay = false;
         props.getSettings('', () => {}, function(error) {
             isErrorDisplay = true;
             toastr.error('There is a problem with server.');
+        });
+        props.getCompanies(function(error) {
+            if (!isErrorDisplay)
+                toastr.error('There is a problem with server.');
         });
         props.getCampaigns(function(error) {
             if (!isErrorDisplay)
@@ -65,6 +75,10 @@ const AppRouter = (props) => {
                             <Route path="/backup" element={<Backup />} />
                             <Route path="/whatsapp" element={<Whatsapp />} />
 
+                            <Route path="/companies" element={<CompanyList />} />
+                            <Route path="/companies/add" element={<CompanyAdd />} />
+                            <Route path="/companies/:id" element={<CompanyEdit />} />
+
                             <Route path="/campaigns" element={<CampaignList />} />
                             <Route path="/campaigns/add" element={<CampaignAdd />} />
                             <Route path="/campaigns/:id" element={<CampaignEdit />} />
@@ -86,5 +100,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { getSettings, getCampaigns, getGroups }
+    { getSettings, getCompanies, getCampaigns, getGroups }
 )(AppRouter);
