@@ -33,6 +33,8 @@ const UploadCampaign = (props) => {
 
     useEffect(function() {
         if (props.group.campaigns.length > 0) {
+            let newState = [];
+
             switch (props.runningWay) {
                 case 'manual':
                     setCampaigns(props.group.campaigns.filter(c => {
@@ -45,12 +47,21 @@ const UploadCampaign = (props) => {
                     }));
                     break;
                 case 'pending_campaigns':
-                    setCampaigns(props.group.campaigns.filter(c => {
-                        return c.status !== 'done' && c.weekday[weekDay] === true;
-                    }));
+                    for (const campaign of props.group.campaigns) {
+                        let isExist = false;
+                        for (const campaignId of props.pendingCampaignIds) {
+                            if (campaign._id === campaignId)
+                                isExist = true;
+                        }
+
+                        if (isExist) {
+                            newState.push(campaign);
+                        }
+                    }
+
+                    setCampaigns(newState);
                     break;
                 case 'manual_step':
-                    let newState = [];
                     for (const campaign of props.group.campaigns) {
                         if (campaign.start_status === 'problem' || campaign.start_status === 'running') {
                             newState.push(campaign);

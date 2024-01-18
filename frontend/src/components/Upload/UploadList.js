@@ -80,6 +80,8 @@ const UploadList = (props) => {
 
     const [unValidationCampaigns, setUnValidationCampaigns] = useState([]);
 
+    const [pendingCampaignIds, setPendngCampaignIds] = useState([]);
+
     const servers = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009];
 
     const currentGroup = props.setting.current_upload && props.setting.current_upload.group ? props.setting.current_upload.group : '';
@@ -154,19 +156,6 @@ const UploadList = (props) => {
         });
 
         let columns = [];
-        // if (currentWay === 'ALL') {
-        //     columns = [...columns, {
-        //         title: 'stop',
-        //         key: 'is_stop_running_status',
-        //         width: 40,
-        //         render: (_, r) => {
-        //             const value = r.is_stop_running_status ? r.is_stop_running_status : false;
-        //             return (
-        //                 <Radio checked={value} onChange={(e) => {handleIsStopRunning(e, r)}}></Radio>
-        //             )
-        //         }
-        //     }];
-        // }
         columns = [...columns, {
             title: 'status',
             key: 'status',
@@ -616,6 +605,11 @@ const UploadList = (props) => {
 
             return false;
         });
+        
+        setPendngCampaignIds(campaigns.map(c => {
+            return c._id;
+        }));
+
         setCurrentUploadRunningWay('pending_campaigns');
         setCurrentUploadRunningCampaigns(campaigns);
         
@@ -909,24 +903,6 @@ const UploadList = (props) => {
                             }
                         </Col> : <Col span={2}></Col>
                 }
-                {/*{*/}
-                {/*    currentWay === 'ALL' ?*/}
-                {/*        <Col span={2}>*/}
-                {/*            {*/}
-                {/*                <Popconfirm*/}
-                {/*                    title="Upload data"*/}
-                {/*                    description="Are you sure to upload manually the rows of selected campaign?"*/}
-                {/*                    onConfirm={handleManuallyStepUploadBtnClick}*/}
-                {/*                    okText="Yes"*/}
-                {/*                    cancelText="No"*/}
-                {/*                >*/}
-                {/*                    <Button type="primary" style={{marginLeft: '0px'}}>*/}
-                {/*                        Manual - Step*/}
-                {/*                    </Button>*/}
-                {/*                </Popconfirm>*/}
-                {/*            }*/}
-                {/*        </Col> : <Col span={2}></Col>*/}
-                {/*}*/}
                 <Col span={3} offset={1}>
                     <Select
                         size="large"
@@ -1083,6 +1059,7 @@ const UploadList = (props) => {
                     <UploadCampaign
                         setOpen={setOpenUploadStatusModal}
                         group={group}
+                        pendingCampaignIds={pendingCampaignIds}
                         upload={props.upload}
                         setting={props.setting}
                         updateSetting={props.updateSetting}
