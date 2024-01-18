@@ -1,4 +1,4 @@
-import {Button, Col, message, Row, Switch, Table} from "antd";
+import {Spin, Button, Col, message, Row, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone} from "@ant-design/icons";
 import moment from "moment";
@@ -18,6 +18,8 @@ let pstDate = current_date.toLocaleString("en-US", {
 const weekDay = moment(pstDate).format('dddd');
 
 const UploadCampaign = (props) => {
+    const [loading, setLoading] = useState(false);
+    const [tip, setTip] = useState('');
     const [messageApi, contextHolder] = message.useMessage();
     const [columns, setColumns] = useState([]);
     const [isRunningStart, setIsRunningStart] = useState(false);
@@ -110,7 +112,24 @@ const UploadCampaign = (props) => {
 
     useEffect(function() {
         if (campaigns.length > 0 && campaigns.filter(c => c.state === '' || c.state === 'loading').length === 0) {
-            props.backupDB((result) => {}, (error) => {
+            props.backupDB((result) => {
+
+                if (props.group.campaigns.filter(c => {
+                    return (c.weekday[weekDay] === true && c.state !== 'success');
+                }).length === 0 && props.setting.is_auto_whatsapp_sending_for_company_qty === true) {
+                    setLoading(true);
+                    setTip('Wait for sending...');
+                    props.sendCompanyQty(function(sendResult) {
+                        setLoading(false);
+                        if (sendResult.status === 'error') {
+                            messageApi.warning(sendResult.description);
+                        } else {
+                            messageApi.success('success');
+                        }
+                    })
+                }
+                
+            }, (error) => {
                 toastr.error('There is a problem with server.');
             });
             messageApi.success('upload success');
@@ -300,7 +319,7 @@ const UploadCampaign = (props) => {
     }
 
     return (
-        <>
+        <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
             <Row>
                 <Col span={2} offset={20}>
@@ -321,7 +340,7 @@ const UploadCampaign = (props) => {
                     />
                 </Col>
             </Row>
-        </>
+        </Spin>
     )
 }
 

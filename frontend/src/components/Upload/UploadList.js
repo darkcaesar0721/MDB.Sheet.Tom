@@ -435,9 +435,9 @@ const UploadList = (props) => {
             if (result.status === 'error') {
                 messageApi.warning(result.description);
             } else {
-                if (!isManually)
+                if (!isManually) {
                     messageApi.success('upload success');
-                else {
+                } else {
                     // setSelectedCampaign(campaign);
                     // setUploadPreviewModalOpen(true);
                 }
@@ -1066,6 +1066,7 @@ const UploadList = (props) => {
                         backupDB={props.backupDB}
                         servers={servers}
                         runningWay={currentUploadRunningWay}
+                        sendCompanyQty={props.sendCompanyQty}
                     />
                 </DraggableModal>
             </DraggableModalProvider>

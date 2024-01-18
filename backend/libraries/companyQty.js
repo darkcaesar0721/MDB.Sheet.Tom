@@ -6,6 +6,7 @@ const qs = require("qs");
 const moment = require('moment-timezone');
 moment.tz.setDefault('America/Los_Angeles');
 
+const Companies = require('../models/company.model');
 const Settings = require("../models/setting.model");
 
 const queryCompanyDailyCountDate = "zzzzz Company ID Daily Count 001 - Date";
@@ -19,8 +20,9 @@ const PDFCROWD_AUTH_USER_TOKEN = 'ed3ec2e15235808c3bfa436c941f909d';
 
 const send = async function(callback) {
     const setting = await Settings.findOne({});
+    const companies = await Companies.find({});
 
-    await getBaseData(setting, callback, function(lastSystemCreateDate, rows) {
+    await getBaseData(companies, setting, callback, function(lastSystemCreateDate, rows) {
         downloadHtmlFile(lastSystemCreateDate, rows, callback, function() {
             convertFromHtmlToImage(callback, function() {
                 sendWhatsAppImage(setting, callback, async function() {
@@ -32,7 +34,7 @@ const send = async function(callback) {
     });
 }
 
-const getBaseData = async function(setting, callback, returnCallback) {
+const getBaseData = async function(companies, setting, callback, returnCallback) {
     const connectionString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=${setting.mdb_path}; Uid=;Pwd=;`;
     ODBC.connect(connectionString, (error, connection) => {
         if (error) {
@@ -41,12 +43,28 @@ const getBaseData = async function(setting, callback, returnCallback) {
         }
 
         connection.query(`SELECT * FROM [${queryCompanyDailyCountDate}]`, async (error, dateResult) => {
+            await connection.close();
+
             if (error) {
                 callback({status: 'error', description: "mdb query error."});
                 return;
             }
 
-            const lastSystemCreateDate = moment(dateResult[dateResult.length - 1].SystemCreateDate).format('M/D/Y hh:mm A');
+            let dateRows = [];
+            for (let i = 0; i < dateResult.length; i++) {
+                const dateRow = dateResult[i];
+                
+                if (!setting.last_system_create_date_time_for_company_qty || new Date(moment(new Date(dateRow.SystemCreateDate)).format('M/D/Y hh:mm:ss A')) > new Date(moment(new Date(setting.last_system_create_date_time_for_company_qty)).format('M/D/Y hh:mm:ss A'))) {
+                    dateRows.push(dateRow);
+                }
+            }
+
+            if (dateRows.length === 0) {
+                callback({status: 'error', description: "nothing new data"});
+                return;
+            }
+
+            const lastSystemCreateDate = moment(dateResult[dateResult.length - 1].SystemCreateDate).format('M/D/Y hh:mm:ss A');
 
             Settings.updateOne({_id: setting._id}, {last_system_create_date_time_for_company_qty: lastSystemCreateDate}, function (err, docs) {
                 if (err) {
@@ -55,21 +73,23 @@ const getBaseData = async function(setting, callback, returnCallback) {
                 } 
             });
 
-            connection.query(`SELECT * FROM [${queryCompanyDailyCount}]`, async (error, result) => {
-                if (error) {
-                    callback({status: 'error', description: "mdb query error."});
-                    return;
-                }
-    
-                await connection.close();
-                
-                let rows = [];
-                for (let i = 0; i < result.length; i++) {
-                    const row = result[i];
-                    rows.push({qty: row['Qty Of Leads'], id: row['CompanyID'], name: row['Company Name']});
-                }
-                returnCallback(lastSystemCreateDate, rows);
-            });
+            let rows = [];
+            companies.forEach(c => {
+                let row = {};
+                row['qty'] = 0;
+                row['id'] = c.mdb_id.slice(2);
+                row['name'] = c.nick_name;
+
+                dateRows.forEach(d => {
+                    if (d.companyId == c.mdb_id) {
+                        row['qty'] += 1;
+                    }
+                })
+
+                rows.push(row);
+            })
+
+            returnCallback(lastSystemCreateDate, rows);
         });
     });
 }
@@ -80,16 +100,16 @@ const downloadHtmlFile = function(lastSystemCreateDate, rows, callback, returnCa
                         <span style="font-size: 18px;">Last SystemCreateDate:</span>
                         <span style="font-size: 18px; font-family: bold; color: red;">` + lastSystemCreateDate + `</span>`;
 
-    html += `<table border='0' cellpadding='3' cellspacing='0' style='border-collapse:collapse;margin-top: 10px;margin-bottom:10px;'>
+    html += `<table border='0' cellpadding='3' cellspacing='0' style='border-collapse:collapse;margin-top: 5px;'>
                 <thead style="background-color: #dfdbdb;">
                     <tr>
                         <th style="width: 100px; border: 1px solid #d3cccc;">Qty Of Leads</th>
                         <th style="width: 110px; border: 1px solid #d3cccc;">CompanyID</th>
-                        <th style="width: 400px; border: 1px solid #d3cccc;">Company Name</th>
+                        <th style="width: 200px; border: 1px solid #d3cccc;">Company Name</th>
                     </tr>
                 </thead>`;
 
-    html += `<tbody style="font-size: 15px;">`;
+    html += `<tbody style="font-size: 12px;">`;
     
     rows.forEach(row => {
         html += `<tr>`;
