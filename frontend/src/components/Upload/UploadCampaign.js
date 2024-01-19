@@ -115,7 +115,7 @@ const UploadCampaign = (props) => {
             props.backupDB((result) => {
 
                 if (props.group.campaigns.filter(c => {
-                    return (c.weekday[weekDay] === true && c.state !== 'success');
+                    return (c.weekday[weekDay] === true && c.status !== 'done');
                 }).length === 0 && props.setting.is_auto_whatsapp_sending_for_company_qty === true) {
                     setLoading(true);
                     setTip('Wait for sending...');
@@ -128,7 +128,7 @@ const UploadCampaign = (props) => {
                         }
                     })
                 }
-                
+
             }, (error) => {
                 toastr.error('There is a problem with server.');
             });

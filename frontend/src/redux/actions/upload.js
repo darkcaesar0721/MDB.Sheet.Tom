@@ -68,7 +68,7 @@ export const getUploadLastPhone = (groupId, groupCampaignId, campaignId, runCamp
 }
 
 export const uploadLeads = (groupId, campaignId, callback) => (dispatch) => {
-    const timeout = 120000;
+    const timeout = 300000;
     axios.post(API + '/upload/upload_leads', {groupId: groupId, campaignId: campaignId})
         .then(result => {
             callback(result.data);
@@ -89,7 +89,7 @@ export const sendCompanyQty = (callback) => (dispatch) => {
 }
 
 export const upload = (groupId, groupCampaignId, campaignId, runCampaignByServer = {}, index = -1, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 180000;
+    const timeout = 300000;
     const api = index !== -1 ? 'http://localhost:' + runCampaignByServer.server + '/api' : API;
     axios.post(api + '/upload', {groupId: groupId, campaignId: campaignId, manually: manually})
         .then(result => {
@@ -165,7 +165,7 @@ export const upload = (groupId, groupCampaignId, campaignId, runCampaignByServer
 }
 
 export const uploadPreviewData = (groupId, campaignId, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 120000;
+    const timeout = 300000;
     axios.post(API + '/upload/upload_preview', {groupId: groupId, campaignId: campaignId})
         .then(result => {
             axios.post(API + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
@@ -202,7 +202,7 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {},
 }
 
 export const getLastInputDate = (groupId, currentDate, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
-    const timeout = 120000;
+    const timeout = 300000;
     axios.post(API + '/upload/get_last_input_date', {groupId: groupId, currentDate: currentDate})
         .then(result => {
             if (result.data.status === 'error') {
