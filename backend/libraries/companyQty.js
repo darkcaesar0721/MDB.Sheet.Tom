@@ -25,10 +25,12 @@ const send = async function(callback) {
     await getBaseData(companies, setting, callback, function(lastSystemCreateDate, rows) {
         downloadHtmlFile(lastSystemCreateDate, rows, callback, function() {
             convertFromHtmlToImage(callback, function() {
-                sendWhatsAppImage(setting, callback, async function() {
-                    const upgradedSetting = await Settings.findOne({});
-                    callback({status: 'success', setting: upgradedSetting});
-                });
+                setTimeout(function() {
+                    sendWhatsAppImage(setting, callback, async function() {
+                        const upgradedSetting = await Settings.findOne({});
+                        callback({status: 'success', setting: upgradedSetting});
+                    });
+                }, 2000);
             });
         });
     });
@@ -111,13 +113,22 @@ const downloadHtmlFile = function(lastSystemCreateDate, rows, callback, returnCa
 
     html += `<tbody style="font-size: 15px;">`;
     
+    let total_qty = 0;
     rows.forEach(row => {
-        html += `<tr>`;
+        total_qty += row.qty;
+
+        html += row.qty === 0 ? `<tr style="background-color: yellow;">` : `<tr>`;
         html += `<td style="text-align: right; border: 1px solid #d3cccc;">` + row.qty + `</td>`;
         html += `<td style="border: 1px solid #d3cccc;">` + row.id + `</td>`;
         html += `<td style="border: 1px solid #d3cccc;">` + row.name + `</td>`;
         html += `</tr>`;
     })
+
+    html += `<tr style="background-color: #dfdbdb;">`;
+    html += `<td style="text-align:right; font-weight: bold; font-size: 18px; border: 1px solid #d3cccc;">` + total_qty + `</td>`;
+    html += `<td style="font-weight: bold; border: 1px solid #d3cccc; font-size: 18px;">Total</td>`;
+    html += `<td style="border: 1px solid #d3cccc;"></td>`;
+    html += `</tr>`
 
     html += `</tbody>`;
 
