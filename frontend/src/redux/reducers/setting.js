@@ -12,6 +12,10 @@ const initialState = {
         ultramsg_instance_id: '',
         ultramsg_token: ''
     },
+    pdfcrowd: {
+        username: '',
+        apikey: ''
+    }
 };
 
 function setting(state = initialState, action) {

@@ -10,13 +10,9 @@ const Companies = require('../models/company.model');
 const Settings = require("../models/setting.model");
 
 const queryCompanyDailyCountDate = "zzzzz Company ID Daily Count 001 - Date";
-const queryCompanyDailyCount = "zzzzz Company ID Daily Count 003";
 
 const htmlFileName = 'company_qty.html';
 const imageFileName = 'company_qty.png';
-
-const PDFCROWD_AUTH_USER_NAME = 'LimWenKai1';
-const PDFCROWD_AUTH_USER_TOKEN = 'ed3ec2e15235808c3bfa436c941f909d';
 
 const send = async function(callback) {
     const setting = await Settings.findOne({});
@@ -24,7 +20,7 @@ const send = async function(callback) {
 
     await getBaseData(companies, setting, callback, function(lastSystemCreateDate, rows) {
         downloadHtmlFile(lastSystemCreateDate, rows, callback, function() {
-            convertFromHtmlToImage(callback, function() {
+            convertFromHtmlToImage(setting, callback, function() {
                 setTimeout(function() {
                     sendWhatsAppImage(setting, callback, async function() {
                         const upgradedSetting = await Settings.findOne({});
@@ -147,8 +143,8 @@ const downloadHtmlFile = function(lastSystemCreateDate, rows, callback, returnCa
     });
 }
 
-const convertFromHtmlToImage = function(callback, returnCallback) {
-    const client = new pdfcrowd.HtmlToImageClient(PDFCROWD_AUTH_USER_NAME, PDFCROWD_AUTH_USER_TOKEN);
+const convertFromHtmlToImage = function(setting, callback, returnCallback) {
+    const client = new pdfcrowd.HtmlToImageClient(setting.pdfcrowd.username, setting.pdfcrowd.apikey);
 
     client.setOutputFormat("png");
     client.convertFileToFile(htmlFileName, imageFileName, function(err, filePath) {

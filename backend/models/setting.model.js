@@ -18,6 +18,10 @@ const settingSchema = new mongoose.Schema({
         ultramsg_instance_id: String,
         ultramsg_token: String
     },
+    pdfcrowd: {
+        username: String,
+        apikey: String
+    },
     current_upload: {
         group: {
             type: mongoose.Schema.ObjectId,

@@ -13,6 +13,9 @@ const MenuList = function(props) {
                         <a className={props.currentPage === "whatsapp" ? "selected" : ""} href="#/whatsapp">WhatsApp</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
+                        <a className={props.currentPage === "pdfcrowd" ? "selected" : ""} href="#/pdfcrowd">Pdfcrowd</a>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>
                         <a className={props.currentPage === "company" ? "selected" : ""} href="#/companies">Add Companies</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
