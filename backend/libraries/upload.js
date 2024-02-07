@@ -10,7 +10,7 @@ const Groups = require('../models/group.model');
 const Settings = require("../models/setting.model");
 
 const auth = new google.auth.GoogleAuth({
-    keyFile: "./credentials.json",
+    keyFile: "./credential.json",
     scopes: "https://www.googleapis.com/auth/spreadsheets",
 });
 

@@ -73,6 +73,31 @@ router.post('/restore', (req, res) => {
         });
 
     });
-})
+});
+
+router.get('/download_google_sheet_credential', (req, res) => {
+    const file = fs.readFileSync('credential.json');
+
+    res.header('Content-Type', 'application/json');
+    res.send(file);
+});
+
+router.post('/upload_google_sheet_credential', (req, res) => {
+    const form = new formidable.IncomingForm();
+    form.parse(req, function (err, fields, files) {
+        fs.readFile(files.file[0].filepath, 'utf8', async (err, data) => {
+            if (err) {
+                console.error(err);
+                return;
+            }
+
+            fs.writeFile('credential.json', data, function(err) {
+                if (err) throw err;
+                res.json('success');
+            });
+        });
+
+    });
+});
 
 module.exports = router;

@@ -42,3 +42,13 @@ export const backupDB = (callback = function() {}, errorCallback = function() {}
             errorCallback(error);
         })
 }
+
+export const downloadGoogleSheetCredential = (callback = function() {}, errorCallback = function() {}) => async (dispatch) => {
+    axios.get(API + '/setting/download_google_sheet_credential')
+        .then(result => {
+            callback(result.data);
+        })
+        .catch(error => {
+            errorCallback(error);
+        })
+}

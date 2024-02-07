@@ -20,6 +20,7 @@ import {
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
 import Pdfcrowd from "./components/Settings/Pdfcrowd";
+import Googlesheet from "./components/Settings/Googlesheet";
 
 import CompanyList from "./components/Company/CompanyList";
 import CompanyAdd from "./components/Company/CompanyAdd";
@@ -76,6 +77,7 @@ const AppRouter = (props) => {
                             <Route path="/backup" element={<Backup />} />
                             <Route path="/whatsapp" element={<Whatsapp />} />
                             <Route path="/pdfcrowd" element={<Pdfcrowd />} />
+                            <Route path="/googlesheet" element={<Googlesheet />} />
 
                             <Route path="/companies" element={<CompanyList />} />
                             <Route path="/companies/add" element={<CompanyAdd />} />
