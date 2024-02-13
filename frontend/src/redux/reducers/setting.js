@@ -12,6 +12,10 @@ const initialState = {
         ultramsg_instance_id: '',
         ultramsg_token: ''
     },
+    whatsapp_receivers_for_database_backup: {
+        users: [],
+        groups: []
+    },
     pdfcrowd: {
         username: '',
         apikey: ''
