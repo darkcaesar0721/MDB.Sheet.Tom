@@ -119,7 +119,7 @@ const Backup = (props) => {
                 </Col>
                 <Col span={2}>
                     <Upload {...upload_props}
-                            accept=".json"
+                            accept=".json, .txt"
                             onChange={(response) => {
                                 if (response.file.status !== 'uploading') {
                                     console.log(response.file, response.fileList);
