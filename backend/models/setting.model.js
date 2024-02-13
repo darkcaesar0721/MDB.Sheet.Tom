@@ -19,6 +19,7 @@ const settingSchema = new mongoose.Schema({
         ultramsg_token: String
     },
     whatsapp_receivers_for_database_backup: {
+        message: String,
         users: [],
         groups: []
     },

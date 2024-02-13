@@ -14,7 +14,8 @@ const initialState = {
     },
     whatsapp_receivers_for_database_backup: {
         users: [],
-        groups: []
+        groups: [],
+        message: ''
     },
     pdfcrowd: {
         username: '',

@@ -145,6 +145,18 @@ const Backup = (props) => {
                         scrollToFirstError
                         onFinish={handleSubmit}
                     >
+                        <Form.Item
+                            name="message"
+                            label="Message"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input message',
+                                },
+                            ]}
+                        >
+                            <Input.TextArea showCount autoSize={{ minRows: 3, maxRows: 10 }}/>
+                        </Form.Item>
                         <Form.List
                             name="users"
                         >
