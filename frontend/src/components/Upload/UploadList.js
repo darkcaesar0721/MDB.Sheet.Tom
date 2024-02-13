@@ -29,7 +29,8 @@ import {
     upload,
     uploadPreviewData,
     updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
-    sendCompanyQty
+    sendCompanyQty,
+    sendBackupData
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -841,6 +842,19 @@ const UploadList = (props) => {
         });
     }
 
+    const handleBackupDataSendBtnClick = function() {
+        setLoading(true);
+        setTip('Wait for sending...');
+        props.sendBackupData(function(result) {
+            setLoading(false);
+            if (result.status === 'error') {
+                messageApi.warning(result.description);
+            } else {
+                messageApi.success('success');
+            }
+        })
+    }
+
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
@@ -942,7 +956,12 @@ const UploadList = (props) => {
                                 Send Company Qty
                             </Button>
                         </Col>
-                        <Col span={2} offset={1}>
+                        <Col span={2}>
+                            <Button type="primary" onClick={handleBackupDataSendBtnClick}>
+                                Send Backup Data
+                            </Button>
+                        </Col>
+                        <Col span={2}>
                             <Popconfirm
                                 title="All Last Phone"
                                 description="Are you sure to get last phone of all campaigns?"
@@ -1067,6 +1086,7 @@ const UploadList = (props) => {
                         servers={servers}
                         runningWay={currentUploadRunningWay}
                         sendCompanyQty={props.sendCompanyQty}
+                        sendBackupData={props.sendBackupData}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
@@ -1173,6 +1193,6 @@ export default connect(
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
         getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
-        sendCompanyQty
+        sendCompanyQty, sendBackupData
     }
 )(UploadList);

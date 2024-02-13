@@ -7,6 +7,7 @@ moment.tz.setDefault('America/Los_Angeles');
 
 const Settings = require('../models/setting.model');
 const Campaigns = require("../models/campaign.model");
+const Companies = require("../models/company.model");
 const Groups = require("../models/group.model");
 
 router.get('/', (req, res) => {
@@ -32,11 +33,13 @@ router.put('/:id', (req, res) => {
 router.post('/backup', async (req, res) => {
     const settings = await Settings.find();
     const campaigns = await Campaigns.find();
+    const companies = await Companies.find();
     const groups = await Groups.find();
 
     const data = {
         settings: settings,
         campaigns: campaigns,
+        companies: companies,
         groups: groups
     }
 
@@ -65,6 +68,10 @@ router.post('/restore', (req, res) => {
             const campaigns = JSON.parse(data).campaigns;
             await Campaigns.find({'__v': 0}).remove().exec();
             await Campaigns.insertMany(campaigns);
+
+            const companies = JSON.parse(data).companies;
+            await Companies.find({'__v': 0}).remove().exec();
+            await Companies.insertMany(companies);
 
             const groups = JSON.parse(data).groups;
             await Groups.find({'__v': 0}).remove().exec();

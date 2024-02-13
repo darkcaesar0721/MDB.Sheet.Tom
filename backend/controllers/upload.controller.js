@@ -7,7 +7,8 @@ const Campaigns = require('../models/campaign.model');
 const Settings = require("../models/setting.model");
 
 const uploadLibrary = require('../libraries/upload');
-const companyQtyLibrary = require('../libraries/companyQty');
+const whatsappCompanyQtyLibrary = require('../libraries/whatsapp.company.qty.send');
+const whatsappBackupFileLibrary = require('../libraries/whatsapp.backup.file.send');
 
 router.post('/', async (req, res) => {
     const {groupId, campaignId, manually} = req.body;
@@ -106,7 +107,13 @@ router.post('/stop_campaign_running', async  (req, res) => {
 });
 
 router.post('/send_company_qty', async (req, res) => {
-    companyQtyLibrary.send(function(result) {
+    whatsappCompanyQtyLibrary.send(function(result) {
+        res.json(result);
+    });
+});
+
+router.post('/send_backup_data', async (req, res) => {
+    whatsappBackupFileLibrary.send(function(result) {
         res.json(result);
     });
 })

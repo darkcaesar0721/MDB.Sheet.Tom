@@ -114,21 +114,31 @@ const UploadCampaign = (props) => {
         if (campaigns.length > 0 && campaigns.filter(c => c.state === '' || c.state === 'loading').length === 0) {
             props.backupDB((result) => {
 
-                if (props.group.campaigns.filter(c => {
-                    return (c.weekday[weekDay] === true && c.status !== 'done');
-                }).length === 0 && props.setting.is_auto_whatsapp_sending_for_company_qty === true) {
-                    setLoading(true);
-                    setTip('Wait for sending...');
-                    props.sendCompanyQty(function(sendResult) {
-                        setLoading(false);
-                        if (sendResult.status === 'error') {
-                            messageApi.warning(sendResult.description);
-                        } else {
-                            messageApi.success('success');
-                        }
-                    })
-                }
+                setLoading(true);
+                setTip('Wait for backup result sending...');
+                props.sendBackupData(function(backupDataResult) {
+                    setLoading(false);
+                    if (backupDataResult.status === 'error') {
+                        messageApi.warning(backupDataResult.description);
+                    } else {
+                        messageApi.success('success');
+                    }
 
+                    if (props.group.campaigns.filter(c => {
+                        return (c.weekday[weekDay] === true && c.status !== 'done');
+                    }).length === 0 && props.setting.is_auto_whatsapp_sending_for_company_qty === true) {
+                        setLoading(true);
+                        setTip('Wait for company qty sending...');
+                        props.sendCompanyQty(function(companyQtyResult) {
+                            setLoading(false);
+                            if (companyQtyResult.status === 'error') {
+                                messageApi.warning(companyQtyResult.description);
+                            } else {
+                                messageApi.success('success');
+                            }
+                        });
+                    }
+                });
             }, (error) => {
                 toastr.error('There is a problem with server.');
             });

@@ -88,6 +88,13 @@ export const sendCompanyQty = (callback) => (dispatch) => {
         });
 }
 
+export const sendBackupData = (callback) => (dispatch) => {
+    axios.post(API + '/upload/send_backup_data')
+        .then(result => {
+            callback(result.data);
+        });
+}
+
 export const upload = (groupId, groupCampaignId, campaignId, runCampaignByServer = {}, index = -1, manually = false, callback = function() {}, errorCallback = function() {}, timeoutCallback = function() {}) => (dispatch) => {
     const timeout = 300000;
     const api = index !== -1 ? 'http://localhost:' + runCampaignByServer.server + '/api' : API;
