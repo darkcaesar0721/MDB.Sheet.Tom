@@ -60,21 +60,23 @@ const sendWhatsAppBackupJson = async function(setting, groups, fileName, base64D
     }
     if (setting.whatsapp_receivers_for_database_backup.groups && setting.whatsapp_receivers_for_database_backup.groups.length > 0) {
         for (const group of setting.whatsapp_receivers_for_database_backup.groups) {
-            if (groups.filter(g => g.name === group).length === 0) {
-                callback({status: 'error', description: 'whatsapp group error'});
-                return;
+            if (group != '') {
+                if (groups.filter(g => g.name === group).length === 0) {
+                    callback({status: 'error', description: 'whatsapp group error'});
+                    return;
+                }
+    
+                const g = groups.filter(g => g.name === group)[0];
+    
+                config['data'] = qs.stringify({
+                    "token": `${setting.whatsapp.ultramsg_token}`,
+                    "to": g.id,
+                    "document": base64Data,
+                    "filename": fileName,
+                    "caption": setting.whatsapp_receivers_for_database_backup.message
+                });
+                await axios(config)
             }
-
-            const g = groups.filter(g => g.name === group)[0];
-
-            config['data'] = qs.stringify({
-                "token": `${setting.whatsapp.ultramsg_token}`,
-                "to": g.id,
-                "document": base64Data,
-                "filename": fileName,
-                "caption": setting.whatsapp_receivers_for_database_backup.message
-            });
-            await axios(config)
         }
     }
 }
