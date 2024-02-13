@@ -46,14 +46,16 @@ const sendWhatsAppBackupJson = async function(setting, groups, fileName, base64D
 
     if (setting.whatsapp_receivers_for_database_backup.users && setting.whatsapp_receivers_for_database_backup.users.length > 0) {
         for (const user of setting.whatsapp_receivers_for_database_backup.users) {
-            config['data'] = qs.stringify({
-                "token": `${setting.whatsapp.ultramsg_token}`,
-                "to": user,
-                "document": base64Data,
-                "filename": fileName,
-                "caption": setting.whatsapp_receivers_for_database_backup.message
-            });
-            await axios(config)
+        	if (user != '') {
+        		config['data'] = qs.stringify({
+	                "token": `${setting.whatsapp.ultramsg_token}`,
+	                "to": user,
+	                "document": base64Data,
+	                "filename": fileName,
+	                "caption": setting.whatsapp_receivers_for_database_backup.message
+	            });
+	            await axios(config);
+        	}
         }
     }
     if (setting.whatsapp_receivers_for_database_backup.groups && setting.whatsapp_receivers_for_database_backup.groups.length > 0) {

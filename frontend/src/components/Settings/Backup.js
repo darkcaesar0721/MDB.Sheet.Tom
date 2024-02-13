@@ -92,9 +92,6 @@ const Backup = (props) => {
     };
 
     const handleSubmit = function(data) {
-        data.users = data.users.filter(user => user !== '');
-        data.groups = data.groups.filter(group => group !== '');
-
         const setting = Object.assign({...props.setting}, {whatsapp_receivers_for_database_backup : data});
         props.updateSetting(setting, (error) => {
             toastr.error("There is a problem with server.\n Can't save the WhatsApp settings");
