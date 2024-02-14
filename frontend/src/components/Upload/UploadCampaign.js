@@ -45,7 +45,7 @@ const UploadCampaign = (props) => {
                     break;
                 case 'daily_manual':
                     setCampaigns(props.group.campaigns.filter(c => {
-                        return !c.is_manually_upload && c.weekday[weekDay] === true;
+                        return !c.is_manually_upload && c.status !== 'unrunning';
                     }));
                     break;
                 case 'pending_campaigns':

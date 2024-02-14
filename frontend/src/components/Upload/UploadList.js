@@ -53,6 +53,8 @@ let pstDate = current_date.toLocaleString("en-US", {
 const today = moment(pstDate).format("M/D/Y");
 const weekDay = moment(pstDate).format('dddd');
 
+const dateFormat = "YYYY-MM-DD";
+
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -70,7 +72,6 @@ const UploadList = (props) => {
     const [selectedCampaign, setSelectedCampaign] = useState(null);
     
     const [settingModalOpen, setSettingModalOpen] = useState(false);
-    const [countSettingModalClick, setCountSettingModalClick] = useState(0);
     const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
     const [uploadCampaignLastPreviewModalOpen, setUploadCampaignLastPreviewModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
@@ -125,7 +126,7 @@ const UploadList = (props) => {
                     campaign[key] = campaign.filter[key];
                 }
 
-                if (campaign.weekday[weekDay] === false) {
+                if (campaign.weekday[weekDay] === false || ((campaign.pause.status && (campaign.pause.type === 'TOTALLY' || (campaign.pause.type === 'PERIOD' && new Date(moment(campaign.pause.period.start).format('M/D/Y')) <= new Date(today) && new Date(moment(campaign.pause.period.end).format('M/D/Y')) >= new Date(today) ))))) {
                     campaign.status = 'unrunning';
                 } else {
                     if (!campaign.last_upload_start_datetime || moment(campaign.last_upload_start_datetime).format('M/D/Y') !== today) {
@@ -148,6 +149,8 @@ const UploadList = (props) => {
 
     useEffect(function() {
         if (group.campaigns === undefined) return;
+
+        checkCampaignPauseStatus();
 
         setTableParams({
             ...tableParams,
@@ -418,6 +421,33 @@ const UploadList = (props) => {
 
     }, [group, currentGroup, currentWay]);
 
+    const checkCampaignPauseStatus = function() {
+        group.campaigns.forEach(campaign => {
+            if ((campaign.pause.status && (campaign.pause.type === 'TOTALLY' || (campaign.pause.type === 'PERIOD' && new Date(moment(campaign.pause.period.start).format('M/D/Y')) <= new Date(today) && new Date(moment(campaign.pause.period.end).format('M/D/Y')) >= new Date(today) )))) {
+                if (campaign.color !== 'purple') {
+                    const updatedObject = {
+                        color: 'purple',
+                        previous_color: campaign.color,
+                        is_manually_upload: false
+                    }
+                    props.updateGroupCampaignField(group._id, campaign._id, updatedObject, true, (result) => {}, (error) => {
+                        toastr.error('There is a problem with server.');
+                    });
+                }
+            } else {
+                if (campaign.color === 'purple') {
+                    const updatedObject = {
+                        color: campaign.previous_color,
+                        is_manually_upload: false
+                    }
+                    props.updateGroupCampaignField(group._id, campaign._id, updatedObject, true, (result) => {}, (error) => {
+                        toastr.error('There is a problem with server.');
+                    });
+                }
+            }
+        });
+    }
+
     const handleIsStopRunning = function(e, campaign) {
         props.updateIsStopCampaignRunning(group._id, campaign._id, (result) => {}, (error) => {
             toastr.warning('There is a problem with MDB file.');
@@ -590,7 +620,7 @@ const UploadList = (props) => {
 
     const handleAutoUploadBtnClick = function() {
         let campaigns = group.campaigns.filter(c => {
-            if (!c.is_manually_upload && c.weekday[weekDay] === true) return true;
+            if (!c.is_manually_upload && c.status !== 'unrunning') return true;
 
             return false;
         });
@@ -604,7 +634,7 @@ const UploadList = (props) => {
 
     const handlePendingUploadBtnClick = function() {
         let campaigns = group.campaigns.filter(c => {
-            if (c.status !== 'done' && c.weekday[weekDay] === true) return true;
+            if (c.status !== 'done' && c.status !== 'unrunning') return true;
 
             return false;
         });
@@ -657,18 +687,6 @@ const UploadList = (props) => {
         startUploadCampaigns(currentUploadRunningCampaigns, currentUploadRunningWay);
     }
 
-    const handleManuallyStepUploadBtnClick = function() {
-        let campaigns = [];
-        for (const campaign of group.campaigns) {
-            if (campaign.status === 'problem' || campaign.status === 'running') {
-                campaigns.push(campaign);
-            }
-
-            if (campaign.is_stop_running_status) break;
-        }
-        startUploadCampaigns(campaigns, 'manual_step');
-    }
-
     const validation = function(campaigns) {
         if (campaigns.length === 0) {
             messageApi.warning('Please select campaign list.');
@@ -696,26 +714,26 @@ const UploadList = (props) => {
 
     const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
-            if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
-            } else {
-                setLoading(true);
-                setTip('Wait for getting input date...');
-                props.getLastInputDate(group._id, today, function(result) {
-                    setLoading(false);
-                    if (result.status === 'error') {
-                    messageApi.warning(result.description);
-                    } else {
+            // if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
+            //     initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
+            // } else {
+            //     setLoading(true);
+            //     setTip('Wait for getting input date...');
+            //     props.getLastInputDate(group._id, today, function(result) {
+            //         setLoading(false);
+            //         if (result.status === 'error') {
+            //         messageApi.warning(result.description);
+            //         } else {
                         initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
-                    }
-                }, (error) => {
-                    setLoading(false);
-                    toastr.error('There is a problem with server.');
-                }, () => {
-                    setLoading(false);
-                    toastr.warning('There is a problem with MDB file.');
-                });
-            }
+            //         }
+            //     }, (error) => {
+            //         setLoading(false);
+            //         toastr.error('There is a problem with server.');
+            //     }, () => {
+            //         setLoading(false);
+            //         toastr.warning('There is a problem with MDB file.');
+            //     });
+            // }
         }
     }
 
@@ -801,7 +819,8 @@ const UploadList = (props) => {
             columns: campaign.columns,
             pause: campaign.pause,
             color: campaign.color,
-            previous_color: campaign.previous_color
+            previous_color: campaign.previous_color,
+            is_manually_upload: campaign.is_manually_upload
         }
         props.updateGroupCampaignField(group._id, campaign._id, updatedCampaign, true, (result) => {}, (error) => {
             toastr.error('There is a problem with server.');

@@ -324,14 +324,13 @@ const GroupCampaignSetting = (props) => {
                 c.filter.date_old_day = !c.filter.date_old_day ? 0 : c.filter.date_old_day;
             }
 
-            if (c.pause.status && (c.pause.type === 'TOTALLY' || (c.pause.type === 'PERIOD' && (new Date(c.pause.period.start) > new Date(today) || new Date(c.pause.period.end) < new Date(today) )))) {
+            if (c.pause.status && (c.pause.type === 'TOTALLY' || (c.pause.type === 'PERIOD' && new Date(c.pause.period.start) <= new Date(today) && new Date(c.pause.period.end) >= new Date(today) ))) {
                 c.previous_color = c.color;
                 c.color = "purple";
+                c.is_manually_upload = false;
             } else {
                 c.color = c.previous_color ? c.previous_color : c.color;
             }
-
-            console.log(c);
 
             props.updateCampaignSetting(Object.assign(props.campaign, c));
             props.showSettingModal(false);
