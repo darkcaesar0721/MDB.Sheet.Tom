@@ -1,13 +1,22 @@
-import {Button, Checkbox, Col, Form, Input, message, Modal, Radio, Row, Select, Spin, Switch, Table} from "antd";
+import {Button, Checkbox, Col, Form, Input, message, Modal, Radio, Row, Select, DatePicker, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import dragula from "dragula";
 import "dragula/dist/dragula.css";
+import moment from "moment";
+import { DateRangePicker } from 'rsuite';
+import 'rsuite/DateRangePicker/styles/index.css';
+
+const { RangePicker } = DatePicker;
 
 let current_date = new Date()
 let pstDate = current_date.toLocaleString("en-US", {
     timeZone: "America/Los_Angeles"
 });
+
+const dateFormat = "YYYY-MM-DD";
+
+const today = moment(pstDate).format(dateFormat);
 
 const layout = {
     labelCol: {
@@ -82,6 +91,19 @@ const GroupCampaignSetting = (props) => {
             let filterKeys = Object.keys(formFields.filter);
             filterKeys.forEach(k => {
                 formFields[k] = formFields.filter[k];
+            });
+
+            let pauseKeys = Object.keys(formFields.pause);
+            formFields['pause_status'] = false;
+            formFields['pause_type'] = 'TOTALLY';
+            formFields['pause_period'] = [];
+
+            pauseKeys.forEach(k => {
+                if (k == 'period' && formFields.pause[k].start) {
+                    formFields['pause_' + k] = [new Date(formFields.pause[k].start), new Date(formFields.pause[k].end)];
+                } else {
+                    formFields['pause_' + k] = formFields.pause[k];
+                }
             });
 
             form.setFieldsValue(formFields);
@@ -254,7 +276,23 @@ const GroupCampaignSetting = (props) => {
         updateCampaign({}, object);
     }
 
-    const updateCampaign = function(filter = {}, whatsapp= {}) {
+    const handlePauseFieldChange = (field, value) => {
+        if (field === 'period') {
+            const start_date = moment(value[0]).format(dateFormat);
+            const end_date = moment(value[1]).format(dateFormat);
+
+            value = {
+                start: start_date,
+                end: end_date
+            }
+        }
+
+        let object = {};
+        object[field] = value;
+        updateCampaign({}, {}, object);
+    }
+
+    const updateCampaign = function(filter = {}, whatsapp = {}, pause = {}) {
         let object = {};
         object['filter'] = Object.assign(campaign.filter, filter);
 
@@ -263,6 +301,8 @@ const GroupCampaignSetting = (props) => {
 
         object['whatsapp'] = Object.assign(campaign.whatsapp, whatsapp);
         object['columns'] = columns;
+
+        object['pause'] = Object.assign(campaign.pause, pause);
 
         setCampaign(oldState => Object.assign({...oldState}, object));
     }
@@ -283,6 +323,16 @@ const GroupCampaignSetting = (props) => {
             if (c.filter.way === 'DATE') {
                 c.filter.date_old_day = !c.filter.date_old_day ? 0 : c.filter.date_old_day;
             }
+
+            if (c.pause.status && (c.pause.type === 'TOTALLY' || (c.pause.type === 'PERIOD' && (new Date(c.pause.period.start) > new Date(today) || new Date(c.pause.period.end) < new Date(today) )))) {
+                c.previous_color = c.color;
+                c.color = "purple";
+            } else {
+                c.color = c.previous_color ? c.previous_color : c.color;
+            }
+
+            console.log(c);
+
             props.updateCampaignSetting(Object.assign(props.campaign, c));
             props.showSettingModal(false);
         }
@@ -498,6 +548,39 @@ const GroupCampaignSetting = (props) => {
                                                     <Input placeholder="End" value={campaign.filter.period_end} onChange={(e) => {handleFilterFieldChange('period_end', e.target.value)}}/>
                                                 </Form.Item>
                                             </Col> : ''
+                                    }
+                                    <Form.Item
+                                        name={['pause_status']}
+                                        label="Pause"
+                                    >
+                                        <Switch
+                                            checkedChildren={<CheckOutlined />}
+                                            unCheckedChildren={<CloseOutlined />}
+                                            size="large"
+                                            onChange={(value) => {handlePauseFieldChange('status', value)}}
+                                            checked={campaign.pause.status}
+                                        />
+                                    </Form.Item>
+                                    {
+                                        campaign.pause.status ?
+                                            <Form.Item
+                                                name={['pause_type']}
+                                                label="Pause Type"
+                                            >
+                                                <Radio.Group onChange={(e) => handlePauseFieldChange('type', e.target.value)} defaultValue="TOTALLY" value={campaign.pause.type}>
+                                                    <Radio value="TOTALLY">Totally</Radio>
+                                                    <Radio value="PERIOD">Period</Radio>
+                                                </Radio.Group>
+                                            </Form.Item> : ''
+                                    }
+                                    {
+                                        campaign.pause.status && campaign.pause.type === 'PERIOD'?
+                                            <Form.Item
+                                                name={['pause_period']}
+                                                label="Pause Period"
+                                            >
+                                                <DateRangePicker onChange={(value) => handlePauseFieldChange('period', value)}/>
+                                            </Form.Item> : ''
                                     }
                                     <Form.Item
                                         name={['send_status']}

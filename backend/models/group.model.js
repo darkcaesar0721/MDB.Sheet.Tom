@@ -49,9 +49,27 @@ const groupSchema = new mongoose.Schema({
             groups: [],
             users: []
         },
+        pause: {
+            status: {
+                type: Boolean,
+                default: false
+            },
+            type: {
+                type: String,
+                enum: ['TOTALLY', 'PERIOD'],
+                default: 'TOTALLY'
+            },
+            period: {
+                start: Date,
+                end: Date
+            }
+        },
         color: {
             type: String,
             default: "none"
+        },
+        previous_color: {
+            type: String
         },
         filter: {
             way: {

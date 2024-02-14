@@ -70,6 +70,7 @@ const UploadList = (props) => {
     const [selectedCampaign, setSelectedCampaign] = useState(null);
     
     const [settingModalOpen, setSettingModalOpen] = useState(false);
+    const [countSettingModalClick, setCountSettingModalClick] = useState(0);
     const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
     const [uploadCampaignLastPreviewModalOpen, setUploadCampaignLastPreviewModalOpen] = useState(false);
     const [openGetAllLastPhoneModal, setOpenGetAllLastPhoneModal] = useState(false);
@@ -255,9 +256,9 @@ const UploadList = (props) => {
             }
         }];
         columns = [...columns, {
-            title: 'N G Y P',
+            title: 'N G Y P Z',
             key: 'color',
-            width: 90,
+            width: 110,
             align: 'center',
             render: (_, r) => {
                 return (
@@ -266,6 +267,7 @@ const UploadList = (props) => {
                         <Radio.Button value="green">G</Radio.Button>
                         <Radio.Button value="yellow">Y</Radio.Button>
                         <Radio.Button value="pink">P</Radio.Button>
+                        <Radio.Button value="purple">Z</Radio.Button>
                     </Radio.Group>
                 )
             }
@@ -327,7 +329,7 @@ const UploadList = (props) => {
                 const link = '#';
                 return (
                     <>
-                        <Link to={link} onClick={(e) => {setSelectedCampaign(record); setSettingModalOpen(true)}}>{record.query}</Link>
+                        <Link to={link} onClick={(e) => {setSelectedCampaign({...record}); setSettingModalOpen(true); }}>{record.query}</Link>
                     </>
                 )
             }
@@ -796,7 +798,10 @@ const UploadList = (props) => {
         let updatedCampaign = {
             whatsapp: campaign.whatsapp,
             filter: campaign.filter,
-            columns: campaign.columns
+            columns: campaign.columns,
+            pause: campaign.pause,
+            color: campaign.color,
+            previous_color: campaign.previous_color
         }
         props.updateGroupCampaignField(group._id, campaign._id, updatedCampaign, true, (result) => {}, (error) => {
             toastr.error('There is a problem with server.');

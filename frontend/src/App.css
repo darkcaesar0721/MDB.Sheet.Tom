@@ -198,6 +198,22 @@ label, span, div, input {
   background-color: pink !important;
 }
 
+.campaign_purple {
+  background-color: #CBC3E3 !important;
+}
+
+.ant-table-row-selected.campaign_purple {
+  background-color: #CBC3E3 !important;
+}
+
+.ant-table-tbody >tr.campaign_purple >td.ant-table-cell-row-hover {
+  background-color: #CBC3E3 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_purple >td {
+  background-color: #CBC3E3 !important;
+}
+
 .campaign_red {
   background-color: indianred !important;
 }
@@ -248,4 +264,8 @@ label, span, div, input {
 
 .upload-status-modal .ant-table {
   margin-bottom: 100px;
+}
+
+.rs-picker-popup {
+  z-index: 1000 !important;
 }
