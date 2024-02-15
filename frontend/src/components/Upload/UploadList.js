@@ -340,7 +340,28 @@ const UploadList = (props) => {
         columns = [...columns, {
             title: 'Sheet Name',
             dataIndex: 'schedule',
-            key: 'schedule',
+            key: 'schedule'
+        }];
+        columns = [...columns, {
+            title: 'Pause Status',
+            key: 'pause_status',
+            render: (_, record) => {
+                let str = 'Not paused';
+
+                if (record.pause.status) {
+                    if (record.pause.type === 'TOTALLY')
+                        str = 'Totally paused';
+                    else
+                        str = 'Period paused (' + moment(record.pause.period.start).format('M/D/Y') + ' ~ ' + moment(record.pause.period.end).format('M/D/Y') + ')';
+                }
+                return (
+                    <>
+                        {
+                            record.pause.status ? <span style={{color: 'red'}}>{str}</span> : <span>{str}</span>
+                        }
+                    </>
+                )
+            }
         }];
         columns = [...columns, {
             title: 'Filter Type',
