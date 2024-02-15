@@ -427,7 +427,7 @@ const UploadList = (props) => {
                 if (campaign.color !== 'purple') {
                     const updatedObject = {
                         color: 'purple',
-                        previous_color: campaign.color,
+                        previous_color: (campaign.color === 'purple' ? 'green' : campaign.color),
                         is_manually_upload: false
                     }
                     props.updateGroupCampaignField(group._id, campaign._id, updatedObject, true, (result) => {}, (error) => {
@@ -714,26 +714,26 @@ const UploadList = (props) => {
 
     const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
-            // if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-            //     initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
-            // } else {
-            //     setLoading(true);
-            //     setTip('Wait for getting input date...');
-            //     props.getLastInputDate(group._id, today, function(result) {
-            //         setLoading(false);
-            //         if (result.status === 'error') {
-            //         messageApi.warning(result.description);
-            //         } else {
+            if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
+                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
+            } else {
+                setLoading(true);
+                setTip('Wait for getting input date...');
+                props.getLastInputDate(group._id, today, function(result) {
+                    setLoading(false);
+                    if (result.status === 'error') {
+                    messageApi.warning(result.description);
+                    } else {
                         initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
-            //         }
-            //     }, (error) => {
-            //         setLoading(false);
-            //         toastr.error('There is a problem with server.');
-            //     }, () => {
-            //         setLoading(false);
-            //         toastr.warning('There is a problem with MDB file.');
-            //     });
-            // }
+                    }
+                }, (error) => {
+                    setLoading(false);
+                    toastr.error('There is a problem with server.');
+                }, () => {
+                    setLoading(false);
+                    toastr.warning('There is a problem with MDB file.');
+                });
+            }
         }
     }
 

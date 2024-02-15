@@ -60,8 +60,8 @@ const groupSchema = new mongoose.Schema({
                 default: 'TOTALLY'
             },
             period: {
-                start: Date,
-                end: Date
+                start: String,
+                end: String
             }
         },
         color: {

@@ -1,4 +1,4 @@
-import {Button, Checkbox, Col, Form, Input, message, Modal, Radio, Row, Select, DatePicker, Switch, Table} from "antd";
+import {Button, Checkbox, Col, Form, Input, message, Modal, Radio, Row, Select, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {CheckOutlined, CloseOutlined, MinusCircleOutlined, PlusOutlined} from "@ant-design/icons";
 import dragula from "dragula";
@@ -6,8 +6,6 @@ import "dragula/dist/dragula.css";
 import moment from "moment";
 import { DateRangePicker } from 'rsuite';
 import 'rsuite/DateRangePicker/styles/index.css';
-
-const { RangePicker } = DatePicker;
 
 let current_date = new Date()
 let pstDate = current_date.toLocaleString("en-US", {
@@ -100,7 +98,7 @@ const GroupCampaignSetting = (props) => {
 
             pauseKeys.forEach(k => {
                 if (k == 'period' && formFields.pause[k].start) {
-                    formFields['pause_' + k] = [new Date(formFields.pause[k].start), new Date(formFields.pause[k].end)];
+                    formFields['pause_' + k] = [new Date(moment(formFields.pause[k].start).add(1, 'days').format(dateFormat)), new Date(moment(formFields.pause[k].end).add(1, 'days').format(dateFormat))];
                 } else {
                     formFields['pause_' + k] = formFields.pause[k];
                 }
@@ -324,8 +322,8 @@ const GroupCampaignSetting = (props) => {
                 c.filter.date_old_day = !c.filter.date_old_day ? 0 : c.filter.date_old_day;
             }
 
-            if (c.pause.status && (c.pause.type === 'TOTALLY' || (c.pause.type === 'PERIOD' && new Date(c.pause.period.start) <= new Date(today) && new Date(c.pause.period.end) >= new Date(today) ))) {
-                c.previous_color = c.color;
+            if (c.pause.status && (c.pause.type === 'TOTALLY' || (c.pause.type === 'PERIOD' && new Date(moment(c.pause.period.start).format(dateFormat)) <= new Date(today) && new Date(moment(c.pause.period.end).format(dateFormat)) >= new Date(today) ))) {
+                c.previous_color = (c.color === 'purple' ? 'green' : c.color);
                 c.color = "purple";
                 c.is_manually_upload = false;
             } else {
