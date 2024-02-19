@@ -166,6 +166,10 @@ label, span, div, input {
   background-color: yellow !important;
 }
 
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row.campaign_yellow >td {
+  background-color: yellow !important;
+}
+
 .campaign_green {
   background-color: lightgreen !important;
 }
@@ -179,6 +183,10 @@ label, span, div, input {
 }
 
 .ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_green >td {
+  background-color: lightgreen !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row.campaign_green >td {
   background-color: lightgreen !important;
 }
 
@@ -198,6 +206,10 @@ label, span, div, input {
   background-color: pink !important;
 }
 
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row.campaign_pink >td {
+  background-color: pink !important;
+}
+
 .campaign_purple {
   background-color: #CBC3E3 !important;
 }
@@ -214,6 +226,10 @@ label, span, div, input {
   background-color: #CBC3E3 !important;
 }
 
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row.campaign_purple >td {
+  background-color:#CBC3E3 !important;
+}
+
 .campaign_red {
   background-color: indianred !important;
 }
@@ -228,6 +244,10 @@ label, span, div, input {
 
 .ant-table-wrapper .ant-table-tbody >tr.ant-table-row-selected.campaign_red >td {
   background-color: indianred !important;
+}
+
+.ant-table-wrapper .ant-table-tbody >tr.ant-table-row.campaign_red >td {
+  background-color:indianred !important;
 }
 
 .antd-custom-table .ant-radio-button-wrapper {
