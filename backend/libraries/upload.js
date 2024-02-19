@@ -322,6 +322,14 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                             return;
                         }
 
+                        const result = await googleSheetsInstance.spreadsheets.values.get({
+                            spreadsheetId: spreadsheetId,
+                            range: sheet.properties.title,
+                        });
+
+                        const rowsCount = result.data.values ? result.data.values.length : 0;
+
+                        let blank_rows = [['']];
                         let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
                         let upload_row = [];
                         for (const column of groupCampaign.columns) {
@@ -330,6 +338,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                             upload_row.push(column.sheet_name);
                         }
                         upload_rows = [...upload_rows, upload_row];
+                        blank_rows = [...blank_rows, ['']];
 
                         rows.forEach((row) => {
                             let upload_row = [];
@@ -338,14 +347,26 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                 upload_row.push(row[key]);
                             })
                             upload_rows.push(upload_row);
+                            blank_rows.push(['']);
                         })
                         upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+                        blank_rows.push(['']);
 
                         if (process.env.ENVIRONMENT === 'production') {
                             await googleSheetsInstance.spreadsheets.values.append({
                                 auth, //auth object
                                 spreadsheetId, //spreadsheet id
                                 range: sheet.properties.title, //sheet name and range of cells
+                                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
+                                resource: {
+                                    values: blank_rows,
+                                },
+                            });
+
+                            await googleSheetsInstance.spreadsheets.values.update({
+                                auth, //auth object
+                                spreadsheetId, //spreadsheet id
+                                range: sheet.properties.title + '!A' + (rowsCount + 1) + ':N' + (rowsCount + upload_rows.length), //sheet name and range of cells
                                 valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
                                 resource: {
                                     values: upload_rows,
