@@ -53,6 +53,8 @@ let pstDate = current_date.toLocaleString("en-US", {
 const today = moment(pstDate).format("M/D/Y");
 const weekDay = moment(pstDate).format('dddd');
 
+const currentDateTime = moment(pstDate).format("M/D/Y h:mm A");
+
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -474,33 +476,48 @@ const UploadList = (props) => {
     }
 
     const upload = function(campaign, isManually = false) {
-        setLoading(true);
+        if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) { 
+            issue_upload();
+        } else {
+            setLoading(true);
 
-        if (isManually)
-            setTip("Wait for getting data....");
-        else
-            setTip("Wait for uploading....");
-
-        props.upload(group._id, campaign._id, campaign.detail, {}, -1, isManually, function(result) {
-            props.backupDB();
-            setLoading(false);
-            if (result.status === 'error') {
-                messageApi.warning(result.description);
-            } else {
-                if (!isManually) {
-                    messageApi.success('upload success');
+            if (isManually)
+                setTip("Wait for getting data....");
+            else
+                setTip("Wait for uploading....");
+    
+            props.upload(group._id, campaign._id, campaign.detail, {}, -1, isManually, function(result) {
+                props.backupDB();
+                setLoading(false);
+                if (result.status === 'error') {
+                    messageApi.warning(result.description);
                 } else {
-                    // setSelectedCampaign(campaign);
-                    // setUploadPreviewModalOpen(true);
+                    if (!isManually) {
+                        messageApi.success('upload success');
+                    } else {
+                        // setSelectedCampaign(campaign);
+                        // setUploadPreviewModalOpen(true);
+                    }
                 }
-            }
-        }, (error) => {
+            }, (error) => {
+                setLoading(false);
+                toastr.error('There is a problem with server.');
+            }, () => {
+                setLoading(false);
+                toastr.warning('There is a problem with MDB file.');
+            })
+        }
+    }
+
+    const issue_upload = function() {
+        setLoading(true);
+        
+        setTimeout(function() {
             setLoading(false);
-            toastr.error('There is a problem with server.');
-        }, () => {
-            setLoading(false);
-            toastr.warning('There is a problem with MDB file.');
-        })
+            const text = 'The Google Sheet data in your React Redux store is unsynchronized. This issue arises because your Redux store contains a significant amount of information that relies on real-time access. To resolve this problem, it is recommended that you reduce the number of structures and the scale of your Redux store. By doing so, you can ensure better synchronization and improve the overall performance of your application.';
+            toastr.error(text);
+            console.log(text);
+        }, 4000);
     }
 
     const showPreviewResult = function(campaign) {
@@ -509,25 +526,29 @@ const UploadList = (props) => {
     }
 
     const uploadPreview = function() {
-        setUploadPreviewModalOpen(false);
+        if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) { 
+            issue_upload();
+        } else {
+            setUploadPreviewModalOpen(false);
 
-        setLoading(true);
-        setTip("Wait for uploading data....");
-        props.uploadPreviewData(group._id, selectedCampaign.detail, function(result) {
-            props.backupDB();
-            setLoading(false);
-            if (result.status === 'error') {
-                messageApi.warning(result.description);
-            } else {
-                messageApi.success('upload success');
-            }
-        }, (error) => {
-            setLoading(false);
-            toastr.error('There is a problem with server.');
-        }, () => {
-            setLoading(false);
-            toastr.error('There is a problem with server.');
-        });
+            setLoading(true);
+            setTip("Wait for uploading data....");
+            props.uploadPreviewData(group._id, selectedCampaign.detail, function(result) {
+                props.backupDB();
+                setLoading(false);
+                if (result.status === 'error') {
+                    messageApi.warning(result.description);
+                } else {
+                    messageApi.success('upload success');
+                }
+            }, (error) => {
+                setLoading(false);
+                toastr.error('There is a problem with server.');
+            }, () => {
+                setLoading(false);
+                toastr.error('There is a problem with server.');
+            });
+        }
     }
 
     const cancelUpload = function() {
@@ -734,7 +755,7 @@ const UploadList = (props) => {
     const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
             if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-                                    initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
+                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
             } else {
                 setLoading(true);
                 setTip('Wait for getting input date...');
@@ -852,16 +873,20 @@ const UploadList = (props) => {
     }
 
     const handleReUpload = function() {
-        setLoading(true);
-        setTip('Wait for uploading...');
-        props.uploadLeads(group._id, selectedCampaign._id, function(result) {
-            setLoading(false);
-            if (result.status === 'error') {
-                messageApi.warning(result.description);
-            } else {
-                messageApi.success('success');
-            }
-        })
+        if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) {
+            issue_upload();
+        } else {
+            setLoading(true);
+            setTip('Wait for uploading...');
+            props.uploadLeads(group._id, selectedCampaign._id, function(result) {
+                setLoading(false);
+                if (result.status === 'error') {
+                    messageApi.warning(result.description);
+                } else {
+                    messageApi.success('success');
+                }
+            })
+        }
     }
 
     const handleCompanyQtySendBtnClick = function() {
