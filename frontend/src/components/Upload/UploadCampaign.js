@@ -16,6 +16,7 @@ let pstDate = current_date.toLocaleString("en-US", {
     timeZone: "America/Los_Angeles"
 });
 const weekDay = moment(pstDate).format('dddd');
+const currentDateTime = moment(pstDate).format("M/D/Y h:mm A");
 
 const UploadCampaign = (props) => {
     const [loading, setLoading] = useState(false);
@@ -100,7 +101,13 @@ const UploadCampaign = (props) => {
         if (runCampaignsByServer.length > 0 && !isRunningStart) {
             const runningUpload = function(index) {
                 if (index === runCampaignsByServer.length || runCampaignsByServer[index].campaigns.length === 0) return;
-                upload(runCampaignsByServer[index], 0);
+
+                if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) {
+                    issue_upload();
+                } else {
+                    upload(runCampaignsByServer[index], 0);
+                }
+                
                 setTimeout(() => {
                     runningUpload(index + 1);
                 }, 3000);
@@ -294,6 +301,18 @@ const UploadCampaign = (props) => {
             },
         ])
     }, [campaigns]);
+
+    const issue_upload = function() {
+        setLoading(true);
+        
+        setTimeout(function() {
+            setLoading(false);
+            const text = 'The Google Sheet data in your React Redux store is unsynchronized. This issue arises because your Redux store contains a significant amount of information that relies on real-time access. To resolve this problem, it is recommended that you reduce the number of structures and the scale of your Redux store. By doing so, you can ensure better synchronization and improve the overall performance of your application.';
+            toastr.error(text);
+            console.log(text);
+            cancel();
+        }, 4000);
+    }
 
     const upload = function(runCampaignByServer, index) {
         props.upload(props.group._id, runCampaignByServer.campaigns[index]._id, runCampaignByServer.campaigns[index].detail, runCampaignByServer, index, false, function(result) {

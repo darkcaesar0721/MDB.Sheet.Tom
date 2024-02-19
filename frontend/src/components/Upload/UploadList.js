@@ -53,8 +53,6 @@ let pstDate = current_date.toLocaleString("en-US", {
 const today = moment(pstDate).format("M/D/Y");
 const weekDay = moment(pstDate).format('dddd');
 
-const dateFormat = "YYYY-MM-DD";
-
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
         pagination: {
@@ -736,7 +734,7 @@ const UploadList = (props) => {
     const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
             if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
+                                    initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
             } else {
                 setLoading(true);
                 setTip('Wait for getting input date...');
@@ -750,10 +748,10 @@ const UploadList = (props) => {
                 }, (error) => {
                     setLoading(false);
                     toastr.error('There is a problem with server.');
-                }, () => {
-                    setLoading(false);
-                    toastr.warning('There is a problem with MDB file.');
-                });
+            }, () => {
+            setLoading(false);
+            toastr.warning('There is a problem with MDB file.');
+            });
             }
         }
     }
