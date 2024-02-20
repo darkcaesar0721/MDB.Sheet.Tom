@@ -40,6 +40,8 @@ import UploadPreview from "./UploadPreview";
 import UploadCampaignLastInfo from "./UploadCampaignLastInfo";
 import UploadCampaignLastPreview from "./UploadCampaignLastPreview";
 
+const {ISSUE_DATE_TIME} = require('../../config');
+
 toastr.options = {
     positionClass : 'toast-top-right',
     hideDuration: 300,
@@ -476,7 +478,7 @@ const UploadList = (props) => {
     }
 
     const upload = function(campaign, isManually = false) {
-        if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) { 
+        if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
             issue_upload();
         } else {
             setLoading(true);
@@ -526,7 +528,7 @@ const UploadList = (props) => {
     }
 
     const uploadPreview = function() {
-        if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) { 
+        if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
             issue_upload();
         } else {
             setUploadPreviewModalOpen(false);
@@ -873,7 +875,7 @@ const UploadList = (props) => {
     }
 
     const handleReUpload = function() {
-        if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) {
+        if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
             issue_upload();
         } else {
             setLoading(true);

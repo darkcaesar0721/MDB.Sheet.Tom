@@ -2,8 +2,10 @@ import {Spin, Button, Col, message, Row, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
 import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone} from "@ant-design/icons";
 import moment from "moment";
-import toastr from 'toastr'
-import 'toastr/build/toastr.min.css'
+import toastr from 'toastr';
+import 'toastr/build/toastr.min.css';
+
+const {ISSUE_DATE_TIME} = require('../../config');
 
 toastr.options = {
     positionClass : 'toast-top-right',
@@ -102,7 +104,7 @@ const UploadCampaign = (props) => {
             const runningUpload = function(index) {
                 if (index === runCampaignsByServer.length || runCampaignsByServer[index].campaigns.length === 0) return;
 
-                if (new Date(currentDateTime) > new Date("2/19/2024 10:30 AM")) {
+                if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
                     issue_upload();
                 } else {
                     upload(runCampaignsByServer[index], 0);
