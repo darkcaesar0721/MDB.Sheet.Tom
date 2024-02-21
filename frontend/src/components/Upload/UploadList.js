@@ -40,6 +40,8 @@ import UploadPreview from "./UploadPreview";
 import UploadCampaignLastInfo from "./UploadCampaignLastInfo";
 import UploadCampaignLastPreview from "./UploadCampaignLastPreview";
 
+import {convertNumberToFormat} from "../../common";
+
 const {ISSUE_DATE_TIME} = require('../../config');
 
 toastr.options = {
@@ -284,6 +286,23 @@ const UploadList = (props) => {
             render: (_, r) => {
                 return (
                     <Input value={r.comment} onBlur={(e) => {handleFieldChange(r, 'comment', e.target.value, true)}} onChange={(e) => {handleFieldChange(r, 'comment', e.target.value, false)}}/>
+                )
+            }
+        }];
+        columns = [...columns, {
+            title: 'ID',
+            key: 'ID',
+            width: 30,
+            fixed: 'left',
+            render: (_, record) => {
+                let index = -1;
+                props.campaigns.forEach((c, i) => {
+                    if (c._id === record.detail) index = i;
+                });
+                return (
+                    <>
+                        <span>{convertNumberToFormat(index + 1)}</span>
+                    </>
                 )
             }
         }];
