@@ -611,6 +611,20 @@ const UploadList = (props) => {
         });
     }
 
+    const handleSendOutTypeChange = function(value) {
+        const setting = Object.assign({...props.setting}, {send_out_type : value});
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
+    }
+
+    const handleSendLocalFileTypeChange = function(value) {
+        const setting = Object.assign({...props.setting}, {send_local_file_type : value});
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
+    }
+
     const handleWayChange = function(e) {
         const setting = Object.assign({...props.setting}, {current_upload : Object.assign({...props.setting.current_upload}, {way: e.target.value})});
         props.updateSetting(setting, (error) => {
@@ -931,6 +945,14 @@ const UploadList = (props) => {
         });
     }
 
+    const handleAutoWhatsAppSendingForLocalWayChange = function(v) {
+        let setting = {...props.setting};
+        setting.is_auto_whatsapp_sending_for_local_way = v;
+        props.updateSetting(setting, (error) => {
+            toastr.error('There is a problem with server.');
+        });
+    }
+
     const handleBackupDataSendBtnClick = function() {
         setLoading(true);
         setTip('Wait for sending...');
@@ -1025,9 +1047,42 @@ const UploadList = (props) => {
             </Row>
             {
                 currentWay === 'ALL' ?
-                    <Row>
-
-                        <Col span={3} offset={13}>
+                    <Row style={{marginTop: '1rem'}}>
+                        <Col span={3}>
+                            <span>Send Out Type:</span>
+                            <Select
+                                size="medium"
+                                defaultValue=""
+                                onChange={handleSendOutTypeChange}
+                                style={{ width: 130, marginLeft: '10px'}}
+                                options={[{value: 'GOOGLE', label: 'Google Sheet'}, {value: 'LOCAL', label: 'Local File'}]}
+                                value={props.setting.send_out_type}
+                            />
+                        </Col>
+                        <Col span={3}>
+                            <span>Send Local File Type:</span>
+                            <Select
+                                size="medium"
+                                defaultValue=""
+                                onChange={handleSendLocalFileTypeChange}
+                                style={{ width: 130, marginLeft: '10px'}}
+                                options={[{value: 'CSV', label: 'CSV'}, {value: 'XLS', label: 'XLS'}]}
+                                value={props.setting.send_local_file_type}
+                                disabled={props.setting.send_out_type !== 'LOCAL'}
+                            />
+                        </Col>
+                        <Col span={3} style={{marginTop: "5px"}}>
+                            <span>WhatsApp Sending In Local Way:</span>
+                            <Switch
+                                checkedChildren={<CheckOutlined />}
+                                unCheckedChildren={<CloseOutlined />}
+                                size="large"
+                                onChange={handleAutoWhatsAppSendingForLocalWayChange}
+                                checked={props.setting.is_auto_whatsapp_sending_for_local_way}
+                                disabled={props.setting.send_out_type !== 'LOCAL'}
+                            />
+                        </Col>
+                        <Col span={3} style={{marginTop: "5px"}} offset={4}>
                             <span>Auto WhatsApp Sending:</span>
                             <Switch
                                 checkedChildren={<CheckOutlined />}

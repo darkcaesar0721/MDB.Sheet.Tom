@@ -9,6 +9,20 @@ const settingSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    send_out_type: {
+        type: String,
+        enum: ['GOOGLE', 'LOCAL'],
+        default: 'GOOGLE'
+    },
+    send_local_file_type: {
+        type: String,
+        enum: ['CSV', 'XLS'],
+        default: 'CSV'
+    },
+    is_auto_whatsapp_sending_for_local_way: {
+        type: Boolean,
+        default: false
+    },
     whatsapp: {
         global_send_status: {
             type: Boolean,

@@ -6,6 +6,9 @@ const initialState = {
     schedule_path: '',
     last_system_create_date_time_for_company_qty: '',
     is_auto_whatsapp_sending_for_company_qty: true,
+    send_out_type: 'GOOGLE',
+    send_local_file_type: 'CSV',
+    is_auto_whatsapp_sending_for_local_way: false,
     whatsapp: {
         global_send_status: true,
         default_message_template: '',
