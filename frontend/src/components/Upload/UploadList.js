@@ -972,9 +972,75 @@ const UploadList = (props) => {
             <MenuList
                 currentPage="upload"
             />
+            <Row style={{marginTop: '-30px'}}>
+                <Col span={3} offset={16}>
+                    <span>Send Out Type:</span>
+                    <Select
+                        size="medium"
+                        defaultValue=""
+                        onChange={handleSendOutTypeChange}
+                        style={{ width: 129, marginLeft: '10px'}}
+                        options={[{value: 'GOOGLE', label: 'Google Sheet'}, {value: 'LOCAL', label: 'Local File'}]}
+                        value={props.setting.send_out_type}
+                    />
+                </Col>
+                <Col span={4}>
+                    <span>Send Local File Type:</span>
+                    <Select
+                        size="medium"
+                        defaultValue=""
+                        onChange={handleSendLocalFileTypeChange}
+                        style={{ width: 129, marginLeft: '10px'}}
+                        options={[{value: 'CSV', label: 'CSV'}, {value: 'XLS', label: 'XLS'}]}
+                        value={props.setting.send_local_file_type}
+                        disabled={props.setting.send_out_type !== 'LOCAL'}
+                    />
+                </Col>
+            </Row>
             <Path/>
             <Row style={{marginTop: '1rem'}}>
-                {
+                <Col span={1} offset={8}>
+                    <Select
+                        size="large"
+                        defaultValue=""
+                        onChange={handleGroupChange}
+                        style={{ width: '100%'}}
+                        options={groupOptions}
+                        value={currentGroup}
+                    />
+                </Col>
+                <Col span={3}>
+                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '20px'}} >
+                        <Radio value="ALL">Upload all campaigns</Radio>
+                        <Radio value="ONE">Upload one by one</Radio>
+                    </Radio.Group>
+                </Col>
+                <Col span={3} style={{marginTop: "5px"}} offset={1}>
+                    <span style={{marginLeft: '-30px'}}>Auto WhatsApp Sending:</span>
+                    <Switch
+                        checkedChildren={<CheckOutlined />}
+                        unCheckedChildren={<CloseOutlined />}
+                        size="large"
+                        onChange={handleAutoWhatsAppSendingForCampaignQtyChange}
+                        checked={props.setting.is_auto_whatsapp_sending_for_company_qty}
+                        style={{marginLeft: '10px'}}
+                    />
+                </Col>
+                <Col span={3} style={{marginTop: "5px"}}>
+                    <span>WhatsApp Sending In Local Way:</span>
+                    <Switch
+                        checkedChildren={<CheckOutlined />}
+                        unCheckedChildren={<CloseOutlined />}
+                        size="large"
+                        onChange={handleAutoWhatsAppSendingForLocalWayChange}
+                        checked={props.setting.is_auto_whatsapp_sending_for_local_way}
+                        disabled={props.setting.send_out_type !== 'LOCAL'}
+                        style={{marginLeft: '10px'}}
+                    />
+                </Col>
+            </Row>
+            <Row style={{marginTop: '5px'}}>
+            {
                     currentWay === 'ALL' ?
                         <Col span={2}>
                             {
@@ -1028,83 +1094,31 @@ const UploadList = (props) => {
                             }
                         </Col> : <Col span={2}></Col>
                 }
-                <Col span={3} offset={1}>
-                    <Select
-                        size="large"
-                        defaultValue=""
-                        onChange={handleGroupChange}
-                        style={{ width: 130, marginLeft: '40px'}}
-                        options={groupOptions}
-                        value={currentGroup}
-                    />
-                </Col>
-                <Col span={3}>
-                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-50px', marginTop: '10px'}} >
-                        <Radio value="ALL">Upload all campaigns</Radio>
-                        <Radio value="ONE">Upload one by one</Radio>
-                    </Radio.Group>
-                </Col>
-            </Row>
-            {
-                currentWay === 'ALL' ?
-                    <Row style={{marginTop: '1rem'}}>
-                        <Col span={3}>
-                            <span>Send Out Type:</span>
-                            <Select
-                                size="medium"
-                                defaultValue=""
-                                onChange={handleSendOutTypeChange}
-                                style={{ width: 130, marginLeft: '10px'}}
-                                options={[{value: 'GOOGLE', label: 'Google Sheet'}, {value: 'LOCAL', label: 'Local File'}]}
-                                value={props.setting.send_out_type}
-                            />
-                        </Col>
-                        <Col span={3}>
-                            <span>Send Local File Type:</span>
-                            <Select
-                                size="medium"
-                                defaultValue=""
-                                onChange={handleSendLocalFileTypeChange}
-                                style={{ width: 130, marginLeft: '10px'}}
-                                options={[{value: 'CSV', label: 'CSV'}, {value: 'XLS', label: 'XLS'}]}
-                                value={props.setting.send_local_file_type}
-                                disabled={props.setting.send_out_type !== 'LOCAL'}
-                            />
-                        </Col>
-                        <Col span={3} style={{marginTop: "5px"}}>
-                            <span>WhatsApp Sending In Local Way:</span>
-                            <Switch
-                                checkedChildren={<CheckOutlined />}
-                                unCheckedChildren={<CloseOutlined />}
-                                size="large"
-                                onChange={handleAutoWhatsAppSendingForLocalWayChange}
-                                checked={props.setting.is_auto_whatsapp_sending_for_local_way}
-                                disabled={props.setting.send_out_type !== 'LOCAL'}
-                            />
-                        </Col>
-                        <Col span={3} style={{marginTop: "5px"}} offset={4}>
-                            <span>Auto WhatsApp Sending:</span>
-                            <Switch
-                                checkedChildren={<CheckOutlined />}
-                                unCheckedChildren={<CloseOutlined />}
-                                size="large"
-                                onChange={handleAutoWhatsAppSendingForCampaignQtyChange}
-                                checked={props.setting.is_auto_whatsapp_sending_for_company_qty}
-                            />
-                        </Col>
-                        <Col span={2}>
+                
+                {
+                    currentWay === 'ALL' ?
+                        <Col span={2} offset={10}>
                             <Input value={props.setting.last_system_create_date_time_for_company_qty} readonly={true}/>
-                        </Col>
+                        </Col> : ''
+                }
+                {
+                    currentWay === 'ALL' ?
                         <Col span={2}>
-                            <Button type="primary" onClick={handleCompanyQtySendBtnClick}>
+                            <Button type="primary" onClick={handleCompanyQtySendBtnClick} style={{marginLeft: '10px'}}>
                                 Send Company Qty
                             </Button>
-                        </Col>
+                        </Col> : ''
+                }
+                {
+                    currentWay === 'ALL' ?
                         <Col span={2}>
-                            <Button type="primary" onClick={handleBackupDataSendBtnClick}>
+                            <Button type="primary" onClick={handleBackupDataSendBtnClick} style={{marginLeft: '5px'}}>
                                 Send Backup Data
                             </Button>
-                        </Col>
+                        </Col> : ''
+                }
+                {
+                    currentWay === 'ALL' ?
                         <Col span={2}>
                             <Popconfirm
                                 title="All Last Phone"
@@ -1117,14 +1131,9 @@ const UploadList = (props) => {
                                     All Last Phone
                                 </Button>
                             </Popconfirm>
-                        </Col>
-                    </Row> :
-                    <Row style={{height: 30}}>
-                        <Col span={2} offset={22}>
-
-                        </Col>
-                    </Row>
-            }
+                        </Col> : ''
+                }
+            </Row>
             <Row>
                 <Col span={24}>
                     {

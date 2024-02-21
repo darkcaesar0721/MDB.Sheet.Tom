@@ -57,11 +57,11 @@ function MdbSchedulePath(props) {
 
     return (
         <div>
-            <Row style={{marginTop: '2rem'}}>
-                <Col span={6} offset={2}>
+            <Row style={{marginTop: '1rem'}}>
+                <Col span={6} offset={1}>
                     <Input addonBefore="MDB PATH" onBlur={saveMdbPath} placeholder="C:\mdb_work\LeadDB_ThisSMALL.mdb" onChange={handleMdbChange} value={mdbPath} />
                 </Col>
-                <Col span={6} offset={1}>
+                <Col span={7} offset={1}>
                     <Input addonBefore="SCHEDULE SHEET URL" onBlur={saveSchedulePath} placeholder="https://docs.google.com/spreadsheets/d/16fiKZjpWZ3ZCY69JpRrTBAYLS4GnjqEKp8tj2G65EAI/edit#gid=0" onChange={handleScheduleChange} value={schedulePath} />
                 </Col>
                 <Col span={6} offset={1}>
