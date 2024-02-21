@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const settingSchema = new mongoose.Schema({
     backup_path: String,
     mdb_path: String,
+    local_folder_path: String,
     schedule_path: String,
     last_system_create_date_time_for_company_qty: String,
     is_auto_whatsapp_sending_for_company_qty: {

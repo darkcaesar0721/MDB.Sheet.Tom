@@ -14,10 +14,12 @@ toastr.options = {
 function MdbSchedulePath(props) {
     const [mdbPath, setMdbPath] = useState('');
     const [schedulePath, setSchedulePath] = useState('');
+    const [localFolderPath, setLocalFolderPath] = useState('');
 
     useEffect(function() {
         setMdbPath(props.setting.mdb_path);
         setSchedulePath(props.setting.schedule_path);
+        setLocalFolderPath(props.setting.local_folder_path);
     }, [props.setting]);
 
     const handleMdbChange = function(e) {
@@ -26,6 +28,10 @@ function MdbSchedulePath(props) {
 
     const handleScheduleChange = function(e) {
         setSchedulePath(e.target.value);
+    }
+
+    const handleLocalFolderChange = function(e) {
+        setLocalFolderPath(e.target.value);
     }
 
     const saveMdbPath = function() {
@@ -42,16 +48,24 @@ function MdbSchedulePath(props) {
         });
     }
 
+    const saveLocalFolderPath = function() {
+        const setting = Object.assign({...props.setting}, {local_folder_path : localFolderPath});
+        props.updateSetting(setting, (error) => {
+            toastr.error("There is a problem with server.\n Can't save the schedule path");
+        });
+    }
+
     return (
         <div>
             <Row style={{marginTop: '2rem'}}>
-                <Col span={16} offset={1}>
+                <Col span={6} offset={2}>
                     <Input addonBefore="MDB PATH" onBlur={saveMdbPath} placeholder="C:\mdb_work\LeadDB_ThisSMALL.mdb" onChange={handleMdbChange} value={mdbPath} />
                 </Col>
-            </Row>
-            <Row style={{marginTop: '1rem'}}>
-                <Col span={16} offset={1}>
+                <Col span={6} offset={1}>
                     <Input addonBefore="SCHEDULE SHEET URL" onBlur={saveSchedulePath} placeholder="https://docs.google.com/spreadsheets/d/16fiKZjpWZ3ZCY69JpRrTBAYLS4GnjqEKp8tj2G65EAI/edit#gid=0" onChange={handleScheduleChange} value={schedulePath} />
+                </Col>
+                <Col span={6} offset={1}>
+                    <Input addonBefore="LOCAL FOLDER PATH" onBlur={saveLocalFolderPath} placeholder="C:\VA.MDB.TO.GOOGLE\CSV" onChange={handleLocalFolderChange} value={localFolderPath} />
                 </Col>
             </Row>
         </div>

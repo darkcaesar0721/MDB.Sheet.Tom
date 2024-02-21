@@ -4,6 +4,7 @@ const initialState = {
     backup_path: '',
     mdb_path: '',
     schedule_path: '',
+    local_folder_path: '',
     last_system_create_date_time_for_company_qty: '',
     is_auto_whatsapp_sending_for_company_qty: true,
     send_out_type: 'GOOGLE',
