@@ -3,6 +3,8 @@ const ODBC = require("odbc");
 const axios = require("axios");
 const qs = require("qs");
 const moment = require('moment-timezone');
+const xlsx = require('xlsx');
+const fs = require('fs');
 moment.tz.setDefault('America/Los_Angeles');
 
 const Campaigns = require('../models/campaign.model');
@@ -70,9 +72,6 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
     const today = moment().format("M/D/Y hh:mm:ss");
     Groups.updateOne({_id: groupId, "campaigns.detail": campaignId}, {"campaigns.$.last_upload_start_datetime": today}, (err, doc) => {});
-
-    const authClientObject = await auth.getClient();//Google sheets instance
-    const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
 
     let last_phone = campaign.last_phone;
     const connectionString = `Driver={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=${setting.mdb_path}; Uid=;Pwd=;`;
@@ -297,81 +296,18 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
 
             if (manually === false) {
                 if (rows.length > 0) {
-                    if (process.env.ENVIRONMENT === 'production') {
-                        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
-                    }
-                    for (const sheet_url of campaign.sheet_urls) {
-                        const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
-                        const match = regex.exec(sheet_url);
-                        const spreadsheetId = match[1]; // Extract the ID from the matched string
-
-                        const spreadsheet = await googleSheetsInstance.spreadsheets.get({
-                            spreadsheetId
-                        });
-
-                        let sheet = {};
-                        for (const s of spreadsheet.data.sheets) {
-                            const sheetId = s.properties.sheetId;
-                            if (sheet_url.indexOf("gid=" + sheetId) !== -1) {
-                                sheet = s;
-                            }
-                        }
-
-                        if (!sheet) {
-                            callback({status: 'error', description: 'sheet url error'});
-                            return;
-                        }
-
-                        const result = await googleSheetsInstance.spreadsheets.values.get({
-                            spreadsheetId: spreadsheetId,
-                            range: sheet.properties.title,
-                        });
-
-                        const rowsCount = result.data.values ? result.data.values.length : 0;
-
-                        let blank_rows = [['']];
-                        let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
-                        let upload_row = [];
-                        for (const column of groupCampaign.columns) {
-                            if (column.is_display === false) continue;
-
-                            upload_row.push(column.sheet_name);
-                        }
-                        upload_rows = [...upload_rows, upload_row];
-                        blank_rows = [...blank_rows, ['']];
-
-                        rows.forEach((row) => {
-                            let upload_row = [];
-                            const keys = Object.keys(row);
-                            keys.forEach(key => {
-                                upload_row.push(row[key]);
-                            })
-                            upload_rows.push(upload_row);
-                            blank_rows.push(['']);
-                        })
-                        upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
-                        blank_rows.push(['']);
-
+                    if (setting.send_out_type === 'GOOGLE') {
                         if (process.env.ENVIRONMENT === 'production') {
-                            await googleSheetsInstance.spreadsheets.values.append({
-                                auth, //auth object
-                                spreadsheetId, //spreadsheet id
-                                range: sheet.properties.title, //sheet name and range of cells
-                                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
-                                resource: {
-                                    values: blank_rows,
-                                },
-                            });
+                            await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+                        }
 
-                            await googleSheetsInstance.spreadsheets.values.update({
-                                auth, //auth object
-                                spreadsheetId, //spreadsheet id
-                                range: sheet.properties.title + '!A' + (rowsCount + 1) + ':N' + (rowsCount + upload_rows.length), //sheet name and range of cells
-                                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
-                                resource: {
-                                    values: upload_rows,
-                                },
-                            });
+                        await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
+                    } else {
+                        const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
+                        if (process.env.ENVIRONMENT === 'production' || setting.is_auto_whatsapp_sending_for_local_way) {
+                            setTimeout(async function() {
+                                await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
+                            }, 3000);
                         }
                     }
                 }
@@ -394,6 +330,152 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
             });
         });
     });
+}
+
+const upload_google_sheet_leads = async function(rows, group, groupCampaign, campaign, setting, callback) {
+    const authClientObject = await auth.getClient();//Google sheets instance
+    const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
+
+    if (process.env.ENVIRONMENT === 'production') {
+        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+    }
+    for (const sheet_url of campaign.sheet_urls) {
+        const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
+        const match = regex.exec(sheet_url);
+        const spreadsheetId = match[1]; // Extract the ID from the matched string
+
+        const spreadsheet = await googleSheetsInstance.spreadsheets.get({
+            spreadsheetId
+        });
+
+        let sheet = {};
+        for (const s of spreadsheet.data.sheets) {
+            const sheetId = s.properties.sheetId;
+            if (sheet_url.indexOf("gid=" + sheetId) !== -1) {
+                sheet = s;
+            }
+        }
+
+        if (!sheet) {
+            callback({status: 'error', description: 'sheet url error'});
+            return;
+        }
+
+        const result = await googleSheetsInstance.spreadsheets.values.get({
+            spreadsheetId: spreadsheetId,
+            range: sheet.properties.title,
+        });
+
+        const rowsCount = result.data.values ? result.data.values.length : 0;
+
+        let blank_rows = [['']];
+        let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
+        let upload_row = [];
+        for (const column of groupCampaign.columns) {
+            if (column.is_display === false) continue;
+
+            upload_row.push(column.sheet_name);
+        }
+        upload_rows = [...upload_rows, upload_row];
+        blank_rows = [...blank_rows, ['']];
+
+        rows.forEach((row) => {
+            let upload_row = [];
+            const keys = Object.keys(row);
+            keys.forEach(key => {
+                upload_row.push(row[key]);
+            })
+            upload_rows.push(upload_row);
+            blank_rows.push(['']);
+        })
+        upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+        blank_rows.push(['']);
+
+        if (process.env.ENVIRONMENT === 'production') {
+            await googleSheetsInstance.spreadsheets.values.append({
+                auth, //auth object
+                spreadsheetId, //spreadsheet id
+                range: sheet.properties.title, //sheet name and range of cells
+                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
+                resource: {
+                    values: blank_rows,
+                },
+            });
+
+            await googleSheetsInstance.spreadsheets.values.update({
+                auth, //auth object
+                spreadsheetId, //spreadsheet id
+                range: sheet.properties.title + '!A' + (rowsCount + 1) + ':N' + (rowsCount + upload_rows.length), //sheet name and range of cells
+                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
+                resource: {
+                    values: upload_rows,
+                },
+            });
+        }
+    }
+}
+
+const download_local_file = async function(rows, group, groupCampaign, campaign, setting, callback) {
+    let downloadRows = [];
+
+    campaign.sheet_urls.forEach(url => {
+        downloadRows = [...downloadRows, [url]];
+    })
+    downloadRows = [...downloadRows, ['']];
+
+    let downloadRow = [];
+    for (const column of groupCampaign.columns) {
+        if (column.is_display === false) continue;
+
+        downloadRow.push(column.sheet_name);
+    }
+    downloadRows = [...downloadRows, downloadRow];
+
+    rows.forEach((row) => {
+        let downloadRow = [];
+        const keys = Object.keys(row);
+        keys.forEach(key => {
+            downloadRow.push(row[key]);
+        })
+        downloadRows.push(downloadRow);
+    })
+
+    let ID = '';
+    const campaigns = await Campaigns.find({});
+    for (let i = 0; i < campaigns.length; i++) {
+        let c = campaigns[i];
+        if (campaign._id.toString() == c._id.toString()) ID = String(i + 1).padStart(3, '0');
+    }
+
+    const currentDateTime = moment().format("M.D.Y_h.m.A");
+    let fileName = ID + '_' + campaign.schedule + '_Qty_' + rows.length + '_' + currentDateTime;
+
+    if (!fs.existsSync(setting.local_folder_path)) {
+        fs.mkdirSync(setting.local_folder_path);
+    }
+
+    if (setting.send_local_file_type === 'XLS') {
+        const workbook = xlsx.utils.book_new();
+
+        const sheetData = xlsx.utils.aoa_to_sheet(downloadRows);
+        xlsx.utils.book_append_sheet(workbook, sheetData, campaign.schedule);
+        
+        fileName += '.xls';
+        const filePath = setting.local_folder_path + '\\' + fileName;
+    
+        xlsx.writeFile(workbook, filePath);
+    } else {
+        fileName += '.csv';
+        const filePath = setting.local_folder_path + '\\' + fileName;
+
+        const csvWriter = fs.createWriteStream(filePath);
+        downloadRows.forEach((row) => {
+            csvWriter.write(row.join(',') + '\n');
+        });
+        csvWriter.end();
+    }
+
+    return fileName;
 }
 
 const check_uploaded_sheet = async function(groupCampaign = {}, campaign = {}, isChecked = true, callback = {}) {
@@ -496,6 +578,54 @@ const uploadLeads = async function (groupId = "", campaignId = "", callback = fu
     });
 }
 
+const send_whatsapp_file = async function (fileName = "", group = {}, groupCampaign = {}, campaign = {}, setting = {}, callback) {
+    const fileData = fs.readFileSync(setting.local_folder_path + '\\' + fileName);
+    const base64Data = fileData.toString('base64');
+    const result = await get_whatsapp_groups(setting);
+    const groups = result.data;
+
+    let config = {
+        method: 'post',
+        url: `https://api.ultramsg.com/${setting.whatsapp.ultramsg_instance_id}/messages/document`,
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data : {}
+    };
+
+    if (groupCampaign.whatsapp.send_status && groupCampaign.whatsapp.users.length > 0 && groupCampaign.whatsapp.message) {
+        for (const user of groupCampaign.whatsapp.users) {
+            config['data'] = qs.stringify({
+                "token": `${setting.whatsapp.ultramsg_token}`,
+                "to": user,
+                "document": base64Data,
+                "filename": fileName,
+                "caption": groupCampaign.whatsapp.message
+            });
+            await axios(config)
+        }
+    }
+    if (groupCampaign.whatsapp.send_status && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
+        for (const group of groupCampaign.whatsapp.groups) {
+            if (groups.filter(g => g.name === group).length === 0) {
+                callback({status: 'error', description: 'whatsapp group error'});
+                return;
+            }
+
+            const g = groups.filter(g => g.name === group)[0];
+
+            config['data'] = qs.stringify({
+                "token": `${setting.whatsapp.ultramsg_token}`,
+                "to": g.id,
+                "document": base64Data,
+                "filename": fileName,
+                "caption": groupCampaign.whatsapp.message
+            });
+            await axios(config)
+        }
+    }
+}
+
 const send_whatsapp_message = async function (group = {}, groupCampaign = {}, campaign = {}, setting = {}, callback) {
     const result = await get_whatsapp_groups(setting);
     const groups = result.data;
@@ -553,6 +683,19 @@ const get_whatsapp_groups = async (setting) => {
     };
 
     return await axios(config);
+}
+
+const getBase64Data = function(filePath, callback) {
+    fs.readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            callback({status: 'error', description: 'Error reading file:'});
+            return;
+        }
+      
+        const base64Content = Buffer.from(data).toString('base64');
+        
+        callback(base64Content);
+      });
 }
 
 const getColumnName = function(num) {
@@ -682,62 +825,22 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
 
     const groupCampaign = group.campaigns.filter(c => c.detail == campaignId)[0];
 
-    const authClientObject = await auth.getClient();//Google sheets instance
-    const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
-
     const rows = campaign.last_temp_upload_info.upload_rows;
     if (rows.length > 0) {
-        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
-        for (const sheet_url of campaign.sheet_urls) {
-            const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
-            const match = regex.exec(sheet_url);
-            const spreadsheetId = match[1]; // Extract the ID from the matched string
-
-            const spreadsheet = await googleSheetsInstance.spreadsheets.get({
-                spreadsheetId
-            });
-
-            let sheet = {};
-            for (const s of spreadsheet.data.sheets) {
-                const sheetId = s.properties.sheetId;
-                if (sheet_url.indexOf("gid=" + sheetId) !== -1) {
-                    sheet = s;
-                }
+        if (setting.send_out_type === 'GOOGLE') {
+            if (process.env.ENVIRONMENT === 'production') {
+                await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
             }
 
-            if (!sheet) {
-                callback({status: 'error', description: 'sheet url error'});
-                return;
+            await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
+        } else {
+            const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
+
+            if (process.env.ENVIRONMENT === 'production' || setting.is_auto_whatsapp_sending_for_local_way) {
+                setTimeout(async function() {
+                    await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
+                }, 3000);
             }
-
-            let upload_rows = [['', '', '', '', '', '', '', '', '', '', '', '', '', '']];
-            let upload_row = [];
-            for (const column of groupCampaign.columns) {
-                if (column.is_display === false) continue;
-
-                upload_row.push(column.sheet_name);
-            }
-            upload_rows = [...upload_rows, upload_row];
-
-            rows.forEach((row) => {
-                let upload_row = [];
-                const keys = Object.keys(row);
-                keys.forEach(key => {
-                    upload_row.push(row[key]);
-                })
-                upload_rows.push(upload_row);
-            })
-            upload_rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', '']);
-
-            await googleSheetsInstance.spreadsheets.values.append({
-                auth, //auth object
-                spreadsheetId, //spreadsheet id
-                range: sheet.properties.title, //sheet name and range of cells
-                valueInputOption: "USER_ENTERED", // The information will be passed according to what the usere passes in as date, number or text
-                resource: {
-                    values: upload_rows,
-                },
-            });
         }
     }
 

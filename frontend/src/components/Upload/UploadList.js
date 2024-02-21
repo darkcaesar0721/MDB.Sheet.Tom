@@ -1039,7 +1039,7 @@ const UploadList = (props) => {
                     />
                 </Col>
                 <Col span={3}>
-                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-50px'}} >
+                    <Radio.Group onChange={handleWayChange} defaultValue="ALL" value={currentWay} style={{marginLeft: '-50px', marginTop: '10px'}} >
                         <Radio value="ALL">Upload all campaigns</Radio>
                         <Radio value="ONE">Upload one by one</Radio>
                     </Radio.Group>
