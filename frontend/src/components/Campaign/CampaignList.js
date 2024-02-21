@@ -10,6 +10,8 @@ import {deleteCampaign} from "../../redux/actions/campaign";
 import Path from "../Settings/MdbSchedulePath";
 import MenuList from "../MenuList";
 
+import {convertNumberToFormat} from "../../common";
+
 toastr.options = {
     positionClass : 'toast-top-right',
     hideDuration: 300,
@@ -55,6 +57,24 @@ function CampaignList(props) {
                     return (
                         <>
                             <span>{(index + 1)}</span>
+                        </>
+                    )
+                }
+            },
+            {
+                title: 'ID',
+                key: 'ID',
+                width: 50,
+                fixed: 'left',
+                render: (_, record) => {
+                    let index = -1;
+                    props.campaigns.data.forEach((c, i) => {
+                        if (c._id === record._id) index = i;
+                    });
+
+                    return (
+                        <>
+                            <span>{convertNumberToFormat(index + 1)}</span>
                         </>
                     )
                 }
