@@ -74,6 +74,8 @@ const UploadList = (props) => {
     const [group, setGroup] = useState({});
     const [selectedManualUploadCampaignKeys, setSelectedManualUploadCampaignKeys] = useState([]);
     const [selectedCampaign, setSelectedCampaign] = useState(null);
+
+    const [search, setSearch] = useState('');
     
     const [settingModalOpen, setSettingModalOpen] = useState(false);
     const [uploadPreviewModalOpen, setUploadPreviewModalOpen] = useState(false);
@@ -966,6 +968,10 @@ const UploadList = (props) => {
         })
     }
 
+    const handleSearchInputChange = function(e) {
+        setSearch(e.target.value);
+    }
+
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
@@ -1037,6 +1043,9 @@ const UploadList = (props) => {
                         disabled={props.setting.send_out_type !== 'LOCAL'}
                         style={{marginLeft: '10px'}}
                     />
+                </Col>
+                <Col span={4}>
+                    <Input addonBefore="Search: " placeholder="" onChange={handleSearchInputChange} value={search} />
                 </Col>
             </Row>
             <Row style={{marginTop: '5px'}}>
@@ -1137,32 +1146,35 @@ const UploadList = (props) => {
             <Row>
                 <Col span={24}>
                     {
-                        currentWay === 'ALL' ?
-                            <Table
-                                bordered={true}
-                                size="small"
-                                columns={tblColumns}
-                                dataSource={group.campaigns}
-                                pagination={tableParams.pagination}
-                                onChange={handleTableChange}
-                                rowSelection={{
-                                    type: 'checkbox',
-                                    selectedRowKeys: selectedManualUploadCampaignKeys,
-                                    ...rowSelection,
-                                }}
-                                className="antd-custom-table campaign-table antd-checked-custom-table"
-                                rowClassName={(record, index) => ((record.color === undefined || record.color === "" || record.color === "none") ? "" : "campaign_" + record.color) }
-                            /> :
-                            <Table
-                                bordered={true}
-                                size="small"
-                                columns={tblColumns}
-                                dataSource={group.campaigns}
-                                pagination={tableParams.pagination}
-                                onChange={handleTableChange}
-                                className="antd-custom-table campaign-table antd-checked-custom-table"
-                                rowClassName={(record, index) => ((record.color === undefined || record.color === "" || record.color === "none") ? "" : "campaign_" + record.color) }
-                            />
+                        group.campaigns ? 
+
+                            currentWay === 'ALL' ?
+                                <Table
+                                    bordered={true}
+                                    size="small"
+                                    columns={tblColumns}
+                                    dataSource={group.campaigns.filter(c => !search || c.query.toLowerCase().search(search.toLowerCase()) !== -1 || c.schedule.toLowerCase().search(search.toLowerCase()) !== -1)}
+                                    pagination={tableParams.pagination}
+                                    onChange={handleTableChange}
+                                    rowSelection={{
+                                        type: 'checkbox',
+                                        selectedRowKeys: selectedManualUploadCampaignKeys,
+                                        ...rowSelection,
+                                    }}
+                                    className="antd-custom-table campaign-table antd-checked-custom-table"
+                                    rowClassName={(record, index) => ((record.color === undefined || record.color === "" || record.color === "none") ? "" : "campaign_" + record.color) }
+                                /> :
+                                <Table
+                                    bordered={true}
+                                    size="small"
+                                    columns={tblColumns}
+                                    dataSource={group.campaigns.filter(c => !search || c.query.toLowerCase().search(search.toLowerCase()) !== -1 || c.schedule.toLowerCase().search(search.toLowerCase()) !== -1)}
+                                    pagination={tableParams.pagination}
+                                    onChange={handleTableChange}
+                                    className="antd-custom-table campaign-table antd-checked-custom-table"
+                                    rowClassName={(record, index) => ((record.color === undefined || record.color === "" || record.color === "none") ? "" : "campaign_" + record.color) }
+                                />
+                            : <></>
                     }
 
                 </Col>
