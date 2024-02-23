@@ -7,28 +7,28 @@ const MenuList = function(props) {
             <Col span={20} offset={1}>
                 <Breadcrumb>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "backup" ? "selected" : ""} href="#/backup">Backup(Restore)</a>
+                        <a className={(props.currentPage === "backup" ? "selected" : "") + " menu-bar-customize"} href="#/backup">Backup(Restore)</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "whatsapp" ? "selected" : ""} href="#/whatsapp">WhatsApp</a>
+                        <a className={(props.currentPage === "whatsapp" ? "selected" : "") + " menu-bar-customize"} href="#/whatsapp">WhatsApp</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "pdfcrowd" ? "selected" : ""} href="#/pdfcrowd">Pdfcrowd</a>
+                        <a className={(props.currentPage === "pdfcrowd" ? "selected" : "") + " menu-bar-customize"} href="#/pdfcrowd">Pdfcrowd</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "googlesheet" ? "selected" : ""} href="#/googlesheet">Google Sheet</a>
+                        <a className={(props.currentPage === "googlesheet" ? "selected" : "") + " menu-bar-customize"} href="#/googlesheet">Google Sheet</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "company" ? "selected" : ""} href="#/companies">Add Companies</a>
+                        <a className={(props.currentPage === "company" ? "selected" : "") + " menu-bar-customize"} href="#/companies">Add Companies</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "campaign" ? "selected" : ""} href="#/campaigns">Add Campaigns</a>
+                        <a className={(props.currentPage === "campaign" ? "selected" : "") + " menu-bar-customize"} href="#/campaigns">Add Campaigns</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "group" ? "selected" : ""} href="#/groups">Edit Campaigns</a>
+                        <a className={(props.currentPage === "group" ? "selected" : "") + " menu-bar-customize"} href="#/groups">Edit Campaigns</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
-                        <a className={props.currentPage === "upload" ? "selected" : ""} href="#/">Upload</a>
+                        <a className={(props.currentPage === "upload" ? "selected" : "") + " menu-bar-customize"} href="#/">Upload</a>
                     </Breadcrumb.Item>
                 </Breadcrumb>
             </Col>

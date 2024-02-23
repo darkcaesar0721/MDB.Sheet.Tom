@@ -289,3 +289,17 @@ label, span, div, input {
 .rs-picker-popup {
   z-index: 1000 !important;
 }
+
+.menu-bar-customize {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+:where(.css-dev-only-do-not-override-1xg9z9n).ant-breadcrumb a {
+  color: rgb(78 78 78);
+}
+
+.ant-breadcrumb-link .selected {
+  color: #1677ff;
+  font-weight: 900;
+}
