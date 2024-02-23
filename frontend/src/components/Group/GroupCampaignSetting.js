@@ -18,7 +18,7 @@ const today = moment(pstDate).format(dateFormat);
 
 const layout = {
     labelCol: {
-        span: 3,
+        span: 3
     },
     wrapperCol: {
         span: 20,
@@ -364,7 +364,7 @@ const GroupCampaignSetting = (props) => {
                                             campaign.sheet_urls.map(url => {
                                                 return (
                                                     <div key={url}>
-                                                        <span>{url}</span>
+                                                        <a onClick={(e) => {window.open(url, '_blank')}} style={{fontSize: '1rem'}}>{url}</a>
                                                     </div>
                                                 )
                                             })
