@@ -194,7 +194,6 @@ const UploadList = (props) => {
             title: 'no',
             key: 'no',
             width: 30,
-            fixed: 'left',
             render: (_, record) => {
                 let index = -1;
                 group.campaigns.forEach((c, i) => {
@@ -295,7 +294,6 @@ const UploadList = (props) => {
             title: 'ID',
             key: 'ID',
             width: 30,
-            fixed: 'left',
             render: (_, record) => {
                 let index = -1;
                 props.campaigns.forEach((c, i) => {
@@ -792,7 +790,7 @@ const UploadList = (props) => {
     const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
             if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
+                                    initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
             } else {
                 setLoading(true);
                 setTip('Wait for getting input date...');
@@ -975,7 +973,7 @@ const UploadList = (props) => {
     return (
         <Spin spinning={loading} tip={tip} delay={500}>
             {contextHolder}
-            <div style={{position:'sticky', top: 0, zIndex: 100, backgroundColor: 'white'}}>
+            <div style={{position:'sticky', top: 0, zIndex: 1, backgroundColor: 'white'}}>
                 <MenuList
                     currentPage="upload"
                 />

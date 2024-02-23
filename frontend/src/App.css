@@ -303,3 +303,7 @@ label, span, div, input {
   color: #1677ff;
   font-weight: 900;
 }
+
+.antd-custom-table .ant-radio-button-wrapper-checked {
+  z-index: auto;
+}

@@ -26,7 +26,6 @@ function UploadCampaignLastInfo(props) {
                 title: 'no',
                 key: 'no',
                 width: 30,
-                fixed: 'left',
                 render: (_, record) => {
                     let index = -1;
                     props.campaigns.forEach((c, i) => {
