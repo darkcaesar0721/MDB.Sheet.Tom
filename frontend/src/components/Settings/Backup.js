@@ -122,6 +122,7 @@ const Backup = (props) => {
                                     console.log(response.file, response.fileList);
                                 }
                                 if (response.file.status === 'done') {
+                                    window.location.reload();
                                     message.success(`${response.file.name} db restored successfully`);
                                 } else if (response.file.status === 'error') {
                                     message.error(`${response.file.name} db restore failed.`);
