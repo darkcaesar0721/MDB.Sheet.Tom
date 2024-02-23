@@ -1006,7 +1006,29 @@ const UploadList = (props) => {
                 </Row>
                 <Path/>
                 <Row style={{marginTop: '1rem'}}>
-                    <Col span={1} offset={8}>
+                    <Col span={7}>
+                        {
+                            group.campaigns ? 
+                                <div style={{marginLeft: '10px', fontWeight: '900'}}>
+                                    <div style={{fontSize: '1rem'}}>
+                                        <span>Total: </span>
+                                        <span>{group.campaigns.length}</span>
+                                    </div>
+                                    <div style={{fontSize: '1rem', fontWeight: '900'}}>
+                                        <span> Run: </span>
+                                        <span>{group.campaigns.filter(c => c.status !== 'unrunning').length}</span>
+                                        <span> ( </span>
+                                        <span style={{color: 'blue'}}>{group.campaigns.filter(c => c.status === 'running').length}</span>
+                                        <span> + </span>
+                                        <span style={{color: 'red'}}>{group.campaigns.filter(c => c.status === 'problem').length}</span>
+                                        <span> + </span>
+                                        <span style={{color: 'green'}}>{group.campaigns.filter(c => c.status === 'done').length}</span>
+                                        <span> ) </span>
+                                    </div>
+                                </div> : <></>
+                        }
+                    </Col>
+                    <Col span={1} offset={1}>
                         <Select
                             size="large"
                             defaultValue=""
@@ -1061,7 +1083,7 @@ const UploadList = (props) => {
                                         okText="Yes"
                                         cancelText="No"
                                     >
-                                        <Button type="primary">
+                                        <Button type="primary" style={{marginLeft: '10px'}}>
                                             Manual
                                         </Button>
                                     </Popconfirm>
