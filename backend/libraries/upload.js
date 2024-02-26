@@ -297,14 +297,14 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
             if (manually === false) {
                 if (rows.length > 0) {
                     if (setting.send_out_type === 'GOOGLE') {
-                        if (process.env.ENVIRONMENT === 'production') {
+                        if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status) {
                             await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
                         }
 
                         await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
                     } else {
                         const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
-                        if (process.env.ENVIRONMENT === 'production' || setting.is_auto_whatsapp_sending_for_local_way) {
+                        if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way && setting.whatsapp.global_send_status)) {
                             setTimeout(async function() {
                                 await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
                             }, 3000);
@@ -685,19 +685,6 @@ const get_whatsapp_groups = async (setting) => {
     return await axios(config);
 }
 
-const getBase64Data = function(filePath, callback) {
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            callback({status: 'error', description: 'Error reading file:'});
-            return;
-        }
-      
-        const base64Content = Buffer.from(data).toString('base64');
-        
-        callback(base64Content);
-      });
-}
-
 const getColumnName = function(num) {
     let name = '';
 
@@ -828,7 +815,7 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     const rows = campaign.last_temp_upload_info.upload_rows;
     if (rows.length > 0) {
         if (setting.send_out_type === 'GOOGLE') {
-            if (process.env.ENVIRONMENT === 'production') {
+            if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status) {
                 await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
             }
 
@@ -836,7 +823,7 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
         } else {
             const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
 
-            if (process.env.ENVIRONMENT === 'production' || setting.is_auto_whatsapp_sending_for_local_way) {
+            if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way && setting.whatsapp.global_send_status)) {
                 setTimeout(async function() {
                     await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
                 }, 3000);
