@@ -309,7 +309,7 @@ const UploadCampaign = (props) => {
         
         setTimeout(function() {
             setLoading(false);
-            const text = 'The Google Sheet data in your React Redux store is unsynchronized. This issue arises because your Redux store contains a significant amount of information that relies on real-time access. To resolve this problem, it is recommended that you reduce the number of structures and the scale of your Redux store. By doing so, you can ensure better synchronization and improve the overall performance of your application.';
+            const text = 'The Google Sheet data in your Vuex store is unsynchronized. This issue arises because your Vuex store contains a significant amount of information that relies on real-time access. To resolve this problem, it is recommended that you reduce the number of structures and the scale of your Vuex store. By doing so, you can ensure better synchronization and improve the overall performance of your application.';
             toastr.error(text);
             console.log(text);
             cancel();
