@@ -30,7 +30,8 @@ import {
     uploadPreviewData,
     updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
     sendCompanyQty,
-    sendBackupData
+    sendBackupData,
+    restartServer
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -497,9 +498,9 @@ const UploadList = (props) => {
     }
 
     const upload = function(campaign, isManually = false) {
-        if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
-            issue_upload();
-        } else {
+        // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
+        //     issue_upload();
+        // } else {
             setLoading(true);
 
             if (isManually)
@@ -527,7 +528,7 @@ const UploadList = (props) => {
                 setLoading(false);
                 toastr.warning('There is a problem with MDB file.');
             })
-        }
+        // }
     }
 
     const issue_upload = function() {
@@ -547,9 +548,9 @@ const UploadList = (props) => {
     }
 
     const uploadPreview = function() {
-        if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
-            issue_upload();
-        } else {
+        // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
+        //     issue_upload();
+        // } else {
             setUploadPreviewModalOpen(false);
 
             setLoading(true);
@@ -569,7 +570,7 @@ const UploadList = (props) => {
                 setLoading(false);
                 toastr.error('There is a problem with server.');
             });
-        }
+        // }
     }
 
     const cancelUpload = function() {
@@ -908,9 +909,9 @@ const UploadList = (props) => {
     }
 
     const handleReUpload = function() {
-        if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
-            issue_upload();
-        } else {
+        // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
+        //     issue_upload();
+        // } else {
             setLoading(true);
             setTip('Wait for uploading...');
             props.uploadLeads(group._id, selectedCampaign._id, function(result) {
@@ -921,7 +922,7 @@ const UploadList = (props) => {
                     messageApi.success('success');
                 }
             })
-        }
+        // }
     }
 
     const handleCompanyQtySendBtnClick = function() {
@@ -1274,6 +1275,7 @@ const UploadList = (props) => {
                         runningWay={currentUploadRunningWay}
                         sendCompanyQty={props.sendCompanyQty}
                         sendBackupData={props.sendBackupData}
+                        restartServer={props.restartServer}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
@@ -1380,6 +1382,7 @@ export default connect(
         updateSetting, getSettings,
         updateCampaignField, updateGroup, updateGroupCampaignField,
         getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
-        sendCompanyQty, sendBackupData
+        sendCompanyQty, sendBackupData,
+        restartServer
     }
 )(UploadList);

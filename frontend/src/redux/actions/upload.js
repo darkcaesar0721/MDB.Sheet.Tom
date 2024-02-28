@@ -281,3 +281,13 @@ export const updateUploadGroup = (group) => (dispatch) => {
         data: group
     });
 }
+
+export const restartServer = (campaignId, port, callback, errorCallback) => (dispatch) => {
+    axios.post('http://localhost:4000/api/upload/restart_server', {campaignId: campaignId, port: port})
+        .then(result => {
+            callback(result);
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
+}

@@ -104,11 +104,11 @@ const UploadCampaign = (props) => {
             const runningUpload = function(index) {
                 if (index === runCampaignsByServer.length || runCampaignsByServer[index].campaigns.length === 0) return;
 
-                if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
-                    issue_upload();
-                } else {
-                    upload(runCampaignsByServer[index], 0);
-                }
+                // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
+                //     issue_upload();
+                // } else {
+                upload(runCampaignsByServer[index], 0);
+                // }
                 
                 setTimeout(() => {
                     runningUpload(index + 1);
@@ -324,7 +324,15 @@ const UploadCampaign = (props) => {
                 upload(runCampaignByServer, index + 1);
             }
         }, (error) => {
-            toastr.error('There is a problem with server.');
+            // props.restartServer(runCampaignByServer.campaigns[index].detail, runCampaignByServer.server, 
+            //     function() {
+                    
+            //     }, 
+            //     function(error) {
+            //         toastr.error('There are some problems in server.');
+            //         cancel();        
+            //     })
+            toastr.error('There are some problems in server.');
             cancel();
         }, () => {
             toastr.warning('There is a problem with MDB file.');
