@@ -324,20 +324,40 @@ const UploadCampaign = (props) => {
                 upload(runCampaignByServer, index + 1);
             }
         }, (error) => {
-            // props.restartServer(runCampaignByServer.campaigns[index].detail, runCampaignByServer.server, 
-            //     function() {
-                    
-            //     }, 
-            //     function(error) {
-            //         toastr.error('There are some problems in server.');
-            //         cancel();        
-            //     })
-            toastr.error('There are some problems in server.');
-            cancel();
+            reUpload(runCampaignByServer, index);
         }, () => {
-            toastr.warning('There is a problem with MDB file.');
-            cancel();
+            reUpload(runCampaignByServer, index);
         })
+    }
+
+    const reUpload = function(runCampaignByServer, index) {
+        props.restartServer(
+            runCampaignByServer.campaigns[index].detail,
+            runCampaignByServer.server,
+            function() {
+                setTimeout(function() {
+                    let checkingInterval = "";
+                    const checkServerOnlineStatus = function() {
+                        props.checkSeverOnlineStatus(
+                            runCampaignByServer.server, 
+                            function (result) {
+                                clearInterval(checkingInterval);
+                                upload(runCampaignByServer, index);
+                            },
+                            function (error) {
+                                console.log(error);
+                            });
+                    };
+                    
+                    checkingInterval = setInterval(checkServerOnlineStatus, 2000);
+                }, 2000);
+            }, 
+            function(error) {
+                toastr.error('There are some problems in server.');
+                cancel();
+            });
+        // toastr.error('There are some problems in server.');
+        // cancel();
     }
 
     const handleTableChange = (pagination, filters, sorter) => {

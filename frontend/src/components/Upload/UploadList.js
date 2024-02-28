@@ -31,7 +31,8 @@ import {
     updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
     sendCompanyQty,
     sendBackupData,
-    restartServer
+    restartServer,
+    checkSeverOnlineStatus
 } from "../../redux/actions/upload";
 import {updateCampaignField} from "../../redux/actions/campaign";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
@@ -1276,6 +1277,7 @@ const UploadList = (props) => {
                         sendCompanyQty={props.sendCompanyQty}
                         sendBackupData={props.sendBackupData}
                         restartServer={props.restartServer}
+                        checkSeverOnlineStatus={props.checkSeverOnlineStatus}
                     />
                 </DraggableModal>
             </DraggableModalProvider>
@@ -1383,6 +1385,6 @@ export default connect(
         updateCampaignField, updateGroup, updateGroupCampaignField,
         getUploadLastPhone, upload, uploadPreviewData, getLastInputDate, updateIsManually, backupDB, updateIsStopCampaignRunning, updateUploadGroup, uploadLeads,
         sendCompanyQty, sendBackupData,
-        restartServer
+        restartServer, checkSeverOnlineStatus
     }
 )(UploadList);

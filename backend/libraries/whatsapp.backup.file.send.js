@@ -4,6 +4,8 @@ const qs = require("qs");
 const path = require("path");
 
 const Settings = require("../models/setting.model");
+const Campaigns = require("../models/campaign.model");
+const Issues = require("../models/issue.model");
 
 const send = async function(callback) {
     const setting = await Settings.findOne({});
@@ -44,6 +46,8 @@ const sendWhatsAppBackupJson = async function(setting, groups, fileName, base64D
         data : {}
     };
 
+    const issueText = await getCurrentIssueText();
+
     if (setting.whatsapp_receivers_for_database_backup.users && setting.whatsapp_receivers_for_database_backup.users.length > 0) {
         for (const user of setting.whatsapp_receivers_for_database_backup.users) {
         	if (user != '') {
@@ -55,6 +59,21 @@ const sendWhatsAppBackupJson = async function(setting, groups, fileName, base64D
 	                "caption": setting.whatsapp_receivers_for_database_backup.message
 	            });
 	            await axios(config);
+
+                if (issueText) {
+                    await axios({
+                        method: 'post',
+                        url: `https://api.ultramsg.com/${setting.whatsapp.ultramsg_instance_id}/messages/chat`,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        data: qs.stringify({
+                            "token": `${setting.whatsapp.ultramsg_token}`,
+                            "to": user,
+                            "body": issueText
+                        })
+                    })
+                }
         	}
         }
     }
@@ -76,9 +95,38 @@ const sendWhatsAppBackupJson = async function(setting, groups, fileName, base64D
                     "caption": setting.whatsapp_receivers_for_database_backup.message
                 });
                 await axios(config)
+
+                if (issueText) {
+                    await axios({
+                        method: 'post',
+                        url: `https://api.ultramsg.com/${setting.whatsapp.ultramsg_instance_id}/messages/chat`,
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        data: qs.stringify({
+                            "token": `${setting.whatsapp.ultramsg_token}`,
+                            "to": g.id,
+                            "body": issueText
+                        })
+                    })
+                }
             }
         }
     }
+}
+
+const getCurrentIssueText = async function() {
+    let issueText = '';
+    
+    const issues = await Issues.find({report_status: false}).populate('campaign').exec();
+
+    issues.forEach((issue, index) => {
+        issueText += (index + 1) + '. Campaign: *' + issue.campaign.schedule + '*, Port: *_' + issue.port + '_*, Issue: *~' + issue.description + '~*, Date: ```' + issue.date + '```\n';   
+    })
+
+    await Issues.updateMany({report_status: false}, {report_status: true}).exec();
+
+    return issueText;
 }
 
 const getMostRecentFileName = function(folderPath) {

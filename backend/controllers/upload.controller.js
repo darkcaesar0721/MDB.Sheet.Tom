@@ -1,10 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const ODBC = require("odbc");
+const fs = require("fs");
+
+const moment = require('moment-timezone');
+moment.tz.setDefault('America/Los_Angeles');
 
 const Groups = require('../models/group.model');
 const Campaigns = require('../models/campaign.model');
 const Settings = require("../models/setting.model");
+const Issues = require("../models/issue.model");
 
 const uploadLibrary = require('../libraries/upload');
 const whatsappCompanyQtyLibrary = require('../libraries/whatsapp.company.qty.send');
@@ -116,6 +121,32 @@ router.post('/send_backup_data', async (req, res) => {
     whatsappBackupFileLibrary.send(function(result) {
         res.json(result);
     });
-})
+});
+
+router.post('/restart_server', (req, res) => {
+    const {campaignId, port} = req.body;
+
+    const date = moment().format('M/D/Y h:m:s A');
+
+    const data = {
+        restart_datetime: date
+    }
+
+    Issues.create({
+        campaign: campaignId,
+        port: port,
+        description: 'Internal server error',
+        date: date,
+        report_status: 'false'
+    });
+
+    fs.writeFile('../SERVER_' + port + '/public/restart.json', JSON.stringify(data), function(err) {
+        res.json('success');
+    });
+});
+
+router.post('/check_server_online_status', (req, res) => {
+    res.json(success);
+});
 
 module.exports = router;

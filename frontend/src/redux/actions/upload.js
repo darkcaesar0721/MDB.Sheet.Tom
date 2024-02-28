@@ -291,3 +291,13 @@ export const restartServer = (campaignId, port, callback, errorCallback) => (dis
             errorCallback(error);
         });
 }
+
+export const checkSeverOnlineStatus = (port, callback, errorCallback) => (dispatch) => {
+    axios.post('http://localhost:' + port + '/api/upload/check_server_online_status')
+        .then(result => {
+            callback(result)
+        })
+        .catch(error => {
+            errorCallback(error);
+        });
+}

@@ -7,7 +7,7 @@ const issueSchema = new mongoose.Schema({
     },
     port: Number,
     description: String,
-    date: Date,
+    date: String,
     report_status: {
         type: Boolean,
         default: false
