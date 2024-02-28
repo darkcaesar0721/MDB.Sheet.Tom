@@ -283,7 +283,7 @@ export const updateUploadGroup = (group) => (dispatch) => {
 }
 
 export const restartServer = (campaignId, port, callback, errorCallback) => (dispatch) => {
-    axios.post('http://localhost:4000/api/upload/restart_server', {campaignId: campaignId, port: port})
+    axios.post('http://localhost:3010/api/upload/restart_server', {campaignId: campaignId, port: port})
         .then(result => {
             callback(result);
         })
