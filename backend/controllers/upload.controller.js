@@ -146,7 +146,7 @@ router.post('/restart_server', (req, res) => {
 });
 
 router.post('/check_server_online_status', (req, res) => {
-    res.json(success);
+    res.json("success");
 });
 
 module.exports = router;
