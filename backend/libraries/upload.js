@@ -297,11 +297,11 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
             if (manually === false) {
                 if (rows.length > 0) {
                     if (setting.send_out_type === 'GOOGLE') {
+                        await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
+
                         if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status) {
                             await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
                         }
-
-                        await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
                     } else {
                         const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
                         if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way && setting.whatsapp.global_send_status)) {
@@ -336,9 +336,6 @@ const upload_google_sheet_leads = async function(rows, group, groupCampaign, cam
     const authClientObject = await auth.getClient();//Google sheets instance
     const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
 
-    if (process.env.ENVIRONMENT === 'production') {
-        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
-    }
     for (const sheet_url of campaign.sheet_urls) {
         const regex = /\/d\/([a-zA-Z0-9-_]+)\//; // Regular expression to match the ID
         const match = regex.exec(sheet_url);
@@ -815,11 +812,11 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     const rows = campaign.last_temp_upload_info.upload_rows;
     if (rows.length > 0) {
         if (setting.send_out_type === 'GOOGLE') {
+            await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
+
             if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status) {
                 await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
             }
-
-            await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
         } else {
             const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
 
