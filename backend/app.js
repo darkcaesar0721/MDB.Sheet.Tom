@@ -10,7 +10,11 @@ const controllers = require('./controllers');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const app = express();
+const app = express()
+
+const opn = require('opn');
+const fs = require('fs');
+const setting = require('./setting.json');
 
 // Enable CORS for all routes
 app.use(cors());
@@ -26,5 +30,15 @@ app.use('/api', controllers);
 const port = process.env.PORT;
 
 app.listen(port, () => {
+    if (!setting.browserOpened) {
+        setTimeout(() => {
+            opn(`http://localhost:${port}`);
+
+            fs.writeFile('./setting.json', JSON.stringify({browserOpened: true}), function(err) {
+                if (err) throw err;
+            });
+        }, 1000);
+    }
+    
     console.log(`App listening on port ${port}`);
 });
