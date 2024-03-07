@@ -1,7 +1,6 @@
 require('dotenv').config();
 
 /* BEGIN: Create a mongodb server and mongodb client */
-require('./database/server');
 require('./database/client');
 /* END: Create a mongodb server and mongodb client */
 
