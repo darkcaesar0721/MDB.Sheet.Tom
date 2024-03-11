@@ -311,7 +311,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         }
                     }
                 }
-                if (process.env.ENVIRONMENT === 'production') {
+                if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE') {
                     await upload_schedule(group, campaign, setting, callback);
                 }
             }
@@ -477,7 +477,7 @@ const download_local_file = async function(rows, group, groupCampaign, campaign,
 
 const check_uploaded_sheet = async function(groupCampaign = {}, campaign = {}, isChecked = true, callback = {}) {
     const urls = campaign.sheet_urls;
-        const last_phone = campaign.last_phone;
+    const last_phone = campaign.last_phone;
 
     const authClientObject = await auth.getClient();//Google sheets instance
     const googleSheetsInstance = google.sheets({version: "v4", auth: authClientObject});
@@ -840,11 +840,13 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     campaign.is_get_last_phone = false;
     campaign.last_upload_datetime = moment().format('M/D/Y hh:mm A');
 
-    await upload_schedule(group, campaign, setting, callback);
-
-    if (process.env.ENVIRONMENT === 'production') {
-        await check_uploaded_sheet(groupCampaign, campaign, true, callback);
+    if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE') {
+        await upload_schedule(group, campaign, setting, callback);
     }
+
+    // if (process.env.ENVIRONMENT === 'production') {
+    //     await check_uploaded_sheet(groupCampaign, campaign, true, callback);
+    // }
 
     Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
         Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
