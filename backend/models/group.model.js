@@ -45,6 +45,10 @@ const groupSchema = new mongoose.Schema({
                 type: Boolean,
                 default: false
             },
+            xls_send_status: {
+                type: Boolean,
+                default: true
+            },
             message: String,
             groups: [],
             users: []

@@ -593,6 +593,19 @@ const GroupCampaignSetting = (props) => {
                                         />
                                     </Form.Item>
                                     <Form.Item
+                                        name={['xls_send_status']}
+                                        label="WhatsApp(XLS)"
+                                    >
+                                        <Switch
+                                            checkedChildren={<CheckOutlined />}
+                                            unCheckedChildren={<CloseOutlined />}
+                                            size="large"
+                                            onChange={(value) => {handleWhatsappFieldChange('xls_send_status', value)}}
+                                            checked={campaign.whatsapp.xls_send_status}
+                                            disabled={props.setting.whatsapp.whatsapp_global_send_status}
+                                        />
+                                    </Form.Item>
+                                    <Form.Item
                                         name={['message']}
                                         label="Message"
                                     >

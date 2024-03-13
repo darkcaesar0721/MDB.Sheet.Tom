@@ -266,6 +266,22 @@ const UploadList = (props) => {
             }
         }];
         columns = [...columns, {
+            title: 'WhtasApp(XLS)',
+            key: 'whatsapp_xls',
+            width: 70,
+            align: 'center',
+            render: (_, r) => {
+                return (
+                    <Switch
+                        size="small"
+                        disabled={!props.setting.whatsapp.global_send_status}
+                        checked={r.whatsapp.xls_send_status}
+                        onChange={(v) => handleObjectChange(r, 'whatsapp', 'xls_send_status', v)}
+                    />
+                )
+            }
+        }];
+        columns = [...columns, {
             title: 'N G Y P Z',
             key: 'color',
             width: 110,
