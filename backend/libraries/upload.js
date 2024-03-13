@@ -299,12 +299,12 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                     if (setting.send_out_type === 'GOOGLE') {
                         await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
 
-                        if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == 'true') {
+                        if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == true) {
                             await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
                         }
                     } else {
                         const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
-                        if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way == 'true' && setting.whatsapp.global_send_status == 'true')) {
+                        if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true)) {
                             setTimeout(async function() {
                                 await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
                             }, 3000);
@@ -590,7 +590,7 @@ const send_whatsapp_file = async function (fileName = "", group = {}, groupCampa
         data : {}
     };
 
-    if (groupCampaign.whatsapp.send_status == 'true' && groupCampaign.whatsapp.users.length > 0 && groupCampaign.whatsapp.message) {
+    if (groupCampaign.whatsapp.send_status == true && groupCampaign.whatsapp.users.length > 0 && groupCampaign.whatsapp.message) {
         for (const user of groupCampaign.whatsapp.users) {
             config['data'] = qs.stringify({
                 "token": `${setting.whatsapp.ultramsg_token}`,
@@ -602,7 +602,7 @@ const send_whatsapp_file = async function (fileName = "", group = {}, groupCampa
             await axios(config)
         }
     }
-    if (groupCampaign.whatsapp.send_status == 'true' && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
+    if (groupCampaign.whatsapp.send_status == true && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
         for (const group of groupCampaign.whatsapp.groups) {
             if (groups.filter(g => g.name === group).length === 0) {
                 callback({status: 'error', description: 'whatsapp group error'});
@@ -636,7 +636,7 @@ const send_whatsapp_message = async function (group = {}, groupCampaign = {}, ca
         data : {}
     };
 
-    if (groupCampaign.whatsapp.send_status == 'true' && groupCampaign.whatsapp.users.length > 0 && groupCampaign.whatsapp.message) {
+    if (groupCampaign.whatsapp.send_status == true && groupCampaign.whatsapp.users.length > 0 && groupCampaign.whatsapp.message) {
         for (const user of groupCampaign.whatsapp.users) {
             config['data'] = qs.stringify({
                 "token": `${setting.whatsapp.ultramsg_token}`,
@@ -646,7 +646,7 @@ const send_whatsapp_message = async function (group = {}, groupCampaign = {}, ca
             await axios(config)
         }
     }
-    if (groupCampaign.whatsapp.send_status == 'true' && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
+    if (groupCampaign.whatsapp.send_status == true && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
         for (const group of groupCampaign.whatsapp.groups) {
             if (groups.filter(g => g.name === group).length === 0) {
                 callback({status: 'error', description: 'whatsapp group error'});
@@ -814,13 +814,13 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
         if (setting.send_out_type === 'GOOGLE') {
             await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
 
-            if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == 'true') {
+            if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == true) {
                 await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
             }
         } else {
             const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
 
-            if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way == 'true' && setting.whatsapp.global_send_status == 'true')) {
+            if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true)) {
                 setTimeout(async function() {
                     await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
                 }, 3000);
