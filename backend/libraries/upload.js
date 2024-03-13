@@ -823,6 +823,19 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     const groupCampaign = group.campaigns.filter(c => c.detail == campaignId)[0];
 
     const rows = campaign.last_temp_upload_info.upload_rows;
+
+    const weekday = moment().format('dddd');
+    const today = moment().format("MM/DD/YYYY");
+    const date_name = weekday === 'Thursday' ? weekday + ' ' + group.name : weekday;
+
+    let schedule = {};
+    schedule.date = today;
+    schedule.weekday = date_name;
+    schedule.name = campaign.schedule;
+    schedule.count = rows.length;
+    schedule.update_status = false;
+    Schedules.create(schedule);
+
     if (rows.length > 0) {
         if (setting.send_out_type === 'GOOGLE') {
             await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
