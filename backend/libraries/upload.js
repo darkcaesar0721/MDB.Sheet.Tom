@@ -304,7 +304,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         }
                     } else {
                         const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
-                        if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
+                        if (process.env.ENVIRONMENT === 'production' && (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
                             setTimeout(async function() {
                                 await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
                             }, 3000);
@@ -820,7 +820,7 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
         } else {
             const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
 
-            if (process.env.ENVIRONMENT === 'production' || (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
+            if (process.env.ENVIRONMENT === 'production' && (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
                 setTimeout(async function() {
                     await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
                 }, 3000);
