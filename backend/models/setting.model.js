@@ -5,6 +5,7 @@ const settingSchema = new mongoose.Schema({
     mdb_path: String,
     local_folder_path: String,
     schedule_path: String,
+    xls_path: String,
     last_system_create_date_time_for_company_qty: String,
     is_auto_whatsapp_sending_for_company_qty: {
         type: Boolean,

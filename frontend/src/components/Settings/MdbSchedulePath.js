@@ -13,17 +13,23 @@ toastr.options = {
 
 function MdbSchedulePath(props) {
     const [mdbPath, setMdbPath] = useState('');
+    const [xlsPath, setXLSPath] = useState('');
     const [schedulePath, setSchedulePath] = useState('');
     const [localFolderPath, setLocalFolderPath] = useState('');
 
     useEffect(function() {
         setMdbPath(props.setting.mdb_path);
+        setXLSPath(props.setting.xls_path);
         setSchedulePath(props.setting.schedule_path);
         setLocalFolderPath(props.setting.local_folder_path);
     }, [props.setting]);
 
     const handleMdbChange = function(e) {
         setMdbPath(e.target.value);
+    }
+
+    const handleXLSChange = function(e) {
+        setXLSPath(e.target.value);
     }
 
     const handleScheduleChange = function(e) {
@@ -38,6 +44,13 @@ function MdbSchedulePath(props) {
         const setting = Object.assign({...props.setting}, {mdb_path : mdbPath});
         props.updateSetting(setting, (error) => {
             toastr.error("There is a problem with server.\n Can't save the mdb path");
+        });
+    }
+
+    const saveXLSPath = function() {
+        const setting = Object.assign({...props.setting}, {xls_path : xlsPath});
+        props.updateSetting(setting, (error) => {
+            toastr.error("There is a problem with server.\n Can't save the xls path");
         });
     }
 
@@ -58,8 +71,11 @@ function MdbSchedulePath(props) {
     return (
         <div>
             <Row style={{marginTop: '1rem'}}>
-                <Col span={6} offset={1}>
+                <Col span={3} offset={1}>
                     <Input addonBefore="MDB PATH" onBlur={saveMdbPath} placeholder="C:\mdb_work\LeadDB_ThisSMALL.mdb" onChange={handleMdbChange} value={mdbPath} />
+                </Col>
+                <Col span={3}>
+                    <Input addonBefore="XLS PATH" onBlur={saveXLSPath} placeholder="" onChange={handleXLSChange} value={xlsPath} />
                 </Col>
                 <Col span={7} offset={1}>
                     <Input addonBefore="SCHEDULE SHEET URL" onBlur={saveSchedulePath} placeholder="https://docs.google.com/spreadsheets/d/16fiKZjpWZ3ZCY69JpRrTBAYLS4GnjqEKp8tj2G65EAI/edit#gid=0" onChange={handleScheduleChange} value={schedulePath} />
