@@ -30,6 +30,7 @@ const settingSchema = new mongoose.Schema({
             default: true,
         },
         default_message_template: String,
+        xls_message_template: String,
         ultramsg_instance_id: String,
         ultramsg_token: String
     },

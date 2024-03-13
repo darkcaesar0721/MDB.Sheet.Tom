@@ -15,7 +15,7 @@ const formItemLayout = {
             span: 24,
         },
         sm: {
-            span: 3,
+            span: 5,
         },
     },
     wrapperCol: {
@@ -23,7 +23,7 @@ const formItemLayout = {
             span: 24,
         },
         sm: {
-            span: 21,
+            span: 19,
         },
     },
 };
@@ -46,12 +46,12 @@ function Whatsapp(props) {
     }, [props.setting]);
 
     const handleWhatsappSettingChange = function(e) {
-        const whatsapp = props.setting.whatsapp !== undefined ? {...props.setting.whatsapp} : {global_send_status: true, default_message_template: '', ultramsg_instance_id: '', ultramsg_token: ''};
+        const whatsapp = props.setting.whatsapp !== undefined ? {...props.setting.whatsapp} : {global_send_status: true, default_message_template: '', xls_message_template: '', ultramsg_instance_id: '', ultramsg_token: ''};
         form.setFieldsValue(Object.assign({...form.getFieldsValue()}, {whatsapp: whatsapp}));
     }
 
     const saveWhatsappSetting = function() {
-        let whatsapp = props.setting.whatsapp !== undefined ? {...props.setting.whatsapp} : {global_send_status: true, default_message_template: '', ultramsg_instance_id: '', ultramsg_token: ''};
+        let whatsapp = props.setting.whatsapp !== undefined ? {...props.setting.whatsapp} : {global_send_status: true, default_message_template: '', xls_message_template: '', ultramsg_instance_id: '', ultramsg_token: ''};
         whatsapp.global_send_status = globalSendStatus;
         const setting = Object.assign({...props.setting}, {whatsapp : Object.assign({...form.getFieldsValue()}, {whatsapp: whatsapp})});
         props.updateSetting(setting, (error) => {
@@ -61,7 +61,7 @@ function Whatsapp(props) {
 
     const handleGlobalSendStatusChange = (v) => {
         setGlobalSendStatus(v);
-        let whatsapp = props.setting.whatsapp !== undefined ? {...props.setting.whatsapp} : {global_send_status: true, default_message_template: '', ultramsg_instance_id: '', ultramsg_token: ''};
+        let whatsapp = props.setting.whatsapp !== undefined ? {...props.setting.whatsapp} : {global_send_status: true, default_message_template: '', xls_message_template: '', ultramsg_instance_id: '', ultramsg_token: ''};
         whatsapp.global_send_status = v;
         const setting = Object.assign({...props.setting}, {whatsapp : Object.assign({...form.getFieldsValue()}, {whatsapp: whatsapp})});
         props.updateSetting(setting, (error) => {
@@ -77,7 +77,7 @@ function Whatsapp(props) {
             <MdbSchedulePath />
             <Divider>WHATSAPP INSTANCE SETTING</Divider>
             <Row style={{marginTop: '2rem'}}>
-                <Col span={20} offset={2}>
+                <Col span={8} offset={8}>
                     <Form
                         {...formItemLayout}
                         form={form}
@@ -103,6 +103,18 @@ function Whatsapp(props) {
                                 {
                                     required: true,
                                     message: 'Please input default message',
+                                },
+                            ]}
+                        >
+                            <Input.TextArea disabled={!globalSendStatus} showCount autoSize={{ minRows: 3, maxRows: 10 }} onBlur={saveWhatsappSetting} onChange={handleWhatsappSettingChange}/>
+                        </Form.Item>
+                        <Form.Item
+                            name="xls_message_template"
+                            label="XLS Global Message"
+                            rules={[
+                                {
+                                    required: true,
+                                    message: 'Please input xls global message',
                                 },
                             ]}
                         >
