@@ -258,7 +258,7 @@ const UploadList = (props) => {
                 return (
                     <Switch
                         size="small"
-                        disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'LOCAL'}
+                        disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'LOCAL' || (r.whatsapp.users.length === 0 && r.whatsapp.groups.length === 0)}
                         checked={r.whatsapp.send_status}
                         onChange={(v) => handleObjectChange(r, 'whatsapp', 'send_status', v)}
                     />
@@ -274,7 +274,7 @@ const UploadList = (props) => {
                 return (
                     <Switch
                         size="small"
-                        disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'GOOGLE'}
+                        disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'GOOGLE' || (r.whatsapp.users.length === 0 && r.whatsapp.groups.length === 0)}
                         checked={r.whatsapp.xls_send_status}
                         onChange={(v) => handleObjectChange(r, 'whatsapp', 'xls_send_status', v)}
                     />

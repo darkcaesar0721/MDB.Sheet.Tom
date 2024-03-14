@@ -587,7 +587,7 @@ const GroupCampaignSetting = (props) => {
                                     }
                                     <Form.Item
                                         name={['send_status']}
-                                        label="WhatsApp"
+                                        label="Google WhatsApp"
                                     >
                                         <Switch
                                             checkedChildren={<CheckOutlined />}
@@ -595,12 +595,12 @@ const GroupCampaignSetting = (props) => {
                                             size="large"
                                             onChange={(value) => {handleWhatsappFieldChange('send_status', value)}}
                                             checked={campaign.whatsapp.send_status}
-                                            disabled={props.setting.whatsapp.whatsapp_global_send_status}
+                                            disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'LOCAL'}
                                         />
                                     </Form.Item>
                                     <Form.Item
                                         name={['xls_send_status']}
-                                        label="WhatsApp(XLS)"
+                                        label="Xls WhatsApp"
                                     >
                                         <Switch
                                             checkedChildren={<CheckOutlined />}
@@ -608,7 +608,7 @@ const GroupCampaignSetting = (props) => {
                                             size="large"
                                             onChange={(value) => {handleWhatsappFieldChange('xls_send_status', value)}}
                                             checked={campaign.whatsapp.xls_send_status}
-                                            disabled={props.setting.whatsapp.whatsapp_global_send_status}
+                                            disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'GOOGLE'}
                                         />
                                     </Form.Item>
                                     <Form.Item
@@ -639,14 +639,14 @@ const GroupCampaignSetting = (props) => {
                                                                 style={{
                                                                     width: '95%',
                                                                 }}
-                                                                disabled={!campaign.whatsapp.send_status}
+                                                                disabled={(props.setting.send_out_type === 'GOOGLE' && !campaign.whatsapp.send_status) || (props.setting.send_out_type === 'LOCAL' && !campaign.whatsapp.xls_send_status)}
                                                             />
                                                         </Form.Item>
                                                         {fields.length > 1 ? (
                                                             <MinusCircleOutlined
                                                                 className="dynamic-delete-button"
                                                                 onClick={() => remove(field.name)}
-                                                                disabled={!campaign.whatsapp.send_status}
+                                                                disabled={(props.setting.send_out_type === 'GOOGLE' && !campaign.whatsapp.send_status) || (props.setting.send_out_type === 'LOCAL' && !campaign.whatsapp.xls_send_status)}
                                                             />
                                                         ) : null}
                                                     </Form.Item>
@@ -660,7 +660,7 @@ const GroupCampaignSetting = (props) => {
                                                             marginLeft: '15%'
                                                         }}
                                                         icon={<PlusOutlined />}
-                                                        disabled={!campaign.whatsapp.send_status}
+                                                        disabled={(props.setting.send_out_type === 'GOOGLE' && !campaign.whatsapp.send_status) || (props.setting.send_out_type === 'LOCAL' && !campaign.whatsapp.xls_send_status)}
                                                         className={"m-t-10"}
                                                     >
                                                         Add Single Person
@@ -692,14 +692,14 @@ const GroupCampaignSetting = (props) => {
                                                                 style={{
                                                                     width: '95%',
                                                                 }}
-                                                                disabled={!campaign.whatsapp.send_status}
+                                                                disabled={(props.setting.send_out_type === 'GOOGLE' && !campaign.whatsapp.send_status) || (props.setting.send_out_type === 'LOCAL' && !campaign.whatsapp.xls_send_status)}
                                                             />
                                                         </Form.Item>
                                                         {fields.length > 1 ? (
                                                             <MinusCircleOutlined
                                                                 className="dynamic-delete-button"
                                                                 onClick={() => remove(field.name)}
-                                                                disabled={!campaign.whatsapp.send_status}
+                                                                disabled={(props.setting.send_out_type === 'GOOGLE' && !campaign.whatsapp.send_status) || (props.setting.send_out_type === 'LOCAL' && !campaign.whatsapp.xls_send_status)}
                                                             />
                                                         ) : null}
                                                     </Form.Item>
@@ -713,7 +713,7 @@ const GroupCampaignSetting = (props) => {
                                                             marginLeft: '15%'
                                                         }}
                                                         icon={<PlusOutlined />}
-                                                        disabled={!campaign.whatsapp.send_status}
+                                                        disabled={(props.setting.send_out_type === 'GOOGLE' && !campaign.whatsapp.send_status) || (props.setting.send_out_type === 'LOCAL' && !campaign.whatsapp.xls_send_status)}
                                                         className={"m-t-10"}
                                                     >
                                                         Add Group
