@@ -304,7 +304,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                 schedule.date = today;
                 schedule.weekday = date_name;
                 schedule.name = campaign.schedule;
-                schedule.count = rows.length;
+                schedule.count = nScheduleCount;
                 schedule.update_status = false;
                 Schedules.create(schedule);
 
