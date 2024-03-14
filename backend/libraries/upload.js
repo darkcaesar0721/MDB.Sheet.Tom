@@ -763,13 +763,7 @@ const upload_schedule = async function (group = {}, campaign = {}, setting = {},
             if (currentColInd !== -1) {
                 let cell = row[currentColInd];
                 if (cell) {
-                    const splitCells = cell.split(' ');
-                    if (splitCells.length > 1) {
-                        updatedValue = cell + ' ' + campaign.qty_schedule;
-                    } else {
-                        if (parseInt(cell) < 13) updatedValue = cell + '+' + campaign.qty_schedule;
-                        else updatedValue = cell + ' ' + campaign.qty_schedule;
-                    }
+                    updatedValue = cell + '+' + campaign.qty_schedule;
                 } else {
                     updatedValue = campaign.qty_schedule;
                 }

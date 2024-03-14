@@ -7,6 +7,7 @@ const campaignController = require('./campaign.controller');
 const issueController = require('./issue.controller');
 const groupController = require('./group.controller');
 const uploadController = require('./upload.controller');
+const scheduleController = require('./schedule.controller');
 
 router.use('/setting', settingController);
 router.use('/company', companyController);
@@ -14,5 +15,6 @@ router.use('/campaign', campaignController);
 router.use('/issue', issueController);
 router.use('/group', groupController);
 router.use('/upload', uploadController);
+router.use('/schedule', scheduleController);
 
 module.exports = router;

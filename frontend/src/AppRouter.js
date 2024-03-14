@@ -16,6 +16,9 @@ import {
 import {
     getGroups
 } from "./redux/actions/group";
+import {
+    updateScheduleXLS
+} from "./redux/actions/schedule";
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
@@ -47,6 +50,22 @@ toastr.options = {
 const AppRouter = (props) => {
 
     useEffect(function() {
+        const updateScheduleXLS = function() {
+            props.updateScheduleXLS(
+                function(result) {
+                    console.log(result);
+                }, 
+                function(error) {
+                    toastr.error('There is a problem with server.');
+                }
+            );
+        }
+
+        updateScheduleXLS();
+        setInterval(function() {
+            updateScheduleXLS();
+        }, 10000);
+
         let isErrorDisplay = false;
         props.getSettings('', () => {}, function(error) {
             isErrorDisplay = true;
@@ -104,5 +123,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { getSettings, getCompanies, getCampaigns, getGroups }
+    { getSettings, getCompanies, getCampaigns, getGroups, updateScheduleXLS }
 )(AppRouter);
