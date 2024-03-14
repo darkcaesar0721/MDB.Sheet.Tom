@@ -759,8 +759,9 @@ const upload_schedule = async function (group = {}, campaign = {}, setting = {},
                 if (cell == today) currentRowInd = rInd;
             }
         });
-        if (currentRowInd !== -1) {
-            if (currentColInd !== -1) {
+        
+        if (!updatedValue) {
+            if (currentRowInd !== -1 && currentColInd !== -1) {
                 let cell = row[currentColInd];
                 if (cell) {
                     updatedValue = cell + '+' + campaign.qty_schedule;
@@ -768,8 +769,6 @@ const upload_schedule = async function (group = {}, campaign = {}, setting = {},
                     updatedValue = campaign.qty_schedule;
                 }
             }
-        } else {
-            updatedValue = campaign.qty_schedule;
         }
     });
 
