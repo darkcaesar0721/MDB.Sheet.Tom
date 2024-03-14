@@ -317,7 +317,13 @@ const GroupCampaignSetting = (props) => {
                 if (group !== '' && group !== undefined) groups.push(group);
             });
 
-            let c = Object.assign({...campaign}, {whatsapp: Object.assign({...campaign.whatsapp}, {users: users, groups: groups}), columns: columns});
+            let whatsapp = {...campaign.whatsapp};
+
+            if (users.length === 0 && groups.length === 0) {
+                whatsapp.send_status = false; whatsapp.xls_send_status = false;
+            }
+
+            let c = Object.assign({...campaign}, {whatsapp: Object.assign({...whatsapp}, {users: users, groups: groups}), columns: columns});
             if (c.filter.way === 'DATE') {
                 c.filter.date_old_day = !c.filter.date_old_day ? 0 : c.filter.date_old_day;
             }
