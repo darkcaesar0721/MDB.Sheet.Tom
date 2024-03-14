@@ -250,7 +250,7 @@ const UploadList = (props) => {
             }
         }];
         columns = [...columns, {
-            title: 'WhatsApp',
+            title: 'Google WhatsApp',
             key: 'whatsapp',
             width: 70,
             align: 'center',
@@ -258,7 +258,7 @@ const UploadList = (props) => {
                 return (
                     <Switch
                         size="small"
-                        disabled={!props.setting.whatsapp.global_send_status}
+                        disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'LOCAL'}
                         checked={r.whatsapp.send_status}
                         onChange={(v) => handleObjectChange(r, 'whatsapp', 'send_status', v)}
                     />
@@ -266,7 +266,7 @@ const UploadList = (props) => {
             }
         }];
         columns = [...columns, {
-            title: 'WhtasApp(XLS)',
+            title: 'Xls WhatsApp',
             key: 'whatsapp_xls',
             width: 70,
             align: 'center',
@@ -274,7 +274,7 @@ const UploadList = (props) => {
                 return (
                     <Switch
                         size="small"
-                        disabled={!props.setting.whatsapp.global_send_status}
+                        disabled={!props.setting.whatsapp.global_send_status || props.setting.send_out_type === 'GOOGLE'}
                         checked={r.whatsapp.xls_send_status}
                         onChange={(v) => handleObjectChange(r, 'whatsapp', 'xls_send_status', v)}
                     />
@@ -479,7 +479,7 @@ const UploadList = (props) => {
 
         setTblColumns(columns);
 
-    }, [group, currentGroup, currentWay]);
+    }, [group, currentGroup, currentWay, props.setting]);
 
     const checkCampaignPauseStatus = function() {
         group.campaigns.forEach(campaign => {
