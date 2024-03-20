@@ -21,7 +21,7 @@ import 'toastr/build/toastr.min.css'
 
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
-import {createCampaign, getQueryColumns} from "../../redux/actions/campaign";
+import {createCampaign, getQueryColumns} from "../../redux/actions/campaign.action";
 
 toastr.options = {
     positionClass : 'toast-top-right',

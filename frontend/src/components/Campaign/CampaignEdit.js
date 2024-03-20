@@ -18,7 +18,7 @@ import dragula from "dragula";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
-import {updateCampaign} from "../../redux/actions/campaign";
+import {updateCampaign} from "../../redux/actions/campaign.action";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 

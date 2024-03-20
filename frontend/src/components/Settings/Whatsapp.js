@@ -7,7 +7,7 @@ import 'toastr/build/toastr.min.css'
 
 import MdbSchedulePath from "./MdbSchedulePath";
 import MenuList from "../MenuList";
-import {updateSetting} from "../../redux/actions/setting";
+import {updateSetting} from "../../redux/actions/setting.action";
 
 const formItemLayout = {
     labelCol: {

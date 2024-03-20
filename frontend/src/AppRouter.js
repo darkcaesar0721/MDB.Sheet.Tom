@@ -6,24 +6,31 @@ import 'toastr/build/toastr.min.css'
 
 import {
     getSettings
-} from "./redux/actions/setting";
+} from "./redux/actions/setting.action";
 import {
     getCompanies
-} from "./redux/actions/company";
+} from "./redux/actions/company.action";
 import {
     getCampaigns
-} from "./redux/actions/campaign";
+} from "./redux/actions/campaign.action";
+import {
+    getGoogleAccounts
+} from "./redux/actions/google.account.action";
 import {
     getGroups
-} from "./redux/actions/group";
+} from "./redux/actions/group.action";
 import {
     updateScheduleXLS
-} from "./redux/actions/schedule";
+} from "./redux/actions/schedule.action";
 
 import Backup from "./components/Settings/Backup";
 import Whatsapp from "./components/Settings/Whatsapp";
 import Pdfcrowd from "./components/Settings/Pdfcrowd";
 import Googlesheet from "./components/Settings/Googlesheet";
+
+import GoogleAccountList from "./components/GoogleAccount/GoogleAccountList";
+import GoogleAccountAdd from "./components/GoogleAccount/GoogleAccountAdd";
+import GoogleAccountEdit from "./components/GoogleAccount/GoogleAccountEdit";
 
 import CompanyList from "./components/Company/CompanyList";
 import CompanyAdd from "./components/Company/CompanyAdd";
@@ -75,6 +82,10 @@ const AppRouter = (props) => {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
         });
+        props.getGoogleAccounts(function(error) {
+            if (!isErrorDisplay)
+                toastr.error('There is a problem with server.');
+        });
         props.getCampaigns(function(error) {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
@@ -97,6 +108,10 @@ const AppRouter = (props) => {
                             <Route path="/whatsapp" element={<Whatsapp />} />
                             <Route path="/pdfcrowd" element={<Pdfcrowd />} />
                             <Route path="/googlesheet" element={<Googlesheet />} />
+
+                            <Route path="/googleaccounts" element={<GoogleAccountList />} />
+                            <Route path="/googleaccounts/add" element={<GoogleAccountAdd />} />
+                            <Route path="/googleaccounts/:id" element={<GoogleAccountEdit />} />
 
                             <Route path="/companies" element={<CompanyList />} />
                             <Route path="/companies/add" element={<CompanyAdd />} />
@@ -123,5 +138,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { getSettings, getCompanies, getCampaigns, getGroups, updateScheduleXLS }
+    { getSettings, getCompanies, getCampaigns, getGoogleAccounts, getGroups, updateScheduleXLS }
 )(AppRouter);

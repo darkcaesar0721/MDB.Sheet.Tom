@@ -6,7 +6,7 @@ import moment from "moment";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
-import {deleteCampaign} from "../../redux/actions/campaign";
+import {deleteCampaign} from "../../redux/actions/campaign.action";
 import Path from "../Settings/MdbSchedulePath";
 import MenuList from "../MenuList";
 
@@ -158,7 +158,7 @@ function CampaignList(props) {
                 }
             },
         ]);
-    }, [props.campaigns]);
+    }, [props.companies]);
 
     const handleTableChange = (pagination, filters, sorter) => {
         setTableParams({

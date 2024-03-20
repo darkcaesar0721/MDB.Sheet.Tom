@@ -8,6 +8,9 @@ moment.tz.setDefault('America/Los_Angeles');
 const Settings = require('../models/setting.model');
 const Campaigns = require("../models/campaign.model");
 const Companies = require("../models/company.model");
+const Issues = require("../models/issue.model");
+const Schedules = require("../models/schedule.model");
+const GoogleAccounts = require("../models/google.account.model");
 const Groups = require("../models/group.model");
 
 router.get('/', (req, res) => {
@@ -34,12 +37,18 @@ router.post('/backup', async (req, res) => {
     const settings = await Settings.find();
     const campaigns = await Campaigns.find();
     const companies = await Companies.find();
+    const schedules = await Schedules.find();
+    const issues = await Issues.find();
+    const googleAccounts = await GoogleAccounts.find();
     const groups = await Groups.find();
 
     const data = {
         settings: settings,
         campaigns: campaigns,
         companies: companies,
+        schedules: schedules,
+        issues: issues,
+        googleAccounts: googleAccounts,
         groups: groups
     }
 
@@ -72,6 +81,18 @@ router.post('/restore', (req, res) => {
             const companies = JSON.parse(data).companies;
             await Companies.find({'__v': 0}).remove().exec();
             await Companies.insertMany(companies);
+
+            const issues = JSON.parse(data).issues;
+            await Issues.find({'__v': 0}).remove().exec();
+            await Issues.insertMany(issues);
+
+            const schedules = JSON.parse(data).schedules;
+            await Schedules.find({'__v': 0}).remove().exec();
+            await Schedules.insertMany(schedules);
+
+            const googleAccounts = JSON.parse(data).googleAccounts;
+            await GoogleAccounts.find({'__v': 0}).remove().exec();
+            await GoogleAccounts.insertMany(googleAccounts);
 
             const groups = JSON.parse(data).groups;
             await Groups.find({'__v': 0}).remove().exec();

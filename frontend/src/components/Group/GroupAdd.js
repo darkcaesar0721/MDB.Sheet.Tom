@@ -9,7 +9,7 @@ import "dragula/dist/dragula.css";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
-import {createGroup} from "../../redux/actions/group";
+import {createGroup} from "../../redux/actions/group.action";
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 import GroupCampaignSetting from "./GroupCampaignSetting";

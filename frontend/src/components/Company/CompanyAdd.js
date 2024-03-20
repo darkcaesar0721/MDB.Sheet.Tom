@@ -16,7 +16,7 @@ import 'toastr/build/toastr.min.css'
 
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
-import {createCompany} from "../../redux/actions/company";
+import {createCompany} from "../../redux/actions/company.action";
 
 toastr.options = {
     positionClass : 'toast-top-right',

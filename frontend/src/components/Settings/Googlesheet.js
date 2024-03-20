@@ -7,7 +7,7 @@ import 'toastr/build/toastr.min.css'
 import MenuList from "../MenuList";
 import {
     downloadGoogleSheetCredential
-} from "../../redux/actions/setting";
+} from "../../redux/actions/setting.action";
 import {API} from "../../config";
 
 toastr.options = {

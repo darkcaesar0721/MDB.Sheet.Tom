@@ -1,7 +1,7 @@
 import { Input, Col, Row } from 'antd';
 import {useEffect, useState} from "react";
 import {connect} from "react-redux";
-import {updateSetting} from "../../redux/actions/setting";
+import {updateSetting} from "../../redux/actions/setting.action";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 

@@ -17,11 +17,11 @@ import {
     backupDB,
     getSettings,
     updateSetting
-} from "../../redux/actions/setting";
+} from "../../redux/actions/setting.action";
 import {
     updateGroup,
     updateGroupCampaignField,
-} from "../../redux/actions/group";
+} from "../../redux/actions/group.action";
 import {
     getLastInputDate,
     getUploadLastPhone,
@@ -33,8 +33,8 @@ import {
     sendBackupData,
     restartServer,
     checkSeverOnlineStatus
-} from "../../redux/actions/upload";
-import {updateCampaignField} from "../../redux/actions/campaign";
+} from "../../redux/actions/upload.action";
+import {updateCampaignField} from "../../redux/actions/campaign.action";
 import GroupCampaignSetting from "../Group/GroupCampaignSetting";
 import UploadGettingAllLastPhone from "./UploadGettingAllLastPhone";
 import UploadCampaign from "./UploadCampaign";

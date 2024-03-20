@@ -6,7 +6,7 @@ import {useNavigate} from "react-router-dom";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
-import { deleteGroup } from '../../redux/actions/group';
+import { deleteGroup } from '../../redux/actions/group.action';
 import MenuList from "../MenuList";
 import Path from "../Settings/MdbSchedulePath";
 

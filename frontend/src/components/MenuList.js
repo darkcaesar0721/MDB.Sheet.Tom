@@ -19,6 +19,9 @@ const MenuList = function(props) {
                         <a className={(props.currentPage === "googlesheet" ? "selected" : "") + " menu-bar-customize"} href="#/googlesheet">Google Sheet</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>
+                        <a className={(props.currentPage === "googleaccount" ? "selected" : "") + " menu-bar-customize"} href="#/googleaccounts">Google Account</a>
+                    </Breadcrumb.Item>
+                    <Breadcrumb.Item>
                         <a className={(props.currentPage === "company" ? "selected" : "") + " menu-bar-customize"} href="#/companies">Add Companies</a>
                     </Breadcrumb.Item>
                     <Breadcrumb.Item>

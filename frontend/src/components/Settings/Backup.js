@@ -8,7 +8,7 @@ import 'toastr/build/toastr.min.css'
 import MenuList from "../MenuList";
 import {
     updateSetting, backupDB
-} from "../../redux/actions/setting";
+} from "../../redux/actions/setting.action";
 import {API} from "../../config";
 
 toastr.options = {
