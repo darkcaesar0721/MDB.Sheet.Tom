@@ -1,6 +1,6 @@
 import {Spin, Button, Col, message, Row, Switch, Table} from "antd";
 import React, {useEffect, useState} from "react";
-import {WarningOutlined, LoadingOutlined, CheckCircleTwoTone} from "@ant-design/icons";
+import {WarningOutlined, QuestionOutlined, LoadingOutlined, CheckCircleTwoTone} from "@ant-design/icons";
 import moment from "moment";
 import toastr from 'toastr';
 import 'toastr/build/toastr.min.css';
@@ -187,6 +187,9 @@ const UploadCampaign = (props) => {
                             break;
                         case 'error':
                             element = <WarningOutlined />;
+                            break;
+                        case 'warning':
+                            element = <QuestionOutlined />;
                             break;
                         case '':
                             element = '';

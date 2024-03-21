@@ -104,9 +104,25 @@ export const upload = (groupId, groupCampaignId, campaignId, runCampaignByServer
                 axios.post(api + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
                     .then(res => {
                         let updateFields = {};
-                        if (result.data.status === 'error') {
-                            updateFields['state'] = 'warning';
+                        if (result.data.status != 'success' ) {
+                            updateFields['state'] = result.data.status;
                             updateFields['description'] = result.data.description;
+
+                            if (result.data.campaign) {
+                                dispatch({
+                                    type: UPDATE_CAMPAIGN_DATA,
+                                    data: result.data.campaign
+                                });
+
+                                dispatch({
+                                    type: UPDATE_UPLOAD_DATETIME,
+                                    data: {
+                                        groupId: groupId,
+                                        campaignId: campaignId,
+                                        uploadDateTime: res.data.uploadDateTime
+                                    }
+                                });
+                            }
                         } else {
                             dispatch({
                                 type: UPDATE_CAMPAIGN_DATA,
@@ -177,7 +193,22 @@ export const uploadPreviewData = (groupId, campaignId, callback = function() {},
         .then(result => {
             axios.post(API + '/group/get_upload_time', {groupId: groupId, campaignId: campaignId})
                 .then(res => {
-                    if (result.data.status === 'error') {
+                    if (result.data.status != 'success' ) {
+                        if (result.data.campaign) {
+                            dispatch({
+                                type: UPDATE_CAMPAIGN_DATA,
+                                data: result.data.campaign
+                            });
+
+                            dispatch({
+                                type: UPDATE_UPLOAD_DATETIME,
+                                data: {
+                                    groupId: groupId,
+                                    campaignId: campaignId,
+                                    uploadDateTime: res.data.uploadDateTime
+                                }
+                            });
+                        }
                         callback(result.data);
                     } else {
                         dispatch({

@@ -528,7 +528,7 @@ const UploadList = (props) => {
             props.upload(group._id, campaign._id, campaign.detail, {}, -1, isManually, function(result) {
                 props.backupDB();
                 setLoading(false);
-                if (result.status === 'error') {
+                if (result.status != 'success') {
                     messageApi.warning(result.description);
                 } else {
                     if (!isManually) {
@@ -575,7 +575,7 @@ const UploadList = (props) => {
             props.uploadPreviewData(group._id, selectedCampaign.detail, function(result) {
                 props.backupDB();
                 setLoading(false);
-                if (result.status === 'error') {
+                if (result.status != 'success') {
                     messageApi.warning(result.description);
                 } else {
                     messageApi.success('upload success');
