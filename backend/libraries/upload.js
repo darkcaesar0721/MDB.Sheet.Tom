@@ -295,6 +295,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                 campaign.last_upload_rows = rows;
             }
 
+            let fileName = "";
             if (manually === false) {
                 const weekday = moment().format('dddd');
                 const today = moment().format("MM/DD/YYYY");
@@ -311,17 +312,8 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                 if (rows.length > 0) {
                     if (setting.send_out_type === 'GOOGLE') {
                         await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
-
-                        if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == true) {
-                            await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
-                        }
                     } else {
-                        const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
-                        if (process.env.ENVIRONMENT === 'production' && (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
-                            setTimeout(async function() {
-                                await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
-                            }, 3000);
-                        }
+                        fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
                     }
                 }
                 if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE') {
@@ -336,7 +328,19 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
             Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
                 Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
                     const today = moment().format("M/D/Y hh:mm:ss");
-                    Groups.updateOne({_id: groupId, "campaigns.detail": campaignId}, {"campaigns.$.last_upload_end_datetime": today}, (err, doc) => {
+                    Groups.updateOne({_id: groupId, "campaigns.detail": campaignId}, {"campaigns.$.last_upload_end_datetime": today}, async (err, doc) => {
+                        if (manually === false && rows.length > 0) {
+                            if (setting.send_out_type === 'GOOGLE') {
+                                if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == true) {
+                                    await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+                                }
+                            } else {
+                                if (process.env.ENVIRONMENT === 'production' && (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
+                                    await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
+                                }
+                            }
+                        }
+
                         callback({status: 'success', campaign: updatedCampaign});
                     });
                 });
@@ -616,6 +620,11 @@ const send_whatsapp_file = async function (fileName = "", group = {}, groupCampa
         }
     }
     if (groupCampaign.whatsapp.xls_send_status == true && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
+        if (!groups || typeof groups === 'string') {
+            callback({status: 'error', description: 'whatsapp sync error'});
+            return;
+        }
+
         for (const group of groupCampaign.whatsapp.groups) {
             if (groups.filter(g => g.name === group).length === 0) {
                 callback({status: 'error', description: 'whatsapp group error'});
@@ -660,6 +669,11 @@ const send_whatsapp_message = async function (group = {}, groupCampaign = {}, ca
         }
     }
     if (groupCampaign.whatsapp.send_status == true && groupCampaign.whatsapp.groups.length > 0 && groupCampaign.whatsapp.message) {
+        if (!groups || typeof groups === 'string') {
+            callback({status: 'error', description: 'whatsapp sync error'});
+            return;
+        }
+
         for (const group of groupCampaign.whatsapp.groups) {
             if (groups.filter(g => g.name === group).length === 0) {
                 callback({status: 'error', description: 'whatsapp group error'});
@@ -829,21 +843,13 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     schedule.update_status = false;
     Schedules.create(schedule);
 
+    let fileName = '';
+
     if (rows.length > 0) {
         if (setting.send_out_type === 'GOOGLE') {
             await upload_google_sheet_leads(rows, group, groupCampaign, campaign, setting, callback);
-
-            if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == true) {
-                await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
-            }
         } else {
-            const fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
-
-            if (process.env.ENVIRONMENT === 'production' && (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
-                setTimeout(async function() {
-                    await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
-                }, 3000);
-            }
+            fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
         }
     }
 
@@ -868,7 +874,19 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     // }
 
     Campaigns.findByIdAndUpdate(campaignId, campaign, function(err, c) {
-        Campaigns.findOne({_id: campaignId}, (err, updatedCampaign) => {
+        Campaigns.findOne({_id: campaignId}, async (err, updatedCampaign) => {
+            if (rows.length > 0) {
+                if (setting.send_out_type === 'GOOGLE') {
+                    if (process.env.ENVIRONMENT === 'production' && setting.whatsapp.global_send_status == true) {
+                        await send_whatsapp_message(group, groupCampaign, campaign, setting, callback);
+                    }
+                } else {
+                    if (process.env.ENVIRONMENT === 'production' && (setting.is_auto_whatsapp_sending_for_local_way == true && setting.whatsapp.global_send_status == true && groupCampaign.whatsapp.xls_send_status == true)) {
+                        await send_whatsapp_file(fileName, group, groupCampaign, campaign, setting, callback);
+                    }
+                }
+            }
+
             callback({status: 'success', campaign: updatedCampaign});
         });
     });
