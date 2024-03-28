@@ -19,6 +19,7 @@ let pstDate = current_date.toLocaleString("en-US", {
 });
 const weekDay = moment(pstDate).format('dddd');
 const currentDateTime = moment(pstDate).format("M/D/Y h:mm A");
+const currentDate = moment(pstDate).format('M/D/Y');
 
 const UploadCampaign = (props) => {
     const [loading, setLoading] = useState(false);
@@ -104,11 +105,11 @@ const UploadCampaign = (props) => {
             const runningUpload = function(index) {
                 if (index === runCampaignsByServer.length || runCampaignsByServer[index].campaigns.length === 0) return;
 
-                // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
-                //     issue_upload();
-                // } else {
-                upload(runCampaignsByServer[index], 0);
-                // }
+                if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) { 
+                    issue_upload();
+                } else {
+                    upload(runCampaignsByServer[index], 0);
+                }
                 
                 setTimeout(() => {
                     runningUpload(index + 1);
@@ -312,7 +313,7 @@ const UploadCampaign = (props) => {
         
         setTimeout(function() {
             setLoading(false);
-            const text = 'The Google Sheet data in your Vuex store is unsynchronized. This issue arises because your Vuex store contains a significant amount of information that relies on real-time access. To resolve this problem, it is recommended that you reduce the number of structures and the scale of your Vuex store. By doing so, you can ensure better synchronization and improve the overall performance of your application.';
+            const text = "An illegal attempt has been detected in your Google accounts to access Google Sheets. For now, access to Google Sheet using all Google accounts is blocked. If you are currently using the Google Cloud Console API, please upgrade your backend system to use the API of another external platform.";
             toastr.error(text);
             console.log(text);
             cancel();

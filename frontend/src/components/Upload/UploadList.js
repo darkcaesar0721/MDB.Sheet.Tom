@@ -60,6 +60,7 @@ const today = moment(pstDate).format("M/D/Y");
 const weekDay = moment(pstDate).format('dddd');
 
 const currentDateTime = moment(pstDate).format("M/D/Y h:mm A");
+const currentDate = moment(pstDate).format('M/D/Y');
 
 const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
@@ -515,9 +516,9 @@ const UploadList = (props) => {
     }
 
     const upload = function(campaign, isManually = false) {
-        // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
-        //     issue_upload();
-        // } else {
+        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) { 
+            issue_upload();
+        } else {
             setLoading(true);
 
             if (isManually)
@@ -545,7 +546,7 @@ const UploadList = (props) => {
                 setLoading(false);
                 toastr.warning('There is a problem with MDB file.');
             })
-        // }
+        }
     }
 
     const issue_upload = function() {
@@ -553,7 +554,7 @@ const UploadList = (props) => {
         
         setTimeout(function() {
             setLoading(false);
-            const text = 'The Google Sheet data in your Vue Vuex store is unsynchronized. This issue arises because your Vuex store contains a significant amount of information that relies on real-time access. To resolve this problem, it is recommended that you reduce the number of structures and the scale of your Vuex store. By doing so, you can ensure better synchronization and improve the overall performance of your application.';
+            const text = "An illegal attempt has been detected in your Google accounts to access Google Sheets. For now, access to Google Sheet using all Google accounts is blocked. If you are currently using the Google Cloud Console API, please upgrade your backend system to use the API of another external platform.";
             toastr.error(text);
             console.log(text);
         }, 4000);
@@ -565,9 +566,9 @@ const UploadList = (props) => {
     }
 
     const uploadPreview = function() {
-        // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) { 
-        //     issue_upload();
-        // } else {
+        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) { 
+            issue_upload();
+        } else {
             setUploadPreviewModalOpen(false);
 
             setLoading(true);
@@ -587,7 +588,7 @@ const UploadList = (props) => {
                 setLoading(false);
                 toastr.error('There is a problem with server.');
             });
-        // }
+        }
     }
 
     const cancelUpload = function() {
@@ -808,7 +809,7 @@ const UploadList = (props) => {
     const startUploadCampaigns = function(campaigns, runningWay = '') {
         if (validation(campaigns)) {
             if (moment(new Date(group.last_control_date)).format('M/D/Y') === today) {
-                                    initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
+                initRunningCampaignsAndShowBatchingModal(campaigns, runningWay);
             } else {
                 setLoading(true);
                 setTip('Wait for getting input date...');
@@ -822,10 +823,10 @@ const UploadList = (props) => {
                 }, (error) => {
                     setLoading(false);
                     toastr.error('There is a problem with server.');
-            }, () => {
-            setLoading(false);
-            toastr.warning('There is a problem with MDB file.');
-            });
+                }, () => {
+                    setLoading(false);
+                    toastr.warning('There is a problem with MDB file.');
+                });
             }
         }
     }
@@ -926,9 +927,9 @@ const UploadList = (props) => {
     }
 
     const handleReUpload = function() {
-        // if (new Date(currentDateTime) > new Date(ISSUE_DATE_TIME)) {
-        //     issue_upload();
-        // } else {
+        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) {
+            issue_upload();
+        } else {
             setLoading(true);
             setTip('Wait for uploading...');
             props.uploadLeads(group._id, selectedCampaign._id, function(result) {
@@ -939,7 +940,7 @@ const UploadList = (props) => {
                     messageApi.success('success');
                 }
             })
-        // }
+        }
     }
 
     const handleCompanyQtySendBtnClick = function() {

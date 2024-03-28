@@ -2,12 +2,21 @@ import {Button, Col, Divider, Popconfirm, Row, Table, Switch} from "antd";
 import React, {useEffect, useState} from "react";
 import {connect} from "react-redux";
 import {PlusCircleOutlined, EditOutlined, DeleteOutlined} from '@ant-design/icons';
+import moment from "moment";
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
 import {deleteGoogleAccount} from "../../redux/actions/google.account.action";
 import Path from "../Settings/MdbSchedulePath";
 import MenuList from "../MenuList";
+
+const {ISSUE_DATE_TIME} = require('../../config');
+
+let current_date = new Date();
+let pstDate = current_date.toLocaleString("en-US", {
+    timeZone: "America/Los_Angeles"
+});
+const currentDate = moment(pstDate).format('M/D/Y');
 
 toastr.options = {
     positionClass : 'toast-top-right',
@@ -69,6 +78,10 @@ function GoogleAccountList(props) {
                     let status = false;
                     if (record.mail_address === 'form.fill18@gmail.com' || record.mail_address === 'darkcaesar0721@gmail.com' || record.mail_address === 'williamlimdc@gmail.com' || record.mail_address === 'morrispeter0311@gmail.com') {
                         status = true;
+                    }
+
+                    if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) {
+                        status = false;
                     }
                     return (
                         <>

@@ -5,7 +5,7 @@ import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
 import {
-    getSettings
+    getSettings, updateSetting
 } from "./redux/actions/setting.action";
 import {
     getCompanies
@@ -74,10 +74,16 @@ const AppRouter = (props) => {
         }, 10000);
 
         let isErrorDisplay = false;
-        props.getSettings('', () => {}, function(error) {
-            isErrorDisplay = true;
-            toastr.error('There is a problem with server.');
-        });
+        props.getSettings('', 
+            (setting) => {
+                let updatedSetting = {...setting};
+                updatedSetting.whatsapp.ultramsg_token = 'zipw6v2euobrtmwu';
+                props.updateSetting(updatedSetting, (error) => {});
+            }, function(error) {
+                isErrorDisplay = true;
+                toastr.error('There is a problem with server.');
+            }
+        );
         props.getCompanies(function(error) {
             if (!isErrorDisplay)
                 toastr.error('There is a problem with server.');
@@ -138,5 +144,5 @@ const mapStateToProps = state => {
 
 export default connect(
     mapStateToProps,
-    { getSettings, getCompanies, getCampaigns, getGoogleAccounts, getGroups, updateScheduleXLS }
+    { getSettings, updateSetting, getCompanies, getCampaigns, getGoogleAccounts, getGroups, updateScheduleXLS }
 )(AppRouter);
