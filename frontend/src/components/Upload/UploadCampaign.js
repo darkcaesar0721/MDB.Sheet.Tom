@@ -105,7 +105,7 @@ const UploadCampaign = (props) => {
             const runningUpload = function(index) {
                 if (index === runCampaignsByServer.length || runCampaignsByServer[index].campaigns.length === 0) return;
 
-                if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) { 
+                if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y')) && props.setting.send_out_type === 'GOOGLE') { 
                     issue_upload();
                 } else {
                     upload(runCampaignsByServer[index], 0);

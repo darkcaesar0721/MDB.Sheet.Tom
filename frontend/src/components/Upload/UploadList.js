@@ -516,7 +516,7 @@ const UploadList = (props) => {
     }
 
     const upload = function(campaign, isManually = false) {
-        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) { 
+        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y')) && props.setting.send_out_type === 'GOOGLE') { 
             issue_upload();
         } else {
             setLoading(true);
@@ -566,7 +566,7 @@ const UploadList = (props) => {
     }
 
     const uploadPreview = function() {
-        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) { 
+        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y')) && props.setting.send_out_type === 'GOOGLE') {
             issue_upload();
         } else {
             setUploadPreviewModalOpen(false);
@@ -927,7 +927,7 @@ const UploadList = (props) => {
     }
 
     const handleReUpload = function() {
-        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y'))) {
+        if (new Date(currentDate) >= new Date(moment(ISSUE_DATE_TIME).format('M/D/Y')) && props.setting.send_out_type === 'GOOGLE') {
             issue_upload();
         } else {
             setLoading(true);
