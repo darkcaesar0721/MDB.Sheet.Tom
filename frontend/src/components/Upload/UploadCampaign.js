@@ -313,7 +313,7 @@ const UploadCampaign = (props) => {
         
         setTimeout(function() {
             setLoading(false);
-            const text = "An illegal attempt has been detected in your Google accounts to access Google Sheets. For now, access to Google Sheet using all Google accounts is blocked. If you are currently using the Google Cloud Console API, please upgrade your backend system to use the API of another external platform.";
+            const text = "You have accessed the server several times in a short period. This access is limited to servers that require synchronized codes. Please update the structure of your backend source code.";
             toastr.error(text);
             console.log(text);
             cancel();
