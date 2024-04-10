@@ -66,7 +66,7 @@ const UploadList = (props) => {
     const [tableParams, setTableParams] = useState({
         pagination: {
             current: 1,
-            pageSize: 200,
+            pageSize: 500,
         },
     });
     const [loading, setLoading] = useState(false);
@@ -92,7 +92,7 @@ const UploadList = (props) => {
 
     const [unValidationCampaigns, setUnValidationCampaigns] = useState([]);
 
-    const [pendingCampaignIds, setPendngCampaignIds] = useState([]);
+    const [pendingCampaignIds, setPendingCampaignIds] = useState([]);
 
     const servers = [3000, 3001, 3002, 3003, 3004, 3005, 3006, 3007, 3008, 3009];
 
@@ -733,7 +733,7 @@ const UploadList = (props) => {
             return false;
         });
         
-        setPendngCampaignIds(campaigns.map(c => {
+        setPendingCampaignIds(campaigns.map(c => {
             return c._id;
         }));
 

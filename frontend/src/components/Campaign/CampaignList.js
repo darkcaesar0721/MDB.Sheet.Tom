@@ -22,7 +22,7 @@ function CampaignList(props) {
     const [tableParams, setTableParams] = useState({
         pagination: {
             current: 1,
-            pageSize: 200,
+            pageSize: 500,
         },
     });
     const [columns, setColumns] = useState([]);
