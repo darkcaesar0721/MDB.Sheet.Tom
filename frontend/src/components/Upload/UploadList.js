@@ -159,7 +159,7 @@ const UploadList = (props) => {
     useEffect(function() {
         if (group.campaigns === undefined) return;
 
-        checkCampaignPauseStatus();
+        // checkCampaignPauseStatus();
 
         setTableParams({
             ...tableParams,
