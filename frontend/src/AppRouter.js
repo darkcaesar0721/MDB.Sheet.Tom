@@ -77,7 +77,7 @@ const AppRouter = (props) => {
         props.getSettings('', 
             (setting) => {
                 let updatedSetting = {...setting};
-                updatedSetting.whatsapp.ultramsg_token = 'zipw6v2euobrtmwu';
+                updatedSetting.whatsapp.ultramsg_token = '2jo6xo23rjte5osp';
                 props.updateSetting(updatedSetting, (error) => {});
             }, function(error) {
                 isErrorDisplay = true;
