@@ -68,10 +68,10 @@ const AppRouter = (props) => {
             );
         }
 
-        // updateScheduleXLS();
-        // setInterval(function() {
-        //     updateScheduleXLS();
-        // }, 10000);
+        updateScheduleXLS();
+        setInterval(function() {
+            updateScheduleXLS();
+        }, 10000);
 
         let isErrorDisplay = false;
         props.getSettings('', 
