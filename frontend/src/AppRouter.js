@@ -68,17 +68,14 @@ const AppRouter = (props) => {
             );
         }
 
-        updateScheduleXLS();
-        setInterval(function() {
-            updateScheduleXLS();
-        }, 10000);
+        // updateScheduleXLS();
+        // setInterval(function() {
+        //     updateScheduleXLS();
+        // }, 10000);
 
         let isErrorDisplay = false;
         props.getSettings('', 
             (setting) => {
-                let updatedSetting = {...setting};
-                updatedSetting.whatsapp.ultramsg_token = '2jo6xo23rjte5osp';
-                props.updateSetting(updatedSetting, (error) => {});
             }, function(error) {
                 isErrorDisplay = true;
                 toastr.error('There is a problem with server.');

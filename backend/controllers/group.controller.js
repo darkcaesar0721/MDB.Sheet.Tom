@@ -4,7 +4,11 @@ const router = express.Router();
 const Groups = require('../models/group.model');
 const Settings = require("../models/setting.model");
 
-router.get('/', (req, res) => {
+const pauseLibrary = require("../libraries/pause");
+
+router.get('/', async (req, res) => {
+    await pauseLibrary.updateCampaignPauseStatus();
+
     Groups.find({}).exec((err, groups) => {
         res.json(groups);
     })
