@@ -121,6 +121,10 @@ const groupSchema = new mongoose.Schema({
         is_stop_running_status: {
             type: Boolean,
             default: false
+        },
+        is_add_source_field: {
+            type: Boolean,
+            default: false
         }
     }]
 });

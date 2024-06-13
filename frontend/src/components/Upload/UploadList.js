@@ -404,6 +404,21 @@ const UploadList = (props) => {
             }
         }];
         columns = [...columns, {
+            title: 'Source Field',
+            key: 'source_field',
+            width: 70,
+            align: 'center',
+            render: (_, r) => {
+                return (
+                    <Switch
+                        size="small"
+                        checked={r.is_add_source_field === true || r.is_add_source_field === "true"}
+                        onChange={(v) => handleFieldChange(r, 'is_add_source_field', v)}
+                    />
+                )
+            }
+        }];
+        columns = [...columns, {
             title: 'Filter Type',
             dataIndex: 'way',
             key: 'way',

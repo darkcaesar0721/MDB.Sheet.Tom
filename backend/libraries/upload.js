@@ -17,6 +17,13 @@ const auth = new google.auth.GoogleAuth({
     scopes: "https://www.googleapis.com/auth/spreadsheets",
 });
 
+const LEAD_SOURCE = {
+    PLEADS: 2,
+    NETWORK: 3,
+    HA: 4,
+    Homeadvisor: 4
+}
+
 function getRandomInt(min, max) {
     min = Math.ceil(min);
     max = Math.floor(max);
@@ -110,6 +117,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                             row[column.mdb_name] = mdbRow[column.mdb_name];
                         }
 
+                        if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                            row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
+                        }
+
                         if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
 
                         rows.push(row);
@@ -123,6 +134,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         for (const column of groupCampaign.columns) {
                             if (column.is_display === false) continue;
                             row[column.mdb_name] = mdbRow[column.mdb_name];
+                        }
+
+                        if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                            row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
                         }
 
                         if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
@@ -140,6 +155,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                 row[column.mdb_name] = mdbRow[column.mdb_name];
                             }
 
+                            if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
+                            }
+
                             if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
 
                             rows.push(row);
@@ -154,6 +173,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                     for (const column of groupCampaign.columns) {
                                         if (column.is_display === false) continue;
                                         row[column.mdb_name] = mdbRow[column.mdb_name];
+                                    }
+
+                                    if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                        row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
                                     }
 
                                     if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
@@ -174,6 +197,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                 row[column.mdb_name] = mdbRow[column.mdb_name];
                             }
 
+                            if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
+                            }
+
                             if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
 
                             rows.push(row);
@@ -191,6 +218,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                     for (const column of groupCampaign.columns) {
                                         if (column.is_display === false) continue;
                                         row[column.mdb_name] = mdbRow[column.mdb_name];
+                                    }
+
+                                    if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                        row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
                                     }
 
                                     if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
@@ -216,6 +247,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                 row[column.mdb_name] = mdbRow[column.mdb_name];
                             }
 
+                            if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
+                            }
+
                             if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
 
                             rows.push(row);
@@ -239,6 +274,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                     row[column.mdb_name] = mdbRow[column.mdb_name];
                                 }
 
+                                if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                    row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
+                                }
+
                                 if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
 
                                 rows.push(row);
@@ -256,6 +295,10 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                                 for (const column of groupCampaign.columns) {
                                     if (column.is_display === false) continue;
                                     row[column.mdb_name] = mdbRow[column.mdb_name];
+                                }
+
+                                if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+                                    row['source'] = mdbRow['LEAD_SOURCE'] === undefined || mdbRow['LEAD_SOURCE'] === null ? '' : LEAD_SOURCE[mdbRow['LEAD_SOURCE']];
                                 }
 
                                 if (!checkDuplicatedLeadInfo(rows, row, groupCampaign.columns)) nScheduleCount++;
@@ -397,6 +440,11 @@ const upload_google_sheet_leads = async function(rows, group, groupCampaign, cam
 
             upload_row.push(column.sheet_name);
         }
+
+        if (groupCampaign.is_add_source_field === true || groupCampaign.is_add_source_field === 'true') {
+            upload_row.push('Source');
+        }
+
         upload_rows = [...upload_rows, upload_row];
         blank_rows = [...blank_rows, ['']];
 
