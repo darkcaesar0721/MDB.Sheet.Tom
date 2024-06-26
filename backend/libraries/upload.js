@@ -361,7 +361,7 @@ const uploadSheet = async function (groupId = "", campaignId = "", manually = fa
                         fileName = await download_local_file(rows, group, groupCampaign, campaign, setting, callback);
                     }
                 }
-                if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE') {
+                if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE' && campaign.qty_schedule !== 0) {
                     upload_schedule_status = await upload_schedule(group, campaign, setting, callback);
                 }
             }
@@ -930,7 +930,7 @@ const uploadPreviewSheet = async function (groupId = "", campaignId = "", callba
     campaign.last_upload_datetime = moment().format('M/D/Y hh:mm A');
 
     let upload_schedule_status = true;
-    if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE') {
+    if (process.env.ENVIRONMENT === 'production' && setting.send_out_type === 'GOOGLE' && campaign.qty_schedule !== 0) {
         upload_schedule_status = await upload_schedule(group, campaign, setting, callback);
     }
 
