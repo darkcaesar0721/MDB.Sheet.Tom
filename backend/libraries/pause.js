@@ -15,7 +15,7 @@ const updateCampaignPauseStatus = async function () {
 
             if (campaign.pause.status) {
                 if (campaign.pause.type === 'TOTALLY') {
-                    updatedCampaign = Object.assign(campaign, {color: 'purple', is_manually_upload: false});
+                    updatedCampaign = Object.assign(campaign, {color: 'red', is_manually_upload: false});
                 } else { //pause type is PERIOD
                     const startDate = new Date(moment(campaign.pause.period.start).format('M/D/Y'));
                     const endDate = new Date(moment(campaign.pause.period.end).format('M/D/Y'));

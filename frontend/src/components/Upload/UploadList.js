@@ -283,9 +283,9 @@ const UploadList = (props) => {
             }
         }];
         columns = [...columns, {
-            title: 'N G Y P Z',
+            title: 'N G Y P Z R',
             key: 'color',
-            width: 110,
+            width: 130,
             align: 'center',
             render: (_, r) => {
                 return (
@@ -295,6 +295,7 @@ const UploadList = (props) => {
                         <Radio.Button value="yellow">Y</Radio.Button>
                         <Radio.Button value="pink">P</Radio.Button>
                         <Radio.Button value="purple">Z</Radio.Button>
+                        <Radio.Button value="red">R</Radio.Button>
                     </Radio.Group>
                 )
             }
@@ -396,9 +397,7 @@ const UploadList = (props) => {
                 }
                 return (
                     <>
-                        {
-                            record.pause.status ? <span style={{color: 'red'}}>{str}</span> : <span>{str}</span>
-                        }
+                        <span>{str}</span>
                     </>
                 )
             }
