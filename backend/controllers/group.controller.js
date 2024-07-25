@@ -5,9 +5,11 @@ const Groups = require('../models/group.model');
 const Settings = require("../models/setting.model");
 
 const pauseLibrary = require("../libraries/pause");
+const phoneLibrary = require("../libraries/phone");
 
 router.get('/', async (req, res) => {
     await pauseLibrary.updateCampaignPauseStatus();
+    await phoneLibrary.addAnotherPhones();
 
     Groups.find({}).exec((err, groups) => {
         res.json(groups);
