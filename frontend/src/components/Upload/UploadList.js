@@ -285,7 +285,7 @@ const UploadList = (props) => {
         columns = [...columns, {
             title: 'N G Y P Z R',
             key: 'color',
-            width: 130,
+            width: 150,
             align: 'center',
             render: (_, r) => {
                 return (
@@ -415,6 +415,19 @@ const UploadList = (props) => {
                         onChange={(v) => handleFieldChange(r, 'is_add_source_field', v)}
                     />
                 )
+            }
+        }];
+        columns = [...columns, {
+            title: 'Extra Phone',
+            key: 'extra_phone',
+            width: 70,
+            align: 'center',
+            render: (_, r) => {
+                if (r.columns.filter(c => c.mdb_name === 'conCellPhone').length !== 0 && (r.columns.filter(c => c.mdb_name === 'conCellPhone')[0].is_display === true) || (r.columns.filter(c => c.mdb_name === 'conEveningPhone')[0].is_display === true)) {
+                    return (<span style={{color: 'red'}}>true</span>)
+                } else {
+                    return (<span>false</span>)
+                }
             }
         }];
         columns = [...columns, {

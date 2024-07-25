@@ -328,12 +328,27 @@ const GroupCampaignSetting = (props) => {
                 c.filter.date_old_day = !c.filter.date_old_day ? 0 : c.filter.date_old_day;
             }
 
-            if (c.pause.status && (c.pause.type === 'TOTALLY' || (c.pause.type === 'PERIOD' && new Date(moment(c.pause.period.start).format(dateFormat)) <= new Date(today) && new Date(moment(c.pause.period.end).format(dateFormat)) >= new Date(today) ))) {
-                c.previous_color = (c.color === 'purple' ? 'green' : c.color);
-                c.color = "purple";
-                c.is_manually_upload = false;
-            } else {
-                c.color = c.previous_color ? c.previous_color : c.color;
+            const today = new Date(moment().format("M/D/Y"));
+            if (c.pause.status) {
+                if (c.pause.type === 'TOTALLY') {
+                    c.color = "red";
+                    c.is_manually_upload = false;
+                } else { //pause type is PERIOD
+                    const startDate = new Date(moment(c.pause.period.start).format('M/D/Y'));
+                    const endDate = new Date(moment(c.pause.period.end).format('M/D/Y'));
+
+                    if (today < startDate) {
+                        c.color =  c.color !== 'purple' ? c.color : 'green';
+                        // c.is_manually_upload = true;
+                    } else if (startDate <= today && endDate >= today) {
+                        c.color =  'purple';
+                        c.is_manually_upload = false;
+                    } else {
+                        c.color =  'green';
+                        // c.is_manually_upload = true;
+                        c.pause = {status: false, type: 'TOTALLY'};
+                    }
+                }
             }
 
             props.updateCampaignSetting(Object.assign(props.campaign, c));

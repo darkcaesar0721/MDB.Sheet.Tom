@@ -21,11 +21,11 @@ const updateCampaignPauseStatus = async function () {
                     const endDate = new Date(moment(campaign.pause.period.end).format('M/D/Y'));
 
                     if (today < startDate) {
-                        updatedCampaign = Object.assign(campaign, {color: campaign.color !== 'purple' ? campaign.color : 'green', is_manually_upload: true});
+                        updatedCampaign = Object.assign(campaign, {color: campaign.color !== 'purple' ? campaign.color : 'green'});
                     } else if (startDate <= today && endDate >= today) {
                         updatedCampaign = Object.assign(campaign, {color: 'purple', is_manually_upload: false});
                     } else {
-                        updatedCampaign = Object.assign(campaign, {color: 'green', pause: {status: false, type: 'TOTALLY'}, is_manually_upload: true});
+                        updatedCampaign = Object.assign(campaign, {color: 'green', pause: {status: false, type: 'TOTALLY'}});
                     }
                 }
             }
