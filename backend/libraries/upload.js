@@ -20,6 +20,7 @@ const auth = new google.auth.GoogleAuth({
 const LEAD_SOURCE = {
     PLEADS: 2,
     NETWORK: 3,
+    HA: 4,
     HAP: 4,
     HAO: 5,
     TT: 6,
