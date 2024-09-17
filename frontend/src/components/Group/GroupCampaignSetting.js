@@ -329,6 +329,7 @@ const GroupCampaignSetting = (props) => {
             }
 
             const today = new Date(moment().format("M/D/Y"));
+            console.log(c.pause);
             if (c.pause.status) {
                 if (c.pause.type === 'TOTALLY') {
                     c.color = "red";
@@ -349,6 +350,9 @@ const GroupCampaignSetting = (props) => {
                         c.pause = {status: false, type: 'TOTALLY'};
                     }
                 }
+            } else {
+                c.pause = {status: false, type: 'TOTALLY'};
+                c.color = 'green';
             }
 
             props.updateCampaignSetting(Object.assign(props.campaign, c));

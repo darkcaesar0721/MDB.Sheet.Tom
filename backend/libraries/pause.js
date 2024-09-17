@@ -28,6 +28,8 @@ const updateCampaignPauseStatus = async function () {
                         updatedCampaign = Object.assign(campaign, {color: 'green', pause: {status: false, type: 'TOTALLY'}});
                     }
                 }
+            } else {
+                updatedCampaign = Object.assign(campaign, {color: 'green', pause: {status: false, type: 'TOTALLY'}});
             }
             updatedCampaigns = [...updatedCampaigns, updatedCampaign];
         }
