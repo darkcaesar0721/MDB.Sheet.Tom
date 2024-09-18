@@ -11,7 +11,6 @@ const updateCampaignPauseStatus = async function () {
         let updatedCampaigns = [];
         for (const campaign of campaigns) {
             let updatedCampaign = {...campaign};
-            // console.log(updatedCampaign);
 
             if (campaign.pause.status) {
                 if (campaign.pause.type === 'TOTALLY') {
@@ -28,8 +27,6 @@ const updateCampaignPauseStatus = async function () {
                         updatedCampaign = Object.assign(campaign, {color: 'green', pause: {status: false, type: 'TOTALLY'}});
                     }
                 }
-            } else {
-                updatedCampaign = Object.assign(campaign, {color: 'green', pause: {status: false, type: 'TOTALLY'}});
             }
             updatedCampaigns = [...updatedCampaigns, updatedCampaign];
         }
